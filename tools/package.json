@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "description": "Date checks for the House SOPs page",
+  "scripts": {
+    "check": "TZ=Europe/London node check.js"
+  },
+  "dependencies": {
+    "jsdom": "24.1.3"
+  }
+}
