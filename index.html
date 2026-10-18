@@ -1,0 +1,1250 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>House SOPs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one narrow column. Name picker and this-week box on top, then collapsible SOP cards by cadence. */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --fg: #1c201e;
+  --muted: #59615d;
+  --line: #d5dbd7;
+  --accent: #23695b;
+  --accent-soft: #e0eee9;
+  --done: #2c7a3f;
+  --warn: #8a4b00;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121514;
+    --surface: #1a1e1c;
+    --fg: #e5e9e7;
+    --muted: #a0aaa5;
+    --line: #2c3330;
+    --accent: #6cc2ad;
+    --accent-soft: #1d3530;
+    --done: #79c98b;
+    --warn: #e6a95a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121514;
+  --surface: #1a1e1c;
+  --fg: #e5e9e7;
+  --muted: #a0aaa5;
+  --line: #2c3330;
+  --accent: #6cc2ad;
+  --accent-soft: #1d3530;
+  --done: #79c98b;
+  --warn: #e6a95a;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 var(--font);
+  max-width: 42rem;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 8px 48px;
+}
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 16px 0 4px; }
+h2 { font-size: 1.25rem; line-height: 1.3; margin: 32px 0 6px; text-wrap: balance; }
+h3 { font-size: 1.05rem; margin: 20px 0 6px; }
+p { margin: 0 0 8px; }
+a { color: var(--accent); }
+.lede, .intro, .when, .next, .note { color: var(--muted); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.who { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.who button {
+  font: inherit; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+}
+.who button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+
+.week { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 4px 14px 10px; }
+.week h2 { margin-top: 10px; }
+.zones { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; margin: 4px 0 8px; }
+.zones div { display: contents; }
+.zones dt { color: var(--muted); }
+.zones dd { margin: 0; font-weight: 600; }
+.today, .you { border-top: 1px solid var(--line); padding-top: 8px; }
+
+.jump { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 16px 0 0; }
+
+.sop { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); margin: 8px 0; }
+.sop > summary {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
+  padding: 12px 14px; cursor: pointer; list-style: none;
+}
+.sop > summary::-webkit-details-marker { display: none; }
+.sop > summary::before { content: "▸"; color: var(--muted); display: inline-block; transition: transform 0.15s; }
+.sop[open] > summary::before { transform: rotate(90deg); }
+.sop .t { font-weight: 600; flex: 1 1 10rem; min-width: 0; }
+.sop .m { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: baseline; color: var(--muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.sop.done .t::before { content: "✓ "; color: var(--done); }
+.sop.done .p { color: var(--done); font-weight: 600; }
+.sop .body { padding: 0 14px 12px; }
+.tag { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 1px 8px; font-size: 0.8125rem; font-weight: 600; }
+
+ol.steps { list-style: none; padding: 0; margin: 8px 0 10px; display: grid; gap: 8px; }
+ol.steps li { display: flex; gap: 10px; align-items: flex-start; }
+ol.steps input { width: 1.25rem; height: 1.25rem; margin: 2px 0 0; flex: none; accent-color: var(--accent); }
+ol.steps label { flex: 1; min-width: 0; cursor: pointer; }
+ol.steps input:checked + label { color: var(--muted); text-decoration: line-through; }
+.sub { margin: 14px 0 0; font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.warn { color: var(--warn); font-size: 0.9375rem; }
+.dw { border-top: 1px solid var(--line); padding-top: 8px; margin: 10px 0 0; }
+
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.plan summary { cursor: pointer; color: var(--accent); margin: 4px 0; }
+.plan tr.now { background: var(--accent-soft); }
+.plan table { font-size: 0.875rem; }
+table.guide { font-size: 0.9375rem; margin: 4px 0 8px; }
+table.guide th { font-weight: 400; color: var(--muted); }
+table.guide td { font-weight: 600; }
+table.skills td:not(:first-child), table.skills thead th:not(:first-child) { text-align: center; width: 3.6rem; }
+table.skills thead th { font-size: 0.8125rem; color: var(--muted); }
+table.skills tr.grp th { padding-top: 16px; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent); }
+.leo { font-size: 0.75rem; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+.rules li, .stages li, .safety li { margin-bottom: 6px; }
+@media (prefers-reduced-motion: reduce) { .sop > summary::before { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>House SOPs</h1>
+  <p class="lede">How we run the house. Pick your name to see your jobs, then tick each one off as you go. New here? Read <a href="#how">How it works</a> first.</p>
+  <div class="who" id="who" role="group" aria-label="Show jobs for"></div>
+</header>
+
+<section class="week" id="week" aria-labelledby="week-h">
+  <h2 id="week-h">This week</h2>
+  <div id="week-body"><noscript><p>The rota needs JavaScript switched on. The SOPs below still work as lists.</p></noscript></div>
+  <details class="plan" id="plan">
+    <summary>Dinners, laundry, and extras by day</summary>
+    <div class="tw">
+      <table>
+        <thead><tr><th scope="col">Day</th><th scope="col">Dinner</th><th scope="col">Laundry</th><th scope="col">Also</th></tr></thead>
+        <tbody id="plan-body"></tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<nav class="jump" aria-label="Sections">
+  <a href="#daily">Daily</a>
+  <a href="#weekly">Weekly</a>
+  <a href="#monthly">Monthly</a>
+  <a href="#quarterly">Quarterly</a>
+  <a href="#skills">Skills</a>
+  <a href="#how">How it works</a>
+</nav>
+
+<!-- ============ DAILY ============ -->
+<section class="cadence" id="daily">
+  <h2>Daily</h2>
+
+  <details class="sop" id="morning" data-who="all" data-period="d" data-time="10 min">
+    <summary>Your morning</summary>
+    <div class="body">
+      <p class="when">Before you leave the house.</p>
+      <ol class="steps">
+        <li>Bed made.</li>
+        <li>Pyjamas folded or hung up.</li>
+        <li>Yesterday's clothes in your wash basket or put away.</li>
+        <li>Window open while you get ready, shut before you go.</li>
+        <li>Breakfast things, and any cups or plates from your room, in the dishwasher.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> bed made, floor clear, window shut, and no dishes in your room.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="evening" data-who="all" data-period="d" data-time="10 min">
+    <summary>Your evening</summary>
+    <div class="body">
+      <p class="when">Before bed.</p>
+      <ol class="steps">
+        <li>Your things off the coffee table and sofas.</li>
+        <li>Shoes and coat in their place in the living room.</li>
+        <li>Bag, clothes, and charger upstairs.</li>
+        <li>Cups and plates in the dishwasher.</li>
+        <li>Phone charging on a hard surface, not on the bed.</li>
+        <li>Last one up: candles out.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> nothing of yours left downstairs, no dishes upstairs, and candles out.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="shower" data-who="all" data-period="d" data-time="5 min">
+    <summary>After every shower</summary>
+    <div class="body">
+      <p class="when">Downstairs shower, every time.</p>
+      <ol class="steps">
+        <li>Glass and walls squeegeed.</li>
+        <li>Leave-on shower spray on.</li>
+        <li>Hair out of the plughole.</li>
+        <li>Towel on the rail or your hook.</li>
+        <li>Bath mat on the lower radiator rung.</li>
+        <li>Fan on or window open.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> glass squeegeed and sprayed, plughole clear, and towel and mat hung up.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dishwasher" data-who="zone:kitchen" data-rota="today" data-period="d" data-time="10 min">
+    <summary>Dishwasher</summary>
+    <div class="body">
+      <p class="when">Every morning, before you leave.</p>
+      <ol class="steps">
+        <li>Dishwasher emptied and everything put away.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the dishwasher is empty and ready for the day's dishes.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dinner" data-who="aurora eshaal" data-period="d" data-days="1 2 3 4 5" data-time="2 hours">
+    <summary>Weekday dinner</summary>
+    <div class="body">
+      <p class="when">Monday to Friday, together. Dinner at 7pm.</p>
+      <p class="sub">Before you start</p>
+      <ol class="steps">
+        <li>Tonight's meal and who does what agreed.</li>
+        <li>Dishwasher empty, sink empty, and worktops clear.</li>
+        <li>Mise en place: every ingredient prepped, and every pan and tool out, before the heat goes on.</li>
+      </ol>
+      <p class="sub">On time</p>
+      <ol class="steps">
+        <li>Started at the time that gets dinner out at 7pm.</li>
+        <li>Everyone told 10 minutes before.</li>
+        <li>Dinner on the table at 7pm.</li>
+      </ol>
+      <p class="sub">Clean-up</p>
+      <ol class="steps">
+        <li>Table cleared.</li>
+        <li>Food scraps in the kitchen bin.</li>
+        <li>Dishwasher loaded and on.</li>
+        <li>Pans, utensils, and anything that can't go in the dishwasher washed, dried, and put away.</li>
+        <li>Leftovers boxed and in the fridge.</li>
+        <li>Hob, worktops, and table wiped.</li>
+        <li>Sink empty and wiped.</li>
+        <li>Kitchen bin full? Out to the outside bin, and a new bag in.</li>
+        <li>Kitchen floor swept.</li>
+        <li>Hob and oven off.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> dinner went out on time, the kitchen is back to clear, and the dishwasher is running.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="weekend-cleanup" data-who="zone:kitchen" data-period="d" data-days="0 6" data-time="40 min">
+    <summary>Weekend clean-up</summary>
+    <div class="body">
+      <p class="when">After a Saturday takeaway and Sunday lunch.</p>
+      <ol class="steps">
+        <li>Table cleared.</li>
+        <li>Food scraps in the kitchen bin.</li>
+        <li>Dishwasher loaded and on.</li>
+        <li>Pans and anything that can't go in the dishwasher washed, dried, and put away.</li>
+        <li>Leftovers boxed and in the fridge.</li>
+        <li>Hob, worktops, and table wiped.</li>
+        <li>Sink empty and wiped.</li>
+        <li>Kitchen bin full? Out to the outside bin, and a new bag in.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the kitchen is back to clear and the dishwasher is running.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="floors-daily" data-who="leo" data-period="d" data-days="0 6" data-time="10 min">
+    <summary>Kitchen floor</summary>
+    <div class="body">
+      <p class="when">After Saturday's takeaway and Sunday lunch, once the clean-up is done.</p>
+      <ol class="steps">
+        <li>Kitchen floor swept.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> no crumbs on the kitchen floor.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bath-daily" data-who="zone:bathrooms" data-rota="today" data-period="d" data-time="10 min">
+    <summary>Bathrooms check</summary>
+    <div class="body">
+      <p class="when">Evening, by 9pm.</p>
+      <ol class="steps">
+        <li>Downstairs sink and taps wiped with a J-cloth.</li>
+        <li>Downstairs toilet brushed, then the seat and handle wiped with a used J-cloth. Bin the cloth.</li>
+        <li>Towels hung up, and the bath mat on the lower radiator rung.</li>
+        <li>Upstairs toilet and sink: the same.</li>
+        <li>A spare loo roll and soap in both bathrooms.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> both sinks wiped, both toilets brushed, and a spare loo roll in each.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="living-daily" data-who="zone:living" data-rota="today" data-period="d" data-time="15 min">
+    <summary>Living room reset</summary>
+    <div class="body">
+      <p class="when">Evening, by 9pm.</p>
+      <ol class="steps">
+        <li>Coffee table clear, apart from a neat stack of books for Dad.</li>
+        <li>Sofas clear.</li>
+        <li>Books back on their shelves. Not sure where one goes? On the stack for Dad.</li>
+        <li>Cushions and throws straight, and remotes back.</li>
+        <li>Cups and plates in the dishwasher.</li>
+        <li>Shoes and coats tidy in their place.</li>
+        <li>Post from the porch to Dad.</li>
+        <li>Stairs clear.</li>
+        <li>Candles out, unless someone's still in the room.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> coffee table and sofas clear, and nothing on the stairs.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dad-daily" data-who="dad" data-period="d" data-time="10 min">
+    <summary>Dad</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Post dealt with.</li>
+        <li>Last thing: doors locked and downstairs windows shut.</li>
+        <li>Candles out.</li>
+        <li>Hob and oven off.</li>
+      </ol>
+      <p class="note">Stage 1 only: one reminder per person per job. After that, leave it.</p>
+      <p class="dw"><b>Done when:</b> post dealt with, house locked, and candles out.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============ WEEKLY ============ -->
+<section class="cadence" id="weekly">
+  <h2>Weekly</h2>
+  <p class="intro">Saturday reset: everyone at the same time, done by midday. Dad works alongside. The other weekly jobs have their own day.</p>
+
+  <details class="sop" id="room-weekly" data-who="all" data-period="w" data-sat data-time="40 min">
+    <summary>Your bedroom</summary>
+    <div class="body">
+      <p class="when">Saturday reset.</p>
+      <ol class="steps">
+        <li>Bed stripped and bedding in the wash (Bedding programme).</li>
+        <li>Surfaces dusted with the small duster.</li>
+        <li>Floor hoovered, under the bed too.</li>
+        <li>Bin emptied.</li>
+        <li>Cups, plates, and food out.</li>
+        <li>Clean clothes put away.</li>
+        <li>Bed made with clean bedding.</li>
+      </ol>
+      <p class="note" data-who="aurora eshaal">Aurora and Eshaal: each of you does your own bunk and your own things. For the floor and shared surfaces, one hoovers and one dusts, and you swap each week.</p>
+      <p class="dw"><b>Done when:</b> clean bedding on, floor hoovered, surfaces dusted, and bin empty.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="kitchen-weekly" data-who="zone:kitchen" data-period="w" data-sat data-time="40 min">
+    <summary>Kitchen</summary>
+    <div class="body">
+      <p class="when">Saturday reset. Leo does the floor.</p>
+      <ol class="steps">
+        <li>Fridge: anything out of date binned, and the shelves, drawers, and door seal wiped.</li>
+        <li>Microwave cleaned inside.</li>
+        <li>Hob cleaned properly.</li>
+        <li>Cupboard doors, handles, fridge door, and light switches wiped.</li>
+        <li>Toaster crumb tray emptied, and the toaster and kettle wiped.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> nothing out of date in the fridge, and the microwave and hob clean.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bath-weekly" data-who="zone:bathrooms" data-period="w" data-sat data-time="45 min">
+    <summary>Bathrooms</summary>
+    <div class="body">
+      <p class="when">Saturday reset. Leo does the floors. On the first Saturday of the month, Dad does this one and you do the monthly bathroom list.</p>
+      <p class="sub">Downstairs</p>
+      <ol class="steps">
+        <li>Toilet cleaned inside and out, the outside with a used J-cloth. Bin the cloth.</li>
+        <li>Shower cubicle cleaned: glass, walls, and tray.</li>
+        <li>Sink and taps cleaned.</li>
+        <li>Mirror cleaned.</li>
+        <li>Bin emptied, a fresh hand towel out, and loo roll and soap stocked.</li>
+      </ol>
+      <p class="sub">Upstairs</p>
+      <ol class="steps">
+        <li>Toilet and sink cleaned.</li>
+        <li>Bin emptied.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> both toilets and sinks clean, the downstairs shower clean, and both bins empty.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="living-weekly" data-who="zone:living" data-period="w" data-sat data-time="25 min">
+    <summary>Living &amp; outside</summary>
+    <div class="body">
+      <p class="when">Saturday reset. Leo does the dusting.</p>
+      <ol class="steps">
+        <li>Living room hoovered, under the sofa cushions too.</li>
+        <li>Front garden: litter picked up.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> living room hoovered, and no litter out the front.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="stairs" data-who="zone:living zone:kitchen" data-period="w" data-sat data-time="20 min">
+    <summary>Stairs and landing</summary>
+    <div class="body">
+      <p class="when">Saturday reset, two of you. Living &amp; outside hoovers; Kitchen holds the unit.</p>
+      <ol class="steps">
+        <li>Stairs hoovered.</li>
+        <li>Landing hoovered.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> stairs and landing hoovered.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="floors-weekly" data-who="leo" data-period="w" data-sat data-time="50 min">
+    <summary>Floors</summary>
+    <div class="body">
+      <p class="when">Saturday reset, once the others have finished in each room.</p>
+      <ol class="steps">
+        <li>Kitchen swept and mopped.</li>
+        <li>Downstairs bathroom swept and mopped.</li>
+        <li>Upstairs bathroom swept and mopped.</li>
+        <li>Porch swept, and the doormat shaken.</li>
+        <li>Front path swept. From October to December, the leaves too.</li>
+        <li>Mop rinsed and left to dry.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the kitchen and both bathroom floors mopped, and the porch and path swept.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dusting-weekly" data-who="leo" data-period="w" data-sat data-time="40 min">
+    <summary>Dusting</summary>
+    <div class="body">
+      <p class="when">Saturday reset.</p>
+      <ol class="steps">
+        <li>Living room dusted: surfaces, TV stand, and window sills.</li>
+        <li>Library dusted, and the books upright with nothing leaning.</li>
+        <li>Landing dusted.</li>
+        <li>Cobwebs and high corners done.</li>
+        <li>Both dusters cleaned.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the living room, library, and landing dusted, and both dusters clean.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="shirts" data-who="leo" data-period="w" data-sat data-time="35 min hands-on">
+    <summary>Your shirts</summary>
+    <div class="body">
+      <p class="when">Saturday, first wash of the day.</p>
+      <ol class="steps">
+        <li>Shirts washed: Synthetics, 40°C, Easy Iron on.</li>
+        <li>Shirts dried.</li>
+        <li>Shirts ironed and hung up.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> a week of shirts ironed and hung up.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bins" data-who="zone:living" data-rota="weekday" data-period="w" data-time="10 min">
+    <summary>Bins</summary>
+    <div class="body">
+      <p class="when">The evening before collection, usually Tuesday. This week says which bin.</p>
+      <ol class="steps">
+        <li>The right bin out at the kerb: grey or red.</li>
+        <li>Lid shut.</li>
+        <li>Bin back in after collection.</li>
+      </ol>
+      <p class="note">Collection is Wednesday, with grey and red on alternate weeks. Christmas and bank holidays can move it; This week already allows for Christmas 2026.</p>
+      <p class="dw"><b>Done when:</b> the right bin out the night before, and back in after collection.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="laundry" data-who="all" data-period="w" data-time="30 min hands-on">
+    <summary>Your laundry</summary>
+    <div class="body">
+      <p class="when">Your laundry day (see This week).</p>
+      <ol class="steps">
+        <li>Pockets checked.</li>
+        <li>Sorted into darks and lights.</li>
+        <li>The right programme for the load (below).</li>
+        <li>Out of the machine within 30 minutes of finishing.</li>
+        <li>Dried on the airer, not on radiators. More than the airer takes? The extra racks, with the dehumidifier on its laundry setting.</li>
+        <li>Folded and put away the same day, and the airer left clear.</li>
+      </ol>
+      <div class="tw">
+        <table class="guide">
+          <tbody>
+            <tr><th scope="row">Everyday clothes</th><td>Daily Wash</td></tr>
+            <tr><th scope="row">Cottons</th><td>Cotton, 40°C</td></tr>
+            <tr><th scope="row">Darks</th><td>Dark Garment</td></tr>
+            <tr><th scope="row">Jeans</th><td>Denim</td></tr>
+            <tr><th scope="row">Gym kit and synthetics</th><td>Synthetics, 40°C</td></tr>
+            <tr><th scope="row">Shirts</th><td>Synthetics, 40°C, Easy Iron on</td></tr>
+            <tr><th scope="row">Wool and delicates</th><td>Wool</td></tr>
+            <tr><th scope="row">Coats and outdoor kit</th><td>Outdoor Care</td></tr>
+            <tr><th scope="row">Stained things</th><td>Stain Away</td></tr>
+            <tr><th scope="row">Towels and bath mats</th><td>Cotton, 60°C</td></tr>
+            <tr><th scope="row">Bedding</th><td>Bedding</td></tr>
+            <tr><th scope="row">Small, lightly worn load</th><td>15' Quick Wash</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="dw"><b>Done when:</b> machine empty, airer clear, and your clothes put away.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="household-wash" data-who="zone:bathrooms" data-rota="weekday" data-period="w" data-time="20 min">
+    <summary>Household wash</summary>
+    <div class="body">
+      <p class="when">Friday.</p>
+      <ol class="steps">
+        <li>Towels, tea towels, and bath mats collected.</li>
+        <li>Washed on Cotton, 60°C.</li>
+        <li>Dried on the airer, or on the extra racks with the dehumidifier on its laundry setting if it's a big load.</li>
+        <li>Folded and back where they live.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> clean towels and tea towels back in place.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dinner-plan" data-who="aurora eshaal" data-period="w" data-time="30 min">
+    <summary>Next week's dinners</summary>
+    <div class="body">
+      <p class="when">Friday, before the shop.</p>
+      <ol class="steps">
+        <li>Five dinners agreed.</li>
+        <li>Their ingredients on the shopping list.</li>
+        <li data-who="aurora">Meal plan written up on the fridge.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> next week's dinners agreed, on the shopping list, and on the fridge.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="shop" data-who="aurora dad" data-period="w" data-time="1 hour">
+    <summary>Weekly shop</summary>
+    <div class="body">
+      <p class="when">Friday. Aurora and Dad.</p>
+      <ol class="steps">
+        <li>Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
+        <li>Next week's dinner ingredients added.</li>
+        <li>Dad: order approved and paid.</li>
+        <li>Shopping put away, fridge and freezer things first and new behind old.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> staples and next week's dinners covered, and everything put away.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dad-weekly" data-who="dad" data-period="w" data-sat data-time="3 hours">
+    <summary>Dad</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Saturday reset: your own room. Thursday is your laundry day.</li>
+        <li>Stage 1 only: a walk round with each zone owner after the reset, checking against "Done when".</li>
+        <li>One skills session: one skill, one learner, 30 minutes. Eshaal first.</li>
+        <li>Friday's shop with Aurora: order approved and paid.</li>
+        <li>Sunday lunch.</li>
+        <li>Bins washed, if they need it.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> skills session done, the shop paid for, and Sunday lunch on the table.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============ MONTHLY ============ -->
+<section class="cadence" id="monthly">
+  <h2>Monthly</h2>
+  <p class="intro">First Saturday of the month, added to the reset. That day Dad does the weekly bathroom clean, and whoever has Bathrooms does the monthly bathroom list.</p>
+
+  <details class="sop" id="kitchen-monthly" data-who="zone:kitchen" data-period="m" data-time="50 min">
+    <summary>Kitchen</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Kettle descaled.</li>
+        <li>Washing machine: door seal wiped, detergent drawer cleaned, and Eco Drum Clean run.</li>
+        <li>Dishwasher: filter cleaned, and salt and rinse aid topped up.</li>
+        <li>One cupboard emptied, wiped, and its dates checked. Next month, the next one.</li>
+        <li>Freezer contents listed for whoever plans next week's dinners.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> kettle clear, both machines done, one cupboard done, and the freezer list written.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bath-monthly" data-who="zone:bathrooms" data-period="m" data-time="35 min">
+    <summary>Bathrooms</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Downstairs shower head descaled.</li>
+        <li>Taps descaled.</li>
+        <li>Behind and under both toilets wiped: pipes and skirting.</li>
+        <li>Stocks checked: loo roll, soap, toothpaste, and cleaning products. Anything low? Tell Aurora before Friday.</li>
+      </ol>
+      <p class="warn"><b>Careful:</b> limescale remover and bleach must never meet.</p>
+      <p class="dw"><b>Done when:</b> shower head and taps clear, and stocks checked.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="living-monthly" data-who="zone:living" data-period="m" data-time="45 min">
+    <summary>Living &amp; outside</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Every smoke alarm and the carbon monoxide alarm tested. Any silent? Tell Dad today.</li>
+        <li>Skirting boards, door frames, light switches, and door handles wiped, downstairs and on the landing.</li>
+        <li>Under and behind the sofa hoovered.</li>
+        <li>Inside of the downstairs windows and the porch glass cleaned.</li>
+        <li>Hoover emptied, its filter cleaned, and the hair cut off the brush.</li>
+        <li>Front garden weeded, and anything over the path cut back.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> alarms tested, skirting wiped, and the front path clear.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="room-monthly" data-who="all" data-period="m" data-time="30 min">
+    <summary>Your bedroom</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Under the bed: everything out, hoovered, and only what belongs there back.</li>
+        <li>One bag out: charity, recycling, or bin.</li>
+        <li>Window cleaned inside.</li>
+        <li>Door, handle, and light switch wiped.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> under the bed hoovered, one bag out, and the window clean.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dusting-monthly" data-who="leo" data-period="m" data-time="30 min">
+    <summary>Dusting</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Tops of the books and the shelves dusted.</li>
+        <li>Lampshades and light fittings dusted.</li>
+        <li>Bathroom fan grilles dusted.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> book tops, shelves, lights, and fan grilles free of dust.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dad-monthly" data-who="dad" data-period="m" data-time="2 hours">
+    <summary>Dad</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>First Saturday: the weekly bathroom clean, alongside whoever has Bathrooms.</li>
+        <li>Mould check: bedroom windows, bathroom seals, and behind bookcases on outside walls.</li>
+        <li>Bills checked.</li>
+        <li>Skills progress checked against each person's pace.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> bathroom done, mould checked, and bills checked.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============ QUARTERLY ============ -->
+<section class="cadence" id="quarterly">
+  <h2>Quarterly</h2>
+  <p class="intro">Second Saturday of January, April, July, and October, so it never lands on top of the monthly list. About 2½ hours, everyone together, Dad included.</p>
+
+  <details class="sop" id="kitchen-q" data-who="zone:kitchen" data-period="q" data-time="75 min">
+    <summary>Kitchen</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Oven and racks cleaned, with Dad.</li>
+        <li>Washing machine filter cleared.</li>
+        <li>Fridge emptied and cleaned inside.</li>
+        <li>Freezer defrosted if the ice is thick, with Dad.</li>
+        <li>Walls and splashbacks behind the hob and sink wiped.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> oven clean, machine filter clear, and fridge clean.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bath-q" data-who="zone:bathrooms" data-period="q" data-time="50 min">
+    <summary>Bathrooms</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Downstairs shower grout scrubbed.</li>
+        <li>Downstairs shower drain cleared of hair.</li>
+        <li>Downstairs tiles and walls wiped.</li>
+        <li>Cisterns, pipes, and both sides of the bathroom doors wiped.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> grout clean, drain clear, and walls wiped.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="living-q" data-who="zone:living" data-period="q" data-time="60 min">
+    <summary>Living &amp; outside</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Cushion covers and throws washed.</li>
+        <li>Doors downstairs and on the landing wiped, both sides.</li>
+        <li>Front door and porch glass washed outside.</li>
+        <li>Curtains or blinds hoovered or washed.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> covers washed, doors wiped, and curtains done.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="room-q" data-who="all" data-period="q" data-time="40 min">
+    <summary>Your bedroom</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Mattress turned head to foot.</li>
+        <li>Pillows and mattress protector washed.</li>
+        <li>Clothes that don't fit, or weren't worn this season, bagged for charity.</li>
+        <li>Drawers and wardrobe wiped inside.</li>
+        <li data-who="aurora eshaal">Bunk bed bolts, ladder, and guard rail checked. Anything loose? Tell Dad, and nobody sleeps on top until it's fixed.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> mattress turned, pillows washed, and the bunk checked.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dusting-q" data-who="leo" data-period="q" data-time="30 min">
+    <summary>Dusting</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Radiators dusted, behind and between the fins.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> every radiator free of dust.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dad-q" data-who="dad" data-period="q" data-time="2 hours">
+    <summary>Dad</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Session run, with a zone job of your own.</li>
+        <li>Trip switch (RCD) tested and reset, with one of the girls watching.</li>
+        <li>Fire plan walked through with everyone.</li>
+        <li>First aid kit and medicines checked and restocked.</li>
+        <li>Zones, dinners, SOPs, skills, and budget reviewed with everyone.</li>
+        <li>Stage moves agreed.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> trip switch tested, fire plan walked through, and SOPs reviewed.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="q-jan" data-who="all" data-period="q" data-quarter="1" data-time="40 min">
+    <summary>January extras</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Decorations away, and the boxes and wrapping recycled.</li>
+        <li data-who="dad">Renewal dates for home insurance, energy, broadband, and phones in the calendar.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="sop" id="q-apr" data-who="all" data-period="q" data-quarter="2" data-time="60 min">
+    <summary>April extras</summary>
+    <div class="body">
+      <ol class="steps">
+        <li data-who="zone:living">Front garden spring tidy: weeded and cut back.</li>
+        <li data-who="leo">Front garden swept after the tidy.</li>
+        <li data-who="zone:kitchen">Outside of the ground-floor windows cleaned, where you can reach from the ground.</li>
+        <li>Winter coat washed or cleaned, and put away.</li>
+        <li>Duvet washed, at the launderette if it won't fit the machine.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="sop" id="q-jul" data-who="all" data-period="q" data-quarter="3" data-time="40 min">
+    <summary>July extras</summary>
+    <div class="body">
+      <ol class="steps">
+        <li data-who="dad">Boiler service booked for September or October.</li>
+        <li data-who="zone:living">Summer growth in the front garden cut back.</li>
+        <li data-who="zone:kitchen">Freezer defrosted, if it needs it.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details class="sop" id="q-oct" data-who="all" data-period="q" data-quarter="4" data-time="60 min">
+    <summary>October extras</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>With Dad: every radiator bled.</li>
+        <li>With Dad: boiler pressure checked, and topped up if it's low.</li>
+        <li>Heating on, and every radiator warm all over.</li>
+        <li>Duvet washed, at the launderette if it won't fit the machine.</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills">
+  <h2>Skills</h2>
+  <p class="intro">What you need to run your own home. Each skill gets three ticks: shown, done with help, and done alone. Anyone who's done a skill alone can teach it.</p>
+  <p><b>Pace.</b> Aurora: all of them by your 18th birthday. Eshaal: two a week, starting with Food and Money. Leo: the ones marked Leo, for now.</p>
+  <p id="skills-sum" class="note"></p>
+  <div class="tw">
+    <table class="skills" id="skills-table">
+      <thead><tr><th scope="col">Skill</th><th scope="col">Shown</th><th scope="col">With help</th><th scope="col">Alone</th></tr></thead>
+      <tbody>
+        <tr class="grp"><th colspan="4" scope="colgroup">Cleaning</th></tr>
+        <tr data-skill="1"><td>Close down a kitchen after a meal. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="2"><td>Clean a toilet properly, top to bottom. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="3"><td>Clean a shower and keep limescale off it. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="4"><td>Clean an oven.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="5"><td>Defrost a freezer.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="6"><td>Treat mould on a window frame or seal, safely.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="7"><td>Clear a blocked sink or shower drain. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+
+        <tr class="grp"><th colspan="4" scope="colgroup">Laundry</th></tr>
+        <tr data-skill="8"><td>Read a care label and pick the programme. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="9"><td>Do a full load, from sorting to putting away. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="10"><td>Get a stain out.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="11"><td>Iron a shirt.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="12"><td>Change a bed, including the duvet cover. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+
+        <tr class="grp"><th colspan="4" scope="colgroup">Food</th></tr>
+        <tr data-skill="13"><td>Plan a week of dinners.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="14"><td>Turn a meal plan into a shopping list.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="15"><td>Do a week's shop within a budget, comparing price per kg.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="16"><td>Cook rice, pasta, and potatoes properly. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="17"><td>Cook five dinners from scratch without a recipe.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="18"><td>Batch cook, freeze portions, and defrost them.</td><td></td><td></td><td></td></tr>
+
+        <tr class="grp"><th colspan="4" scope="colgroup">The house</th></tr>
+        <tr data-skill="19"><td>Turn the water off at the stopcock. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="20"><td>Reset a tripped switch at the fuse box. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="21"><td>Read the gas and electricity meters and submit the readings.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="22"><td>Set the heating: thermostat and timer.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="23"><td>Bleed a radiator and top up the boiler pressure.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="24"><td>Change a light bulb safely. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="25"><td>Unblock a toilet with a plunger. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="26"><td>Lock up the house at night.</td><td></td><td></td><td></td></tr>
+
+        <tr class="grp"><th colspan="4" scope="colgroup">Safety</th></tr>
+        <tr data-skill="27"><td>Smell gas: no switches and no flames. Open the windows, turn the gas off at the meter if you can, get out, and call 0800 111 999. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="28"><td>Power cut: check the trip switch first, then call 105. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="29"><td>Pan on fire: heat off if it's safe, never water. Get out, close the door, and call 999. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+        <tr data-skill="30"><td>Burn: cool it under cool running water for 20 minutes. <span class="leo">Leo</span></td><td></td><td></td><td></td></tr>
+
+        <tr class="grp"><th colspan="4" scope="colgroup">Money and admin</th></tr>
+        <tr data-skill="31"><td>Read an energy bill: what you used and what it cost.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="32"><td>Know the bills a home pays: rent or mortgage, council tax, energy, water, broadband, insurance, and TV licence.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="33"><td>Make a monthly budget and track it for a month.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="34"><td>Register with a GP and a dentist.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="35"><td>Sort something out by phone, like booking an appointment or chasing a delivery.</td><td></td><td></td><td></td></tr>
+        <tr data-skill="36"><td>Renting: check the deposit is protected, check the inventory, and take meter readings on moving-in day.</td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how">
+  <h2>How it works</h2>
+  <ul class="rules">
+    <li><b>Your jobs.</b> Pick your name at the top. You'll see your own jobs, this week's zone, and anything due today.</li>
+    <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Weekday dinners are always Aurora and Eshaal's.</li>
+    <li><b>The standard.</b> "Done when" is the standard. If it isn't met, it isn't done.</li>
+    <li><b>Ticks.</b> Ticks stay on your phone and nobody else sees them. They clear themselves overnight, on Mondays, and when the month or quarter turns over.</li>
+    <li><b>Your own dishes.</b> Straight into the dishwasher, every time.</li>
+    <li><b>Running low.</b> Used the last of something? Tell Aurora before Friday's shop.</li>
+    <li><b>Meter readings.</b> When the energy company emails for them, Dad passes it to Aurora.</li>
+    <li><b>Swaps.</b> Agree a swap with the other person before the day, then tell Dad.</li>
+    <li><b>Broken or leaking.</b> Tell Dad the same day. If you smell gas, get out first, then call 0800 111 999.</li>
+    <li><b>A better way.</b> Tell Dad. If it's better, the page changes.</li>
+  </ul>
+
+  <h3>Stages</h3>
+  <ol class="stages">
+    <li><b>Learn.</b> Follow the list. One reminder per job is fine.</li>
+    <li><b>Own.</b> Nobody reminds you. Your jobs happen at their time.</li>
+    <li><b>Run.</b> You don't need the list any more.</li>
+  </ol>
+  <p>Target: everyone at Own by 1 February 2027. Dad's Saturday walk-rounds stop for each person when they reach Own.</p>
+
+  <h3>Safety rules</h3>
+  <ol class="safety">
+    <li>Never mix bleach with anything except water. Mixed with limescale remover or other cleaners, it gives off a toxic gas.</li>
+    <li>Use the step stool, never a chair.</li>
+    <li>Unplug anything electrical before you clean it.</li>
+    <li>Candles out before bed. The last one up checks.</li>
+    <li>Hob and oven off before you leave the kitchen.</li>
+  </ol>
+
+  <h3>When the cleaner starts</h3>
+  <p>The cleaner takes the weekly zone cleans and most of the monthly lists. Daily jobs, dinners, laundry, bedrooms, bins, and the shop stay with us. A cleaner can only clean what they can get to, so tidy before they arrive.</p>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Settings. Change these, then republish. ---------- */
+  const ROTA = ["Aurora", "Eshaal", "Leo"];   // Weekend zones: weekend daily jobs, Saturday cleans, and the monthly and quarterly lists.
+  const WEEKDAY_ROTA = ["Aurora", "Eshaal"];  // Weekday zones. Leo's weekday evenings stay clear.
+  const EPOCH = "2026-10-19";                 // Monday of rota week 0.
+  // Bin collection: Wednesday, grey and red on alternate weeks.
+  const BIN_DAY = 3;
+  const GREY_DATE = "2026-10-21";
+  const BIN_MOVES = { "2026-12-30": "2027-01-02" }; // Usual date to moved date (Christmas 2026).
+  // Main meal by day, Sunday first.
+  const MEALS = [
+    { cooks: ["Dad"], label: "Dad's Sunday lunch", short: "Dad's lunch" },
+    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: [], label: "Eating out or ordering in", short: "Out or takeaway" }
+  ];
+  const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
+  const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset"];          // Sunday first; bins are added below.
+  /* ---------- End of settings ---------- */
+
+  const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
+  const SETS = [["kitchen"], ["bathrooms"], ["living"]];
+  const WEEKDAY_SETS = [["kitchen", "bathrooms"], ["living"]];
+  const PEOPLE = ROTA.concat(["Dad"]);
+  const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const DAY = 864e5;
+
+  const utc = (s) => { const p = s.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]); };
+  const mod = (a, n) => ((a % n) + n) % n;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const and = (l) => (l.length < 3 ? l.join(" and ") : l.slice(0, -1).join(", ") + ", and " + l[l.length - 1]);
+  const dm = (t) => { const d = new Date(t); return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()]; };
+  const ymd = (t) => new Date(t).toISOString().slice(0, 10);
+
+  // Dates as UTC midnights built from the local calendar date, so clock changes never shift a day.
+  const now = new Date();
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const dow = now.getDay();
+  const monday = today - mod(dow - 1, 7) * DAY;
+  const week = Math.round((monday - utc(EPOCH)) / (7 * DAY));
+  const quarter = Math.floor(now.getMonth() / 3) + 1;
+  const isSat = dow === 6;
+  const firstSat = isSat && now.getDate() <= 7;
+  const quarterSat = isSat && now.getDate() >= 8 && now.getDate() <= 14 && now.getMonth() % 3 === 0;
+
+  // Monthly lists belong to whoever has the zone in the week of the month's first Saturday;
+  // quarterly lists to whoever has it in the week of the quarter's second Saturday.
+  const firstSatOf = (y, m) => { const d1 = Date.UTC(y, m, 1); return d1 + mod(6 - new Date(d1).getUTCDay(), 7) * DAY; };
+  const mSat = firstSatOf(now.getFullYear(), now.getMonth());
+  const qSat = firstSatOf(now.getFullYear(), (quarter - 1) * 3) + 7 * DAY;
+  const weekOfSat = (sat) => Math.round((sat - 5 * DAY - utc(EPOCH)) / (7 * DAY));
+  const cardWeek = (card) => {
+    const p = card.getAttribute("data-period");
+    return p === "m" ? weekOfSat(mSat) : p === "q" ? weekOfSat(qSat) : week;
+  };
+  const notYet = (card) => {
+    const p = card.getAttribute("data-period");
+    return (p === "m" && today < mSat - 5 * DAY) || (p === "q" && today < qSat - 5 * DAY);
+  };
+
+  // kind is "weekday" (Monday to Friday) or "weekend" (weekend jobs, Saturday cleans, monthly and quarterly lists).
+  const zonesOf = (name, w, kind) => {
+    const rota = kind === "weekday" ? WEEKDAY_ROTA : ROTA;
+    const sets = kind === "weekday" ? WEEKDAY_SETS : SETS;
+    const i = rota.indexOf(name);
+    return i < 0 ? [] : sets[mod(i + w, rota.length)] || [];
+  };
+  const ownerOf = (zone, w, kind) => (kind === "weekday" ? WEEKDAY_ROTA : ROTA).find((n) => zonesOf(n, w, kind).indexOf(zone) > -1) || "";
+  const todayKind = dow >= 1 && dow <= 5 ? "weekday" : "weekend";
+  const cardKind = (card) => {
+    const r = card.getAttribute("data-rota");
+    return r === "today" ? todayKind : r === "weekday" ? "weekday" : "weekend";
+  };
+
+  // Bins: which bin is collected on day t (a UTC midnight), if any.
+  const colour = (t) => (mod(Math.round((t - utc(GREY_DATE)) / (7 * DAY)), 2) === 0 ? "grey bin" : "red bin");
+  const collectedOn = (t) => {
+    const s = ymd(t);
+    for (const from in BIN_MOVES) if (BIN_MOVES[from] === s) return colour(utc(from));
+    if (new Date(t).getUTCDay() !== BIN_DAY || BIN_MOVES[s]) return "";
+    return colour(t);
+  };
+  const binsEve = (t) => collectedOn(t + DAY);
+
+  const laundrySentence = (d) => {
+    const l = LAUNDRY[d];
+    if (l === "Household") return "Household wash: " + ownerOf("bathrooms", week, "weekday") + ".";
+    if (l === "Bedding") return "Bedding wash, everyone.";
+    return l ? "Laundry: " + l + "." : "No laundry today.";
+  };
+  const laundryShort = (d) => {
+    const l = LAUNDRY[d];
+    if (l === "Household") return "Household (" + ownerOf("bathrooms", week, "weekday") + ")";
+    if (l === "Bedding") return "Bedding, everyone";
+    return l || "Free";
+  };
+
+  /* ---------- Storage: this phone only, and the page still works without it. ---------- */
+  const mem = {};
+  const ls = (() => { try { const k = "hsop-test"; localStorage.setItem(k, k); localStorage.removeItem(k); return localStorage; } catch (e) { return null; } })();
+  const get = (k) => { if (ls) { try { return ls.getItem(k); } catch (e) { /* fall through */ } } return k in mem ? mem[k] : null; };
+  const set = (k, v) => { mem[k] = v; if (ls) { try { ls.setItem(k, v); } catch (e) { /* memory only */ } } };
+  const del = (k) => { delete mem[k]; if (ls) { try { ls.removeItem(k); } catch (e) { /* memory only */ } } };
+
+  const PERIOD = { d: "d" + ymd(today), w: "w" + ymd(monday), m: "m" + ymd(today).slice(0, 7), q: "q" + now.getFullYear() + "-" + quarter, o: "o" };
+  // Clear ticks from days, weeks, months, and quarters that have passed.
+  if (ls) {
+    try {
+      const stale = [];
+      for (let i = 0; i < ls.length; i++) {
+        const k = ls.key(i);
+        if (!k || k.indexOf("hsop|") !== 0) continue;
+        const p = k.split("|")[1] || "";
+        if ("dwmq".indexOf(p.charAt(0)) > -1 && p !== PERIOD[p.charAt(0)]) stale.push(k);
+      }
+      stale.forEach((k) => ls.removeItem(k));
+    } catch (e) { /* ignore */ }
+  }
+
+  let who = get("hsop-who") || "";
+  if (PEOPLE.indexOf(who) < 0) who = "";
+
+  const matches = (tokens, person, w, kind) => {
+    if (!person) return true;
+    const zs = zonesOf(person, w, kind);
+    return tokens.split(/\s+/).some((t) => {
+      if (t === "all") return true;
+      if (t.indexOf("zone:") === 0) return zs.indexOf(t.slice(5)) > -1;
+      return t === person.toLowerCase();
+    });
+  };
+
+  /* ---------- Cards: summary line, ticks, progress ---------- */
+  const cards = Array.from(document.querySelectorAll(".sop"));
+
+  const progress = (card) => {
+    const boxes = Array.from(card.querySelectorAll("ol.steps > li:not([hidden]) input"));
+    const done = boxes.filter((b) => b.checked).length;
+    card.querySelector(".p").textContent = boxes.length ? done + "/" + boxes.length : "";
+    card.classList.toggle("done", boxes.length > 0 && done === boxes.length);
+  };
+
+  cards.forEach((card) => {
+    const s = card.querySelector("summary");
+    const title = s.textContent.trim();
+    s.textContent = "";
+    const t = document.createElement("span");
+    t.className = "t";
+    t.textContent = title;
+    const m = document.createElement("span");
+    m.className = "m";
+    m.innerHTML = '<span class="tags"></span><span class="time"></span><span class="p"></span>';
+    m.querySelector(".time").textContent = card.getAttribute("data-time") || "";
+    s.appendChild(t);
+    s.appendChild(m);
+
+    const per = PERIOD[card.getAttribute("data-period") || "o"];
+    Array.from(card.querySelectorAll("ol.steps > li")).forEach((li, i) => {
+      const key = "hsop|" + per + "|" + card.id + "|" + i;
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.id = "c-" + card.id + "-" + i;
+      box.checked = get(key) === "1";
+      const label = document.createElement("label");
+      label.htmlFor = box.id;
+      while (li.firstChild) label.appendChild(li.firstChild);
+      li.appendChild(box);
+      li.appendChild(label);
+      box.addEventListener("change", () => { if (box.checked) set(key, "1"); else del(key); progress(card); });
+    });
+  });
+
+  const tagsFor = (card, person) => {
+    const id = card.id;
+    const per = card.getAttribute("data-period");
+    const q = card.getAttribute("data-quarter");
+    const zones = (card.getAttribute("data-who") || "").match(/zone:\w+/g) || [];
+    const out = [];
+    const l = LAUNDRY[dow];
+    const ownLaundry = l && l !== "Household" && l !== "Bedding";
+    const weekday = dow >= 1 && dow <= 5;
+    if (id === "dinner") {
+      if (weekday) out.push(person ? "Tonight" : "Tonight: " + MEALS[dow].label);
+    } else if (id === "weekend-cleanup") {
+      if (!weekday) out.push("Today");
+    } else if (id === "laundry") {
+      if (ownLaundry && !person) out.push("Today: " + l);
+      else if (ownLaundry && l === person) out.push("Today");
+    } else if (id === "household-wash") {
+      if (l === "Household") out.push("Today");
+    } else if (id === "bins") {
+      const b = binsEve(today);
+      if (b) out.push("Tonight: " + b);
+    } else if (id === "dinner-plan") {
+      if (dow === 5) out.push("Today");
+    } else if (id === "shop") {
+      if (dow === 5) out.push("Today");
+    } else if (per === "w" && isSat && card.hasAttribute("data-sat")) {
+      out.push("Today");
+    } else if (per === "m" && firstSat) {
+      out.push("Today");
+    } else if (per === "q" && quarterSat && (!q || +q === quarter)) {
+      out.push("Today");
+    }
+    if (q && +q === quarter) out.push("This quarter");
+    if (id === "bath-weekly" && firstSat) out.push("Dad does this today");
+    else if (zones.length && !person) out.push(and(zones.map((z) => ownerOf(z.slice(5), cardWeek(card), cardKind(card)))));
+    return out;
+  };
+
+  /* ---------- This week ---------- */
+  const youLine = (p) => {
+    const out = [];
+    const wd = zonesOf(p, week, "weekday");
+    const we = zonesOf(p, week, "weekend");
+    const names = (zs) => and(zs.map((z) => ZONES[z]));
+    if (wd.length && we.length) out.push("This week: " + names(wd) + " on weekdays, and " + names(we) + " at the weekend.");
+    else if (we.length) out.push("This weekend you're on " + names(we) + ".");
+    if (p === "Leo") out.push("Your weekday evenings are free. Floors and dusting are always yours at the weekend, and so are your shirts on Saturday.");
+    const cookDays = [];
+    for (let i = 1; i <= 7; i++) { const d = i % 7; if (MEALS[d].cooks.indexOf(p) > -1) cookDays.push(d); }
+    if (cookDays.length) {
+      const partner = MEALS[cookDays[0]].cooks.filter((n) => n !== p);
+      const weekdays = cookDays.length === 5 && cookDays.every((d) => d >= 1 && d <= 5);
+      const when = weekdays ? "every weekday" : and(cookDays.map((d) => DAYS[d] + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : "")));
+      out.push("You cook " + when + (partner.length ? " with " + and(partner) : "") + ".");
+    }
+    if (p === "Aurora") out.push("On Friday you and Eshaal agree next week's dinners, then you put the plan on the fridge and do the shop with Dad.");
+    if (p === "Eshaal") out.push("On Friday you and Aurora agree next week's dinners.");
+    if (p === "Dad") out.push("Friday's shop is yours and Aurora's.");
+    const ld = LAUNDRY.indexOf(p);
+    if (ld > -1) out.push("Your laundry day is " + DAYS[ld] + ".");
+    if (wd.indexOf("bathrooms") > -1) out.push("Friday's household wash is yours.");
+    if (wd.indexOf("living") > -1) out.push("Bins go out the night before collection.");
+    if (we.indexOf("living") > -1) out.push("On Saturday you hoover the stairs while " + ownerOf("kitchen", week, "weekend") + " holds the unit.");
+    if (we.indexOf("kitchen") > -1) out.push("On Saturday you hold the hoover while " + ownerOf("living", week, "weekend") + " does the stairs.");
+    return out.join(" ");
+  };
+
+  const range = () => {
+    const a = new Date(monday);
+    const b = new Date(monday + 6 * DAY);
+    return a.getUTCMonth() === b.getUTCMonth()
+      ? "Monday " + a.getUTCDate() + " to Sunday " + dm(+b)
+      : "Monday " + dm(+a) + " to Sunday " + dm(+b);
+  };
+
+  const rotaRows = (w, kind) => (kind === "weekday" ? WEEKDAY_SETS : SETS)
+    .map((set) => [set.map((z) => ZONES[z]).join(" and "), ownerOf(set[0], w, kind)]);
+  const rowsHtml = (rows) => rows.map(([z, n]) => "<div><dt>" + esc(z) + "</dt><dd>" + esc(n) + "</dd></div>").join("");
+  const renderWeek = () => {
+    let h = '<p class="next">' + esc(range()) + "</p>";
+    h += '<p class="sub">Weekdays</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekday").concat([["Dinners", "Aurora and Eshaal"]])) + "</dl>";
+    h += '<p class="sub">Weekend</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekend").concat([["Floors and dusting", "Leo"]])) + "</dl>";
+    const nx = (kind) => rotaRows(week + 1, kind).map(([z, n]) => z + " " + n).join(", ");
+    h += '<p class="next">Next week: weekdays ' + esc(nx("weekday")) + "; weekend " + esc(nx("weekend")) + ".</p>";
+    const bits = [];
+    const meal = MEALS[dow];
+    bits.push(meal.cooks.length ? meal.label + (meal.label.indexOf("lunch") > -1 ? "." : " cook dinner.") : meal.label + " tonight.");
+    bits.push(laundrySentence(dow));
+    if (quarterSat) bits.push("Saturday reset plus the quarterly session, about 2½ hours with everyone.");
+    else if (firstSat) bits.push("Saturday reset plus the monthly lists. Dad does the weekly bathroom clean.");
+    else if (isSat) bits.push("Saturday reset, done by midday.");
+    if (dow === 5) bits.push("Next week's meal plan goes on the fridge, and Aurora and Dad do the shop.");
+    const b = binsEve(today);
+    if (b) bits.push("Bins out tonight: the " + b + " (" + ownerOf("living", week, "weekday") + ").");
+    h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + esc(bits.join(" ")) + "</p>";
+    if (who) h += '<p class="you"><b>' + esc(who + ".") + "</b> " + esc(youLine(who)) + "</p>";
+    document.getElementById("week-body").innerHTML = h;
+  };
+
+  const renderPlan = () => {
+    let rows = "";
+    for (let i = 0; i < 7; i++) {
+      const t = monday + i * DAY;
+      const d = new Date(t).getUTCDay();
+      const also = [ALSO[d]];
+      const b = binsEve(t);
+      if (b) also.push("Bins out (" + b.replace(" bin", "") + ")");
+      rows += "<tr" + (t === today ? ' class="now"' : "") + '><th scope="row">' + DAYS[d].slice(0, 3) + "</th><td>" + esc(MEALS[d].short) + "</td><td>" + esc(laundryShort(d)) + "</td><td>" + esc(also.filter(Boolean).join(", ")) + "</td></tr>";
+    }
+    document.getElementById("plan-body").innerHTML = rows;
+  };
+
+  /* ---------- Skills ---------- */
+  const LEVELS = ["Shown", "With help", "Alone"];
+  const skillRows = Array.from(document.querySelectorAll("#skills-table tr[data-skill]"));
+  const skey = (tr, lvl) => "hsop|s:" + who + "|" + tr.getAttribute("data-skill") + "|" + lvl;
+
+  const skillSum = () => {
+    const el = document.getElementById("skills-sum");
+    if (!who) { el.textContent = "Pick your name at the top to tick off your skills."; return; }
+    const alone = skillRows.filter((tr) => get(skey(tr, 2)) === "1").length;
+    el.textContent = who + ": " + alone + " of " + skillRows.length + " done alone.";
+  };
+
+  skillRows.forEach((tr) => {
+    const tds = tr.querySelectorAll("td");
+    const name = tds[0].firstChild.textContent.trim();
+    LEVELS.forEach((lvl, i) => {
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.id = "s-" + tr.getAttribute("data-skill") + "-" + i;
+      box.setAttribute("aria-label", lvl + ": " + name);
+      box.addEventListener("change", () => {
+        if (!who) return;
+        if (box.checked) set(skey(tr, i), "1"); else del(skey(tr, i));
+        skillSum();
+      });
+      tds[i + 1].appendChild(box);
+    });
+  });
+
+  const renderSkills = () => {
+    skillRows.forEach((tr) => {
+      LEVELS.forEach((lvl, i) => {
+        const box = document.getElementById("s-" + tr.getAttribute("data-skill") + "-" + i);
+        box.disabled = !who;
+        box.checked = !!who && get(skey(tr, i)) === "1";
+      });
+    });
+    skillSum();
+  };
+
+  /* ---------- Name picker and filtering ---------- */
+  const picker = document.getElementById("who");
+  [["Everyone", ""]].concat(PEOPLE.map((n) => [n, n])).forEach(([label, value]) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.id = "who-" + (value || "everyone").toLowerCase();
+    b.value = value;
+    b.textContent = label;
+    b.addEventListener("click", () => {
+      who = value;
+      if (value) set("hsop-who", value); else del("hsop-who");
+      apply();
+    });
+    picker.appendChild(b);
+  });
+
+  function apply() {
+    Array.from(picker.querySelectorAll("button")).forEach((b) => b.setAttribute("aria-pressed", String(b.value === who)));
+    renderWeek();
+    cards.forEach((card) => {
+      const q = card.getAttribute("data-quarter");
+      const days = card.getAttribute("data-days");
+      const w = cardWeek(card);
+      const kind = cardKind(card);
+      let show = matches(card.getAttribute("data-who") || "all", who, w, kind);
+      if (who && ((q && +q !== quarter) || notYet(card) || (days && days.split(" ").indexOf(String(dow)) < 0))) show = false;
+      card.hidden = !show;
+      Array.from(card.querySelectorAll("[data-who]")).forEach((el) => { el.hidden = !matches(el.getAttribute("data-who"), who, w, kind); });
+      card.querySelector(".tags").innerHTML = tagsFor(card, who).map((t) => '<span class="tag">' + esc(t) + "</span>").join("");
+      progress(card);
+    });
+    Array.from(document.querySelectorAll("section.cadence")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
+    renderSkills();
+  }
+
+  renderPlan();
+  apply();
+})();
+</script>
+</body>
+</html>
