@@ -158,7 +158,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 <section class="cadence" id="daily">
   <h2>Daily</h2>
 
-  <details class="sop" id="morning" data-who="all" data-period="d" data-time="10 min">
+  <details class="sop" id="morning" data-who="all" data-period="d" data-time="15 min">
     <summary>Your morning</summary>
     <div class="body">
       <p class="when">Before you leave the house.</p>
@@ -168,6 +168,8 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
         <li>Yesterday's clothes in your wash basket or put away.</li>
         <li>Window open while you get ready, shut before you go.</li>
         <li>Breakfast things, and any cups or plates from your room, in the dishwasher.</li>
+        <li data-who="leo" data-days="1 2 3 4 5">PE day? PE kit packed.</li>
+        <li data-who="aurora eshaal leo" data-days="1 2 3 4 5">Phone, wallet, and keys on you.</li>
       </ol>
       <p class="dw"><b>Done when:</b> bed made, floor clear, window shut, and no dishes in your room.</p>
     </div>
@@ -529,17 +531,18 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="shop" data-who="aurora dad" data-period="w" data-time="1 hour">
+  <details class="sop" id="shop" data-who="aurora dad leo" data-period="w" data-time="1 hour">
     <summary>Weekly shop</summary>
     <div class="body">
       <p class="when">Friday. Aurora and Dad.</p>
       <ol class="steps">
-        <li>Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
-        <li>Next week's dinner ingredients added.</li>
-        <li>Dad: order approved and paid.</li>
-        <li>Shopping put away, fridge and freezer things first and new behind old.</li>
+        <li data-who="aurora dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
+        <li data-who="aurora dad">Next week's dinner ingredients added.</li>
+        <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
+        <li data-who="aurora dad">Dad: order approved and paid.</li>
+        <li data-who="aurora dad">Shopping put away, fridge and freezer things first and new behind old.</li>
       </ol>
-      <p class="dw"><b>Done when:</b> staples and next week's dinners covered, and everything put away.</p>
+      <p class="dw"><b>Done when:</b> staples, next week's dinners, and any food tech ingredients covered, and everything put away.</p>
     </div>
   </details>
 
@@ -1113,6 +1116,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     if (p === "Aurora") out.push("On Friday you and Eshaal agree next week's dinners, then you put the plan on the fridge and do the shop with Dad.");
     if (p === "Eshaal") out.push("On Friday you and Aurora agree next week's dinners.");
     if (p === "Dad") out.push("Friday's shop is yours and Aurora's.");
+    if (p === "Leo") out.push("On Friday you and Aurora add any food tech ingredients to the shop.");
     const ld = LAUNDRY.indexOf(p);
     if (ld > -1) out.push("Your laundry day is " + DAYS[ld] + ".");
     if (wd.indexOf("bathrooms") > -1) out.push("Friday's household wash is yours.");
@@ -1234,7 +1238,11 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       let show = matches(card.getAttribute("data-who") || "all", who, w, kind);
       if (who && ((q && +q !== quarter) || notYet(card) || (days && days.split(" ").indexOf(String(dow)) < 0))) show = false;
       card.hidden = !show;
-      Array.from(card.querySelectorAll("[data-who]")).forEach((el) => { el.hidden = !matches(el.getAttribute("data-who"), who, w, kind); });
+      // Steps and notes can carry data-who and data-days too, as cards do.
+      Array.from(card.querySelectorAll("[data-who], [data-days]")).forEach((el) => {
+        const d = el.getAttribute("data-days");
+        el.hidden = !matches(el.getAttribute("data-who") || "all", who, w, kind) || !!(who && d && d.split(" ").indexOf(String(dow)) < 0);
+      });
       card.querySelector(".tags").innerHTML = tagsFor(card, who).map((t) => '<span class="tag">' + esc(t) + "</span>").join("");
       progress(card);
     });
