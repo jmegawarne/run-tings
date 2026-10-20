@@ -112,6 +112,7 @@ th, td { padding: 6px 6px; border-bottom: 1px solid var(--line); text-align: lef
 .plan summary { cursor: pointer; color: var(--accent); margin: 4px 0; }
 .plan tr.now { background: var(--accent-soft); }
 .plan table { font-size: 0.875rem; }
+.plan td a { display: block; margin-top: 4px; }
 table.guide { font-size: 0.9375rem; margin: 4px 0 8px; }
 table.guide th { font-weight: 400; color: var(--muted); }
 table.guide td { font-weight: 600; }
@@ -1013,6 +1014,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   ];
   const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
   const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
+  // The week's recipes live in recipes.json beside this page, not here, so the menu never needs an edit to this file.
   /* ---------- End of settings ---------- */
 
   const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
@@ -1029,6 +1031,17 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   const and = (l) => (l.length < 3 ? l.join(" and ") : l.slice(0, -1).join(", ") + ", and " + l[l.length - 1]);
   const dm = (t) => { const d = new Date(t); return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()]; };
   const ymd = (t) => new Date(t).toISOString().slice(0, 10);
+
+  // Recipes from recipes.json: { "YYYY-MM-DD": [{ "dish": "...", "deck": "<Drive ID>", "doc": "<Drive ID>" }] }.
+  // The Hub deck wins over the recipe doc. Links are built from bare Drive IDs only, so no account IDs reach the page.
+  let recipes = {};
+  const DRIVE_ID = /^[\w-]{20,}$/;
+  const recipeLinks = (t) => {
+    const list = recipes[ymd(t)];
+    return (Array.isArray(list) ? list : [])
+      .filter((r) => r && r.dish && (DRIVE_ID.test(r.deck || "") || DRIVE_ID.test(r.doc || "")))
+      .map((r) => '<a href="https://docs.google.com/' + (DRIVE_ID.test(r.deck || "") ? "presentation/d/" + r.deck : "document/d/" + r.doc) + '/edit">' + esc(r.dish) + "</a>");
+  };
 
   // Dates as UTC midnights built from the local calendar date, so clock changes never shift a day.
   const now = new Date();
@@ -1275,7 +1288,10 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     h += '<p class="next">Next week: weekdays ' + esc(nx("weekday")) + "; weekend " + esc(nx("weekend")) + ".</p>";
     const bits = [];
     const meal = MEALS[dow];
-    bits.push(meal.cooks.length ? meal.label + (meal.label.indexOf("lunch") > -1 ? "." : " cook dinner.") : meal.label + " tonight.");
+    const links = meal.cooks.length ? recipeLinks(today) : [];
+    const mealHtml = meal.cooks.length
+      ? esc(meal.label + (meal.label.indexOf("lunch") > -1 ? "" : " cook dinner")) + (links.length ? ": " + and(links) : "") + "."
+      : esc(meal.label + " tonight.");
     bits.push(laundrySentence(dow));
     if (quarterSat) bits.push("Saturday reset from 9:00, then the quarterly session, about 2½ hours more with everyone.");
     else if (firstSat) bits.push("Saturday reset from 9:00, then the monthly lists. Dad does the weekly bathroom clean.");
@@ -1285,7 +1301,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     if (c) bits.push("Bin day: the " + c + " comes back in (" + ownerOf("living", week, "weekday") + ").");
     const b = binsEve(today);
     if (b) bits.push("Bins out tonight: the " + b + " (" + ownerOf("living", week, "weekday") + ").");
-    h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + esc(bits.join(" ")) + "</p>";
+    h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + mealHtml + " " + esc(bits.join(" ")) + "</p>";
     if (who) h += '<p class="you"><b>' + esc(who + ".") + "</b> " + esc(youLine(who)) + "</p>";
     document.getElementById("week-body").innerHTML = h;
   };
@@ -1298,7 +1314,8 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       const also = [ALSO[d]];
       const b = binsEve(t);
       if (b) also.push("Bins out (" + b.replace(" bin", "") + ")");
-      rows += "<tr" + (t === today ? ' class="now"' : "") + '><th scope="row">' + DAYS[d].slice(0, 3) + "</th><td>" + esc(MEALS[d].short) + "</td><td>" + esc(laundryShort(d)) + "</td><td>" + esc(also.filter(Boolean).join(", ")) + "</td></tr>";
+      const links = MEALS[d].cooks.length ? recipeLinks(t) : [];
+      rows += "<tr" + (t === today ? ' class="now"' : "") + '><th scope="row">' + DAYS[d].slice(0, 3) + "</th><td>" + esc(MEALS[d].short) + links.join("") + "</td><td>" + esc(laundryShort(d)) + "</td><td>" + esc(also.filter(Boolean).join(", ")) + "</td></tr>";
     }
     document.getElementById("plan-body").innerHTML = rows;
   };
@@ -1399,6 +1416,14 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 
   renderPlan();
   apply();
+
+  // Recipes arrive after the first render. No file, or a bad one, and the page is the same, just without links.
+  if (window.fetch) {
+    fetch("recipes.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((data) => { if (data && typeof data === "object") { recipes = data; renderPlan(); renderWeek(); } });
+  }
 })();
 </script>
 </body>

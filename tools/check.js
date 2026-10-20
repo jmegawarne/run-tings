@@ -1,11 +1,14 @@
 // Loads ../index.html at fixed dates and prints what each person sees, gate by gate
-// in page order, so a change to gates, rotas, meals, laundry, or bins can be checked
-// before it's pushed. "due" lists the cards tagged Today, Tonight, or Still to finish.
+// in page order, so a change to gates, rotas, meals, laundry, bins, or recipes can be
+// checked before it's pushed. "due" lists the cards tagged Today, Tonight, or Still to finish.
 //
 // Usage:  cd tools && npm install && npm run check            (today and the next 13 days)
 //         cd tools && npm run check -- 2026-12-29 2027-01-01  (specific dates)
 //
-// Exits non-zero if the page's script throws on any date, or a card sits outside a gate.
+// The page fetches ../recipes.json; this script hands it the file from disk instead,
+// and prints the recipe links on each date's Today line.
+// Exits non-zero if the page's script throws on any date, a card sits outside a gate,
+// or recipes.json isn't valid JSON.
 
 const fs = require("fs");
 const path = require("path");
@@ -13,6 +16,17 @@ const { JSDOM } = require("jsdom");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const PEOPLE = ["everyone", "aurora", "eshaal", "leo", "dad"];
+
+const recipesFile = path.join(__dirname, "..", "recipes.json");
+let recipes = null;
+if (fs.existsSync(recipesFile)) {
+  try {
+    recipes = JSON.parse(fs.readFileSync(recipesFile, "utf8"));
+  } catch (e) {
+    console.log("recipes.json is not valid JSON: " + e.message);
+    process.exit(1);
+  }
+}
 
 function load(dateStr) {
   const fixed = new Date(dateStr + "T12:00:00").getTime();
@@ -27,6 +41,9 @@ function load(dateStr) {
         static now() { return fixed; }
       }
       w.Date = Fixed;
+      w.fetch = () => Promise.resolve(recipes
+        ? { ok: true, json: () => Promise.resolve(recipes) }
+        : { ok: false, json: () => Promise.resolve(null) });
       w.addEventListener("error", (e) => errors.push(e.message));
     },
   });
@@ -40,8 +57,9 @@ function gates(doc) {
     .map((s) => s.id.replace(/^g-/, "") + ": " + Array.from(s.querySelectorAll(".sop")).filter((c) => !c.hidden).map((c) => c.id).join(" "));
 }
 
-function report(dateStr) {
+async function report(dateStr) {
   const { doc, errors } = load(dateStr);
+  await new Promise((r) => setTimeout(r, 0)); // let the page's recipes fetch settle
   console.log("\n=== " + dateStr + " ===");
   if (errors.length) {
     console.log("SCRIPT ERRORS: " + errors.join("; "));
@@ -61,6 +79,8 @@ function report(dateStr) {
     if (p === "everyone") {
       const today = doc.querySelector("#week-body .today");
       console.log(today ? today.textContent : "(no today line)");
+      const links = today ? Array.from(today.querySelectorAll("a")).map((a) => a.textContent + " -> " + a.href) : [];
+      if (links.length) console.log("  recipes: " + links.join("; "));
       console.log("  morning gate: " + doc.getElementById("g-morning-h").textContent + (due.length ? "  |  due: " + due.join(", ") : ""));
       continue;
     }
@@ -77,4 +97,4 @@ const dates = args.length
       d.setDate(d.getDate() + i);
       return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
     });
-dates.forEach(report);
+(async () => { for (const d of dates) await report(d); })();
