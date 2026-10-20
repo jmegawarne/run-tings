@@ -1,10 +1,11 @@
-// Loads ../index.html at fixed dates and prints what each person sees, so a change
-// to rotas, meals, laundry, or bins can be checked before it's pushed.
+// Loads ../index.html at fixed dates and prints what each person sees, gate by gate
+// in page order, so a change to gates, rotas, meals, laundry, or bins can be checked
+// before it's pushed. "due" lists the cards tagged Today, Tonight, or Still to finish.
 //
 // Usage:  cd tools && npm install && npm run check            (today and the next 13 days)
 //         cd tools && npm run check -- 2026-12-29 2027-01-01  (specific dates)
 //
-// Exits non-zero if the page's script throws on any date.
+// Exits non-zero if the page's script throws on any date, or a card sits outside a gate.
 
 const fs = require("fs");
 const path = require("path");
@@ -32,8 +33,11 @@ function load(dateStr) {
   return { doc: dom.window.document, errors };
 }
 
-function visibleIds(doc, selector) {
-  return Array.from(doc.querySelectorAll(selector)).filter((c) => !c.hidden).map((c) => c.id);
+// Visible gates and the visible cards in each, as "gate: card card".
+function gates(doc) {
+  return Array.from(doc.querySelectorAll("section.gate"))
+    .filter((s) => !s.hidden)
+    .map((s) => s.id.replace(/^g-/, "") + ": " + Array.from(s.querySelectorAll(".sop")).filter((c) => !c.hidden).map((c) => c.id).join(" "));
 }
 
 function report(dateStr) {
@@ -44,17 +48,23 @@ function report(dateStr) {
     process.exitCode = 1;
     return;
   }
+  const loose = Array.from(doc.querySelectorAll(".sop")).filter((c) => !c.closest("section.gate")).map((c) => c.id);
+  if (loose.length) {
+    console.log("CARDS OUTSIDE A GATE: " + loose.join(", "));
+    process.exitCode = 1;
+  }
   for (const p of PEOPLE) {
     doc.getElementById("who-" + p).click();
+    const due = Array.from(doc.querySelectorAll(".sop"))
+      .filter((c) => !c.hidden && Array.from(c.querySelectorAll(".tag")).some((t) => /^(Today|Tonight|Still to finish)/.test(t.textContent)))
+      .map((c) => c.id);
     if (p === "everyone") {
       const today = doc.querySelector("#week-body .today");
       console.log(today ? today.textContent : "(no today line)");
+      console.log("  morning gate: " + doc.getElementById("g-morning-h").textContent + (due.length ? "  |  due: " + due.join(", ") : ""));
+      continue;
     }
-    const due = Array.from(doc.querySelectorAll(".sop"))
-      .filter((c) => !c.hidden && Array.from(c.querySelectorAll(".tag")).some((t) => /^(Today|Tonight)/.test(t.textContent)))
-      .map((c) => c.id);
-    const daily = visibleIds(doc, "#daily .sop");
-    console.log("  " + p.padEnd(9) + "daily: " + daily.join(", ") + (due.length ? "  |  due: " + due.join(", ") : ""));
+    console.log("  " + p.padEnd(7) + gates(doc).join("  |  ") + (due.length ? "\n           due: " + due.join(", ") : ""));
   }
 }
 

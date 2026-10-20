@@ -8,7 +8,7 @@
 <title>House SOPs</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: one narrow column. Name picker and this-week box on top, then collapsible SOP cards by cadence. */
+/* Layout: one narrow column. Name picker and this-week box on top, then collapsible SOP cards under the moments in the day they're done at. */
 :root {
   --bg: #f6f7f5;
   --surface: #ffffff;
@@ -127,7 +127,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 <body>
 <header>
   <h1>House SOPs</h1>
-  <p class="lede">How we run the house. Pick your name to see your jobs, then tick each one off as you go. New here? Read <a href="#how">How it works</a> first.</p>
+  <p class="lede">How we run the house. Pick your name to see today's jobs, then tick each one off as you go. New here? Read <a href="#how">How it works</a> first.</p>
   <div class="who" id="who" role="group" aria-label="Show jobs for"></div>
 </header>
 
@@ -146,22 +146,33 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 </section>
 
 <nav class="jump" aria-label="Sections">
-  <a href="#daily">Daily</a>
-  <a href="#weekly">Weekly</a>
-  <a href="#monthly">Monthly</a>
-  <a href="#quarterly">Quarterly</a>
+  <a href="#g-morning">Morning</a>
+  <a href="#g-reset">Saturday reset</a>
+  <a href="#g-monthly">Monthly</a>
+  <a href="#g-quarterly">Quarterly</a>
+  <a href="#g-office-in">At the office</a>
+  <a href="#g-office-out">Leaving the office</a>
+  <a href="#g-home">Home</a>
+  <a href="#g-dinner">Dinner</a>
+  <a href="#g-meal">After the meal</a>
+  <a href="#g-after">After dinner</a>
+  <a href="#g-bed">Before bed</a>
+  <a href="#g-any">Any time</a>
   <a href="#skills">Skills</a>
   <a href="#how">How it works</a>
 </nav>
 
-<!-- ============ DAILY ============ -->
-<section class="cadence" id="daily">
-  <h2>Daily</h2>
+<!-- ============ GATES ============
+     The moments in a day, in order. Each card sits under the moment it's done at.
+     With a name picked, only today's cards show (see dueToday in the script).
+     data-we moves a card to another gate at the weekend; data-when shows a card
+     only on your laundry day, the evening before collection, or collection day. -->
+<section class="gate" id="g-morning" aria-labelledby="g-morning-h">
+  <h2 id="g-morning-h" data-weekday="Before you leave the house" data-weekend="When you get up">Morning</h2>
 
   <details class="sop" id="morning" data-who="all" data-period="d" data-time="15 min">
     <summary>Your morning</summary>
     <div class="body">
-      <p class="when">Before you leave the house.</p>
       <ol class="steps">
         <li>Bed made.</li>
         <li>Pyjamas folded or hung up.</li>
@@ -175,199 +186,54 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="coming-home" data-who="aurora eshaal leo" data-period="d" data-days="1 2 3 4 5" data-time="15 min">
-    <summary>Coming home</summary>
-    <div class="body">
-      <p class="when">As soon as you're home for the day.</p>
-      <ol class="steps">
-        <li>Shoes and coat in their place in the living room, and slippers on.</li>
-        <li>Hands washed.</li>
-        <li data-who="aurora eshaal">Lunch box and water bottle in the dishwasher.</li>
-        <li>Bag upstairs.</li>
-        <li data-who="leo">Out of uniform: shirt in your wash basket, and the rest hung up.</li>
-        <li data-who="leo">PE day? PE kit in your wash basket.</li>
-        <li data-who="aurora eshaal">Windows open, if the weather's right.</li>
-        <li data-who="aurora eshaal">Dinner started, then a short break.</li>
-        <li data-who="leo">Homework: real progress made before anything else.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> coat, shoes, bag, and uniform away, slippers on, and dinner or homework under way.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="evening" data-who="all" data-period="d" data-time="25 min">
-    <summary>Your evening</summary>
-    <div class="body">
-      <p class="when">Before bed.</p>
-      <ol class="steps">
-        <li>Your things off the coffee table and sofas.</li>
-        <li>Shoes and coat in their place in the living room.</li>
-        <li>Bag, clothes, and charger upstairs.</li>
-        <li>Cups and plates in the dishwasher.</li>
-        <li>Phone charging on a hard surface, not on the bed.</li>
-        <li>Showered. A quick one counts.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> nothing of yours left downstairs, no dishes upstairs, and you've showered.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="shower" data-who="all" data-period="d" data-time="5 min">
-    <summary>After every shower</summary>
-    <div class="body">
-      <p class="when">Downstairs shower, every time.</p>
-      <ol class="steps">
-        <li>Glass and walls squeegeed.</li>
-        <li>Leave-on shower spray on.</li>
-        <li>Hair out of the plughole.</li>
-        <li>Towel on the rail or your hook.</li>
-        <li>Bath mat on the lower radiator rung.</li>
-        <li>Fan on or window open.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> glass squeegeed and sprayed, plughole clear, and towel and mat hung up.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="laundry-daily" data-who="all" data-period="d" data-time="20 min">
-    <summary>Folding and putting away</summary>
-    <div class="body">
-      <p class="when">Every day, as soon as it's dry.</p>
-      <ol class="steps">
-        <li>Your dry laundry off the airer and racks.</li>
-        <li>Folded or hung up, and put away.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> none of your dry laundry left on the airer or racks, and it's all put away.</p>
-    </div>
-  </details>
-
   <details class="sop" id="dishwasher" data-who="zone:kitchen" data-rota="today" data-period="d" data-time="10 min">
     <summary>Dishwasher</summary>
     <div class="body">
-      <p class="when">Every morning, before you leave.</p>
       <ol class="steps">
         <li>Dishwasher emptied and everything put away.</li>
       </ol>
       <p class="dw"><b>Done when:</b> the dishwasher is empty and ready for the day's dishes.</p>
     </div>
   </details>
-
-  <details class="sop" id="dinner" data-who="aurora eshaal" data-period="d" data-days="1 2 3 4 5" data-time="2 hours">
-    <summary>Weekday dinner</summary>
-    <div class="body">
-      <p class="when">Monday to Friday, together. Dinner at 7pm.</p>
-      <p class="sub">Before you start</p>
-      <ol class="steps">
-        <li>Tonight's meal and who does what agreed.</li>
-        <li>Dishwasher empty, sink empty, and worktops clear.</li>
-        <li>Mise en place: every ingredient prepped, and every pan and tool out, before the heat goes on.</li>
-      </ol>
-      <p class="sub">On time</p>
-      <ol class="steps">
-        <li>Started at the time that gets dinner out at 7pm.</li>
-        <li>Everyone told 10 minutes before.</li>
-        <li>Dinner on the table at 7pm.</li>
-      </ol>
-      <p class="sub">Clean-up</p>
-      <ol class="steps">
-        <li>Table cleared.</li>
-        <li>Food scraps in the kitchen bin.</li>
-        <li>Dishwasher loaded and on.</li>
-        <li>Pans, utensils, and anything that can't go in the dishwasher washed, dried, and put away.</li>
-        <li>Leftovers boxed and in the fridge.</li>
-        <li>Hob, worktops, and table wiped.</li>
-        <li>Sink empty and wiped.</li>
-        <li>Kitchen bin full? Out to the outside bin, and a new bag in.</li>
-        <li>Kitchen floor swept.</li>
-        <li>Hob and oven off.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> dinner went out on time, the kitchen is back to clear, and the dishwasher is running.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="weekend-cleanup" data-who="zone:kitchen" data-period="d" data-days="0 6" data-time="40 min">
-    <summary>Weekend clean-up</summary>
-    <div class="body">
-      <p class="when">After a Saturday takeaway and Sunday lunch.</p>
-      <ol class="steps">
-        <li>Table cleared.</li>
-        <li>Food scraps in the kitchen bin.</li>
-        <li>Dishwasher loaded and on.</li>
-        <li>Pans and anything that can't go in the dishwasher washed, dried, and put away.</li>
-        <li>Leftovers boxed and in the fridge.</li>
-        <li>Hob, worktops, and table wiped.</li>
-        <li>Sink empty and wiped.</li>
-        <li>Kitchen bin full? Out to the outside bin, and a new bag in.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> the kitchen is back to clear and the dishwasher is running.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="floors-daily" data-who="leo" data-period="d" data-days="0 6" data-time="10 min">
-    <summary>Kitchen floor</summary>
-    <div class="body">
-      <p class="when">After Saturday's takeaway and Sunday lunch, once the clean-up is done.</p>
-      <ol class="steps">
-        <li>Kitchen floor swept.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> no crumbs on the kitchen floor.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="bath-daily" data-who="zone:bathrooms" data-rota="today" data-period="d" data-time="10 min">
-    <summary>Bathrooms check</summary>
-    <div class="body">
-      <p class="when">Evening, by 9pm.</p>
-      <ol class="steps">
-        <li>Downstairs sink and taps wiped with a J-cloth.</li>
-        <li>Downstairs toilet brushed, then the seat and handle wiped with a used J-cloth. Bin the cloth.</li>
-        <li>Towels hung up, and the bath mat on the lower radiator rung.</li>
-        <li>Upstairs toilet and sink: the same.</li>
-        <li>A spare loo roll and soap in both bathrooms.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> both sinks wiped, both toilets brushed, and a spare loo roll in each.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="living-daily" data-who="zone:living" data-rota="today" data-period="d" data-time="15 min">
-    <summary>Living room reset</summary>
-    <div class="body">
-      <p class="when">Evening, by 9pm.</p>
-      <ol class="steps">
-        <li>Coffee table clear, apart from a neat stack of books for Dad.</li>
-        <li>Sofas clear.</li>
-        <li>Books back on their shelves. Not sure where one goes? On the stack for Dad.</li>
-        <li>Cushions and throws straight, and remotes back.</li>
-        <li>Cups and plates in the dishwasher.</li>
-        <li>Shoes and coats tidy in their place.</li>
-        <li>Post from the porch to Dad.</li>
-        <li>Stairs clear.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> coffee table and sofas clear, and nothing on the stairs.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="dad-daily" data-who="dad" data-period="d" data-time="10 min">
-    <summary>Dad</summary>
-    <div class="body">
-      <ol class="steps">
-        <li>Post dealt with.</li>
-        <li>Last thing: doors locked and downstairs windows shut.</li>
-        <li>Candles lit for the evening, and out before bed.</li>
-        <li>Hob and oven off.</li>
-      </ol>
-      <p class="note">Stage 1 only: one reminder per person per job. After that, leave it.</p>
-      <p class="dw"><b>Done when:</b> post dealt with, house locked, and candles out.</p>
-    </div>
-  </details>
 </section>
 
-<!-- ============ WEEKLY ============ -->
-<section class="cadence" id="weekly">
-  <h2>Weekly</h2>
-  <p class="intro">Saturday reset: everyone at the same time, done by midday. Dad works alongside. The other weekly jobs have their own day.</p>
+<section class="gate" id="g-reset" aria-labelledby="g-reset-h">
+  <h2 id="g-reset-h">Saturday reset</h2>
+  <p class="intro">Saturday from 9:00, everyone together, done by midday. Dad works alongside. Do the cards in order: Leo's shirts go in first, and he dusts while the others do their bedrooms. His floors come last.</p>
 
-  <details class="sop" id="room-weekly" data-who="all" data-period="w" data-sat data-time="40 min">
+  <details class="sop" id="shirts" data-who="leo" data-period="w" data-sat data-days="6" data-time="35 min hands-on">
+    <summary>Your shirts</summary>
+    <div class="body">
+      <p class="when">First wash of the day. Ironed after lunch, once they're dry.</p>
+      <ol class="steps">
+        <li>Shirts washed: Synthetics, 40°C, Easy Iron on.</li>
+        <li>Shirts dried.</li>
+        <li>Shirts ironed and hung up.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> a week of shirts ironed and hung up.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dusting-weekly" data-who="leo" data-period="w" data-sat data-days="6" data-time="40 min">
+    <summary>Dusting</summary>
+    <div class="body">
+      <p class="when">First, while the others do their bedrooms.</p>
+      <ol class="steps">
+        <li>Living room dusted: surfaces, TV stand, and window sills.</li>
+        <li>Library dusted, and the books upright with nothing leaning.</li>
+        <li>Landing dusted.</li>
+        <li>Cobwebs and high corners done.</li>
+        <li>Both dusters cleaned.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the living room, library, and landing dusted, and both dusters clean.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="room-weekly" data-who="all" data-period="w" data-sat data-days="6" data-time="40 min">
     <summary>Your bedroom</summary>
     <div class="body">
-      <p class="when">Saturday reset.</p>
+      <p class="when">Beds stripped first. The bedding goes in after the shirts.</p>
+      <p class="note" data-who="leo">Leo: strip your bed first, then do the rest after your dusting.</p>
       <ol class="steps">
         <li>Bed stripped and bedding in the wash (Bedding programme).</li>
         <li>Surfaces dusted with the small duster.</li>
@@ -382,7 +248,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="kitchen-weekly" data-who="zone:kitchen" data-period="w" data-sat data-time="40 min">
+  <details class="sop" id="kitchen-weekly" data-who="zone:kitchen" data-period="w" data-sat data-days="6" data-time="40 min">
     <summary>Kitchen</summary>
     <div class="body">
       <p class="when">Saturday reset. Leo does the floor.</p>
@@ -397,7 +263,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="bath-weekly" data-who="zone:bathrooms" data-period="w" data-sat data-time="45 min">
+  <details class="sop" id="bath-weekly" data-who="zone:bathrooms" data-period="w" data-sat data-days="6" data-time="45 min">
     <summary>Bathrooms</summary>
     <div class="body">
       <p class="when">Saturday reset. Leo does the floors. On the first Saturday of the month, Dad does this one and you do the monthly bathroom list.</p>
@@ -418,10 +284,10 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="living-weekly" data-who="zone:living" data-period="w" data-sat data-time="25 min">
+  <details class="sop" id="living-weekly" data-who="zone:living" data-period="w" data-sat data-days="6" data-time="25 min">
     <summary>Living &amp; outside</summary>
     <div class="body">
-      <p class="when">Saturday reset. Leo does the dusting.</p>
+      <p class="when">Saturday reset. Hoover once Leo's dusted.</p>
       <ol class="steps">
         <li>Living room hoovered, under the sofa cushions too.</li>
         <li>Front garden: litter picked up.</li>
@@ -430,10 +296,10 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="stairs" data-who="zone:living zone:kitchen" data-period="w" data-sat data-time="20 min">
+  <details class="sop" id="stairs" data-who="zone:living zone:kitchen" data-period="w" data-sat data-days="6" data-time="20 min">
     <summary>Stairs and landing</summary>
     <div class="body">
-      <p class="when">Saturday reset, two of you. Living &amp; outside hoovers; Kitchen holds the unit.</p>
+      <p class="when">Saturday reset, two of you, once Leo's dusted the landing. Living &amp; outside hoovers; Kitchen holds the unit.</p>
       <ol class="steps">
         <li>Stairs hoovered.</li>
         <li>Landing hoovered.</li>
@@ -442,7 +308,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
-  <details class="sop" id="floors-weekly" data-who="leo" data-period="w" data-sat data-time="50 min">
+  <details class="sop" id="floors-weekly" data-who="leo" data-period="w" data-sat data-days="6" data-time="50 min">
     <summary>Floors</summary>
     <div class="body">
       <p class="when">Saturday reset, once the others have finished in each room.</p>
@@ -457,145 +323,11 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       <p class="dw"><b>Done when:</b> the kitchen and both bathroom floors mopped, and the porch and path swept.</p>
     </div>
   </details>
-
-  <details class="sop" id="dusting-weekly" data-who="leo" data-period="w" data-sat data-time="40 min">
-    <summary>Dusting</summary>
-    <div class="body">
-      <p class="when">Saturday reset.</p>
-      <ol class="steps">
-        <li>Living room dusted: surfaces, TV stand, and window sills.</li>
-        <li>Library dusted, and the books upright with nothing leaning.</li>
-        <li>Landing dusted.</li>
-        <li>Cobwebs and high corners done.</li>
-        <li>Both dusters cleaned.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> the living room, library, and landing dusted, and both dusters clean.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="shirts" data-who="leo" data-period="w" data-sat data-time="35 min hands-on">
-    <summary>Your shirts</summary>
-    <div class="body">
-      <p class="when">Saturday, first wash of the day.</p>
-      <ol class="steps">
-        <li>Shirts washed: Synthetics, 40°C, Easy Iron on.</li>
-        <li>Shirts dried.</li>
-        <li>Shirts ironed and hung up.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> a week of shirts ironed and hung up.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="bins" data-who="zone:living" data-rota="weekday" data-period="w" data-time="10 min">
-    <summary>Bins</summary>
-    <div class="body">
-      <p class="when">The evening before collection, usually Tuesday. This week says which bin.</p>
-      <ol class="steps">
-        <li>The right bin out at the kerb: grey or red.</li>
-        <li>Lid shut.</li>
-        <li>Bin back in after collection.</li>
-      </ol>
-      <p class="note">Collection is Wednesday, with grey and red on alternate weeks. Christmas and bank holidays can move it; This week already allows for Christmas 2026.</p>
-      <p class="dw"><b>Done when:</b> the right bin out the night before, and back in after collection.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="laundry" data-who="all" data-period="w" data-time="30 min hands-on">
-    <summary>Your laundry</summary>
-    <div class="body">
-      <p class="when">Your laundry day (see This week).</p>
-      <ol class="steps">
-        <li>Pockets checked.</li>
-        <li>Sorted into darks and lights.</li>
-        <li>The right programme for the load (below).</li>
-        <li>Out of the machine within 30 minutes of finishing.</li>
-        <li>Dried on the airer, not on radiators. More than the airer takes? The extra racks, with the dehumidifier on its laundry setting.</li>
-        <li>Folded and put away the same day, and the airer left clear.</li>
-      </ol>
-      <div class="tw">
-        <table class="guide">
-          <tbody>
-            <tr><th scope="row">Everyday clothes</th><td>Daily Wash</td></tr>
-            <tr><th scope="row">Cottons</th><td>Cotton, 40°C</td></tr>
-            <tr><th scope="row">Darks</th><td>Dark Garment</td></tr>
-            <tr><th scope="row">Jeans</th><td>Denim</td></tr>
-            <tr><th scope="row">Gym kit and synthetics</th><td>Synthetics, 40°C</td></tr>
-            <tr><th scope="row">Shirts</th><td>Synthetics, 40°C, Easy Iron on</td></tr>
-            <tr><th scope="row">Wool and delicates</th><td>Wool</td></tr>
-            <tr><th scope="row">Coats and outdoor kit</th><td>Outdoor Care</td></tr>
-            <tr><th scope="row">Stained things</th><td>Stain Away</td></tr>
-            <tr><th scope="row">Towels and bath mats</th><td>Cotton, 60°C</td></tr>
-            <tr><th scope="row">Bedding</th><td>Bedding</td></tr>
-            <tr><th scope="row">Small, lightly worn load</th><td>15' Quick Wash</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="dw"><b>Done when:</b> machine empty, airer clear, and your clothes put away.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="household-wash" data-who="zone:bathrooms" data-rota="weekday" data-period="w" data-time="20 min">
-    <summary>Household wash</summary>
-    <div class="body">
-      <p class="when">Friday.</p>
-      <ol class="steps">
-        <li>Towels, tea towels, and bath mats collected.</li>
-        <li>Washed on Cotton, 60°C.</li>
-        <li>Dried on the airer, or on the extra racks with the dehumidifier on its laundry setting if it's a big load.</li>
-        <li>Folded and back where they live.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> clean towels and tea towels back in place.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="dinner-plan" data-who="aurora eshaal" data-period="w" data-time="30 min">
-    <summary>Next week's dinners</summary>
-    <div class="body">
-      <p class="when">Friday, before the shop.</p>
-      <ol class="steps">
-        <li>Five dinners agreed.</li>
-        <li>Their ingredients on the shopping list.</li>
-        <li data-who="aurora">Meal plan written up on the fridge.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> next week's dinners agreed, on the shopping list, and on the fridge.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="shop" data-who="aurora dad leo" data-period="w" data-time="1 hour">
-    <summary>Weekly shop</summary>
-    <div class="body">
-      <p class="when">Friday. Aurora and Dad.</p>
-      <ol class="steps">
-        <li data-who="aurora dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
-        <li data-who="aurora dad">Next week's dinner ingredients added.</li>
-        <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
-        <li data-who="aurora dad">Dad: order approved and paid.</li>
-        <li data-who="aurora dad">Shopping put away, fridge and freezer things first and new behind old.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> staples, next week's dinners, and any food tech ingredients covered, and everything put away.</p>
-    </div>
-  </details>
-
-  <details class="sop" id="dad-weekly" data-who="dad" data-period="w" data-sat data-time="3 hours">
-    <summary>Dad</summary>
-    <div class="body">
-      <ol class="steps">
-        <li>Saturday reset: your own room. Thursday is your laundry day.</li>
-        <li>Stage 1 only: a walk round with each zone owner after the reset, checking against "Done when".</li>
-        <li>One skills session: one skill, one learner, 30 minutes. Eshaal first.</li>
-        <li>Friday's shop with Aurora: order approved and paid.</li>
-        <li>Sunday lunch.</li>
-        <li>Bins washed, if they need it.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> skills session done, the shop paid for, and Sunday lunch on the table.</p>
-    </div>
-  </details>
 </section>
 
-<!-- ============ MONTHLY ============ -->
-<section class="cadence" id="monthly">
-  <h2>Monthly</h2>
-  <p class="intro">First Saturday of the month, added to the reset. That day Dad does the weekly bathroom clean, and whoever has Bathrooms does the monthly bathroom list.</p>
+<section class="gate" id="g-monthly" aria-labelledby="g-monthly-h">
+  <h2 id="g-monthly-h">Monthly</h2>
+  <p class="intro">First Saturday of the month, after the reset, so that day runs into the afternoon. Dad does the weekly bathroom clean, and whoever has Bathrooms does the monthly bathroom list. Anything not finished comes back the next Saturday.</p>
 
   <details class="sop" id="kitchen-monthly" data-who="zone:kitchen" data-period="m" data-time="50 min">
     <summary>Kitchen</summary>
@@ -679,10 +411,9 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   </details>
 </section>
 
-<!-- ============ QUARTERLY ============ -->
-<section class="cadence" id="quarterly">
-  <h2>Quarterly</h2>
-  <p class="intro">Second Saturday of January, April, July, and October, so it never lands on top of the monthly list. About 2½ hours, everyone together, Dad included.</p>
+<section class="gate" id="g-quarterly" aria-labelledby="g-quarterly-h">
+  <h2 id="g-quarterly-h">Quarterly</h2>
+  <p class="intro">Second Saturday of January, April, July, and October, after the reset, so it never lands on top of the monthly list. About 2½ hours more, everyone together, Dad included. Anything not finished comes back the next Saturday.</p>
 
   <details class="sop" id="kitchen-q" data-who="zone:kitchen" data-period="q" data-time="75 min">
     <summary>Kitchen</summary>
@@ -810,6 +541,355 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   </details>
 </section>
 
+<section class="gate" id="g-office-in" aria-labelledby="g-office-in-h">
+  <h2 id="g-office-in-h">When you get to the office</h2>
+
+  <details class="sop" id="office-in" data-who="aurora" data-period="d" data-days="1 2 3 4 5" data-time="10 min">
+    <summary>Arriving at the office</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Diffuser on.</li>
+        <li>A cuppa made for Dad.</li>
+        <li>Morning? A glass of sparkling water to Dad, for his vitamins.</li>
+        <li>Radio on Smooth Chill, volume 3. It sometimes dies overnight.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> diffuser on, Dad's cuppa made, and the radio on.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-office-out" aria-labelledby="g-office-out-h">
+  <h2 id="g-office-out-h">Before you leave the office</h2>
+
+  <details class="sop" id="office-out" data-who="aurora" data-period="d" data-days="1 2 3 4 5" data-time="15 min">
+    <summary>Leaving the office</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>All dishes, mugs, and glasses back to the kitchen.</li>
+        <li>Any used cutlery washed.</li>
+        <li>Anything that should come home, in your bag.</li>
+        <li>Diffuser off.</li>
+        <li>TV back on the screensaver.</li>
+        <li>Blinds up to the right positions.</li>
+        <li>All chairs tucked in.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> kitchen things back, diffuser off, TV on the screensaver, and blinds and chairs straight.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-home" aria-labelledby="g-home-h">
+  <h2 id="g-home-h">When you get home</h2>
+  <p class="intro">Weekdays, as soon as you're in.</p>
+
+  <details class="sop" id="coming-home" data-who="aurora eshaal leo" data-period="d" data-days="1 2 3 4 5" data-time="15 min">
+    <summary>Coming home</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Shoes and coat in their place in the living room, and slippers on.</li>
+        <li>Hands washed.</li>
+        <li data-who="aurora eshaal">Lunch box and water bottle in the dishwasher.</li>
+        <li>Bag upstairs.</li>
+        <li data-who="leo">Out of uniform: shirt in your wash basket, and the rest hung up.</li>
+        <li data-who="leo">PE day? PE kit in your wash basket.</li>
+        <li data-who="aurora eshaal">Windows open, if the weather's right.</li>
+        <li data-who="aurora eshaal">Dinner started, then a short break.</li>
+        <li data-who="leo">Homework: real progress made before anything else.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> coat, shoes, bag, and uniform away, slippers on, and dinner or homework under way.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="laundry-daily" data-who="all" data-period="d" data-we="g-morning" data-time="20 min">
+    <summary>Folding and putting away</summary>
+    <div class="body">
+      <p class="when">Anything of yours that's dry.</p>
+      <ol class="steps">
+        <li>Your dry laundry off the airer and racks.</li>
+        <li>Folded or hung up, and put away.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> none of your dry laundry left on the airer or racks, and it's all put away.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="laundry" data-who="all" data-period="w" data-when="laundry" data-we="g-morning" data-time="30 min hands-on">
+    <summary>Your laundry</summary>
+    <div class="body">
+      <p class="when">Your laundry day.</p>
+      <ol class="steps">
+        <li>Pockets checked.</li>
+        <li>Sorted into darks and lights.</li>
+        <li>The right programme for the load (below).</li>
+        <li>Out of the machine within 30 minutes of finishing.</li>
+        <li>Dried on the airer, not on radiators. More than the airer takes? The extra racks, with the dehumidifier on its laundry setting.</li>
+        <li>Folded and put away the same day, and the airer left clear.</li>
+      </ol>
+      <div class="tw">
+        <table class="guide">
+          <tbody>
+            <tr><th scope="row">Everyday clothes</th><td>Daily Wash</td></tr>
+            <tr><th scope="row">Cottons</th><td>Cotton, 40°C</td></tr>
+            <tr><th scope="row">Darks</th><td>Dark Garment</td></tr>
+            <tr><th scope="row">Jeans</th><td>Denim</td></tr>
+            <tr><th scope="row">Gym kit and synthetics</th><td>Synthetics, 40°C</td></tr>
+            <tr><th scope="row">Shirts</th><td>Synthetics, 40°C, Easy Iron on</td></tr>
+            <tr><th scope="row">Wool and delicates</th><td>Wool</td></tr>
+            <tr><th scope="row">Coats and outdoor kit</th><td>Outdoor Care</td></tr>
+            <tr><th scope="row">Stained things</th><td>Stain Away</td></tr>
+            <tr><th scope="row">Towels and bath mats</th><td>Cotton, 60°C</td></tr>
+            <tr><th scope="row">Bedding</th><td>Bedding</td></tr>
+            <tr><th scope="row">Small, lightly worn load</th><td>15' Quick Wash</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="dw"><b>Done when:</b> machine empty, airer clear, and your clothes put away.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="household-wash" data-who="zone:bathrooms" data-rota="weekday" data-period="w" data-days="5 6" data-we="g-morning" data-time="20 min">
+    <summary>Household wash</summary>
+    <div class="body">
+      <p class="when">Friday when you get home. Folded and away on Saturday morning.</p>
+      <ol class="steps">
+        <li>Towels, tea towels, and bath mats collected.</li>
+        <li>Washed on Cotton, 60°C.</li>
+        <li>Dried on the airer, or on the extra racks with the dehumidifier on its laundry setting if it's a big load.</li>
+        <li>Folded and back where they live.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> clean towels and tea towels back in place.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bins-in" data-who="zone:living" data-rota="weekday" data-period="d" data-when="bins-day" data-we="g-reset" data-time="5 min">
+    <summary>Bin back in</summary>
+    <div class="body">
+      <p class="when">Collection day.</p>
+      <ol class="steps">
+        <li>Emptied bin back in its place.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> no bin left at the kerb.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-dinner" aria-labelledby="g-dinner-h">
+  <h2 id="g-dinner-h">Dinner</h2>
+
+  <details class="sop" id="dinner" data-who="aurora eshaal" data-period="d" data-days="1 2 3 4 5" data-time="2 hours">
+    <summary>Weekday dinner</summary>
+    <div class="body">
+      <p class="when">Monday to Friday, together. Dinner at 7pm.</p>
+      <p class="sub">Before you start</p>
+      <ol class="steps">
+        <li>Tonight's meal and who does what agreed.</li>
+        <li>Dishwasher empty, sink empty, and worktops clear.</li>
+        <li>Mise en place: every ingredient prepped, and every pan and tool out, before the heat goes on.</li>
+      </ol>
+      <p class="sub">On time</p>
+      <ol class="steps">
+        <li>Started at the time that gets dinner out at 7pm.</li>
+        <li>Everyone told 10 minutes before.</li>
+        <li>Dinner on the table at 7pm.</li>
+      </ol>
+      <p class="sub">Clean-up</p>
+      <ol class="steps">
+        <li>Table cleared.</li>
+        <li>Food scraps in the kitchen bin.</li>
+        <li>Dishwasher loaded and on.</li>
+        <li>Pans, utensils, and anything that can't go in the dishwasher washed, dried, and put away.</li>
+        <li>Leftovers boxed and in the fridge.</li>
+        <li>Hob, worktops, and table wiped.</li>
+        <li>Sink empty and wiped.</li>
+        <li>Kitchen bin full? Out to the outside bin, and a new bag in.</li>
+        <li>Kitchen floor swept.</li>
+        <li>Hob and oven off.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> dinner went out on time, the kitchen is back to clear, and the dishwasher is running.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-meal" aria-labelledby="g-meal-h">
+  <h2 id="g-meal-h">After the main meal</h2>
+  <p class="intro">Weekends: after Saturday's takeaway, and after Sunday lunch.</p>
+
+  <details class="sop" id="weekend-cleanup" data-who="zone:kitchen" data-period="d" data-days="0 6" data-time="40 min">
+    <summary>Weekend clean-up</summary>
+    <div class="body">
+      <p class="when">After a Saturday takeaway and Sunday lunch.</p>
+      <ol class="steps">
+        <li>Table cleared.</li>
+        <li>Food scraps in the kitchen bin.</li>
+        <li>Dishwasher loaded and on.</li>
+        <li>Pans and anything that can't go in the dishwasher washed, dried, and put away.</li>
+        <li>Leftovers boxed and in the fridge.</li>
+        <li>Hob, worktops, and table wiped.</li>
+        <li>Sink empty and wiped.</li>
+        <li>Kitchen bin full? Out to the outside bin, and a new bag in.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the kitchen is back to clear and the dishwasher is running.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="floors-daily" data-who="leo" data-period="d" data-days="0 6" data-time="10 min">
+    <summary>Kitchen floor</summary>
+    <div class="body">
+      <p class="when">After Saturday's takeaway and Sunday lunch, once the clean-up is done.</p>
+      <ol class="steps">
+        <li>Kitchen floor swept.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> no crumbs on the kitchen floor.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-after" aria-labelledby="g-after-h">
+  <h2 id="g-after-h">After dinner</h2>
+
+  <details class="sop" id="bath-daily" data-who="zone:bathrooms" data-rota="today" data-period="d" data-time="10 min">
+    <summary>Bathrooms check</summary>
+    <div class="body">
+      <p class="when">Evening, by 9pm.</p>
+      <ol class="steps">
+        <li>Downstairs sink and taps wiped with a J-cloth.</li>
+        <li>Downstairs toilet brushed, then the seat and handle wiped with a used J-cloth. Bin the cloth.</li>
+        <li>Towels hung up, and the bath mat on the lower radiator rung.</li>
+        <li>Upstairs toilet and sink: the same.</li>
+        <li>A spare loo roll and soap in both bathrooms.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> both sinks wiped, both toilets brushed, and a spare loo roll in each.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="living-daily" data-who="zone:living" data-rota="today" data-period="d" data-time="15 min">
+    <summary>Living room reset</summary>
+    <div class="body">
+      <p class="when">Evening, by 9pm.</p>
+      <ol class="steps">
+        <li>Coffee table clear, apart from a neat stack of books for Dad.</li>
+        <li>Sofas clear.</li>
+        <li>Books back on their shelves. Not sure where one goes? On the stack for Dad.</li>
+        <li>Cushions and throws straight, and remotes back.</li>
+        <li>Cups and plates in the dishwasher.</li>
+        <li>Shoes and coats tidy in their place.</li>
+        <li>Post from the porch to Dad.</li>
+        <li>Stairs clear.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> coffee table and sofas clear, and nothing on the stairs.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="bins" data-who="zone:living" data-rota="weekday" data-period="d" data-when="bins-eve" data-time="5 min">
+    <summary>Bins out</summary>
+    <div class="body">
+      <p class="when">The evening before collection, usually Tuesday. This week says which bin.</p>
+      <ol class="steps">
+        <li>The right bin out at the kerb: grey or red.</li>
+        <li>Lid shut.</li>
+      </ol>
+      <p class="note">Collection is Wednesday, with grey and red on alternate weeks. Christmas and bank holidays can move it; This week already allows for Christmas 2026.</p>
+      <p class="dw"><b>Done when:</b> the right bin at the kerb, lid shut.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dinner-plan" data-who="aurora eshaal" data-period="w" data-days="5" data-time="30 min">
+    <summary>Next week's dinners</summary>
+    <div class="body">
+      <p class="when">Friday, before the shop.</p>
+      <ol class="steps">
+        <li>Five dinners agreed.</li>
+        <li>Their ingredients on the shopping list.</li>
+        <li data-who="aurora">Meal plan written up on the fridge.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> next week's dinners agreed, on the shopping list, and on the fridge.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="shop" data-who="aurora dad leo" data-period="w" data-days="5" data-time="1 hour">
+    <summary>Weekly shop</summary>
+    <div class="body">
+      <p class="when">Friday. Aurora and Dad.</p>
+      <ol class="steps">
+        <li data-who="aurora dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
+        <li data-who="aurora dad">Next week's dinner ingredients added.</li>
+        <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
+        <li data-who="aurora dad">Dad: order approved and paid.</li>
+        <li data-who="aurora dad">Shopping put away, fridge and freezer things first and new behind old.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> staples, next week's dinners, and any food tech ingredients covered, and everything put away.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-bed" aria-labelledby="g-bed-h">
+  <h2 id="g-bed-h">Before bed</h2>
+
+  <details class="sop" id="evening" data-who="all" data-period="d" data-time="25 min">
+    <summary>Your evening</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Your things off the coffee table and sofas.</li>
+        <li>Shoes and coat in their place in the living room.</li>
+        <li>Bag, clothes, and charger upstairs.</li>
+        <li>Cups and plates in the dishwasher.</li>
+        <li>Phone charging on a hard surface, not on the bed.</li>
+        <li>Showered. A quick one counts.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> nothing of yours left downstairs, no dishes upstairs, and you've showered.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dad-daily" data-who="dad" data-period="d" data-time="10 min">
+    <summary>Dad</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Post dealt with.</li>
+        <li>Last thing: doors locked and downstairs windows shut.</li>
+        <li>Candles lit for the evening, and out before bed.</li>
+        <li>Hob and oven off.</li>
+      </ol>
+      <p class="note">Stage 1 only: one reminder per person per job. After that, leave it.</p>
+      <p class="dw"><b>Done when:</b> post dealt with, house locked, and candles out.</p>
+    </div>
+  </details>
+</section>
+
+<section class="gate" id="g-any" aria-labelledby="g-any-h">
+  <h2 id="g-any-h">Any time</h2>
+  <p class="intro">Whenever it comes up.</p>
+
+  <details class="sop" id="shower" data-who="all" data-period="d" data-time="5 min">
+    <summary>After every shower</summary>
+    <div class="body">
+      <p class="when">Downstairs shower, every time.</p>
+      <ol class="steps">
+        <li>Glass and walls squeegeed.</li>
+        <li>Leave-on shower spray on.</li>
+        <li>Hair out of the plughole.</li>
+        <li>Towel on the rail or your hook.</li>
+        <li>Bath mat on the lower radiator rung.</li>
+        <li>Fan on or window open.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> glass squeegeed and sprayed, plughole clear, and towel and mat hung up.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="dad-weekly" data-who="dad" data-period="w" data-sat data-time="3 hours">
+    <summary>Dad</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Saturday reset: your own room. Thursday is your laundry day.</li>
+        <li>Stage 1 only: a walk round with each zone owner after the reset, checking against "Done when".</li>
+        <li>One skills session: one skill, one learner, 30 minutes. Eshaal first.</li>
+        <li>Friday's shop with Aurora: order approved and paid.</li>
+        <li>Sunday lunch.</li>
+        <li>Bins washed, if they need it.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> skills session done, the shop paid for, and Sunday lunch on the table.</p>
+    </div>
+  </details>
+</section>
+
 <!-- ============ SKILLS ============ -->
 <section id="skills">
   <h2>Skills</h2>
@@ -876,7 +956,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 <section id="how">
   <h2>How it works</h2>
   <ul class="rules">
-    <li><b>Your jobs.</b> Pick your name at the top. You'll see your own jobs, this week's zone, and anything due today.</li>
+    <li><b>Your jobs.</b> Pick your name at the top. You'll see this week's zone, and today's jobs under the moments in the day they belong to. When a moment comes, do the cards under it.</li>
     <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Weekday dinners are always Aurora and Eshaal's.</li>
     <li><b>The standard.</b> "Done when" is the standard. If it isn't met, it isn't done.</li>
     <li><b>Ticks.</b> Ticks stay on your phone and nobody else sees them. They clear themselves overnight, on Mondays, and when the month or quarter turns over.</li>
@@ -932,7 +1012,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     { cooks: [], label: "Eating out or ordering in", short: "Out or takeaway" }
   ];
   const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
-  const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset"];          // Sunday first; bins are added below.
+  const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
   /* ---------- End of settings ---------- */
 
   const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
@@ -971,10 +1051,12 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     const p = card.getAttribute("data-period");
     return p === "m" ? weekOfSat(mSat) : p === "q" ? weekOfSat(qSat) : week;
   };
-  const notYet = (card) => {
-    const p = card.getAttribute("data-period");
-    return (p === "m" && today < mSat - 5 * DAY) || (p === "q" && today < qSat - 5 * DAY);
-  };
+  // With a name picked, monthly and quarterly lists show on their Saturday, then on later
+  // Saturdays in the same month or quarter until every step is ticked. Lists that came due
+  // before rota week 0 have no owner, so they don't carry over.
+  const listSat = (card) => (card.getAttribute("data-period") === "m" ? mSat : qSat);
+  const carried = (card) => today > listSat(card) && listSat(card) >= utc(EPOCH) && !allTicked(card);
+  const listDue = (card) => isSat && (today === listSat(card) || carried(card));
 
   // kind is "weekday" (Monday to Friday) or "weekend" (weekend jobs, Saturday cleans, monthly and quarterly lists).
   const zonesOf = (name, w, kind) => {
@@ -1051,8 +1133,10 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   /* ---------- Cards: summary line, ticks, progress ---------- */
   const cards = Array.from(document.querySelectorAll(".sop"));
 
+  const stepBoxes = (card) => Array.from(card.querySelectorAll("ol.steps > li:not([hidden]) input"));
+  const allTicked = (card) => { const b = stepBoxes(card); return b.length > 0 && b.every((x) => x.checked); };
   const progress = (card) => {
-    const boxes = Array.from(card.querySelectorAll("ol.steps > li:not([hidden]) input"));
+    const boxes = stepBoxes(card);
     const done = boxes.filter((b) => b.checked).length;
     card.querySelector(".p").textContent = boxes.length ? done + "/" + boxes.length : "";
     card.classList.toggle("done", boxes.length > 0 && done === boxes.length);
@@ -1088,6 +1172,17 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     });
   });
 
+  /* ---------- Gates: a few cards move to another moment at the weekend ---------- */
+  if (todayKind === "weekend") {
+    cards.forEach((card) => {
+      const to = document.getElementById(card.getAttribute("data-we") || "");
+      if (card.getAttribute("data-when") === "bins-day" && !collectedOn(today)) return;
+      if (to) to.appendChild(card);
+    });
+  }
+  const mh = document.getElementById("g-morning-h");
+  mh.textContent = mh.getAttribute(todayKind === "weekend" ? "data-weekend" : "data-weekday");
+
   const tagsFor = (card, person) => {
     const id = card.id;
     const per = card.getAttribute("data-period");
@@ -1109,6 +1204,9 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     } else if (id === "bins") {
       const b = binsEve(today);
       if (b) out.push("Tonight: " + b);
+    } else if (id === "bins-in") {
+      const b = collectedOn(today);
+      if (b) out.push("Today: " + b);
     } else if (id === "dinner-plan") {
       if (dow === 5) out.push("Today");
     } else if (id === "shop") {
@@ -1119,6 +1217,8 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       out.push("Today");
     } else if (per === "q" && quarterSat && (!q || +q === quarter)) {
       out.push("Today");
+    } else if ((per === "m" || per === "q") && isSat && (!q || +q === quarter) && carried(card)) {
+      out.push("Still to finish");
     }
     if (q && +q === quarter) out.push("This quarter");
     if (id === "bath-weekly" && firstSat) out.push("Dad does this today");
@@ -1150,7 +1250,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     const ld = LAUNDRY.indexOf(p);
     if (ld > -1) out.push("Your laundry day is " + DAYS[ld] + ".");
     if (wd.indexOf("bathrooms") > -1) out.push("Friday's household wash is yours.");
-    if (wd.indexOf("living") > -1) out.push("Bins go out the night before collection.");
+    if (wd.indexOf("living") > -1) out.push("Bins go out the night before collection, and back in when you get home.");
     if (we.indexOf("living") > -1) out.push("On Saturday you hoover the stairs while " + ownerOf("kitchen", week, "weekend") + " holds the unit.");
     if (we.indexOf("kitchen") > -1) out.push("On Saturday you hold the hoover while " + ownerOf("living", week, "weekend") + " does the stairs.");
     return out.join(" ");
@@ -1177,10 +1277,12 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     const meal = MEALS[dow];
     bits.push(meal.cooks.length ? meal.label + (meal.label.indexOf("lunch") > -1 ? "." : " cook dinner.") : meal.label + " tonight.");
     bits.push(laundrySentence(dow));
-    if (quarterSat) bits.push("Saturday reset plus the quarterly session, about 2½ hours with everyone.");
-    else if (firstSat) bits.push("Saturday reset plus the monthly lists. Dad does the weekly bathroom clean.");
-    else if (isSat) bits.push("Saturday reset, done by midday.");
+    if (quarterSat) bits.push("Saturday reset from 9:00, then the quarterly session, about 2½ hours more with everyone.");
+    else if (firstSat) bits.push("Saturday reset from 9:00, then the monthly lists. Dad does the weekly bathroom clean.");
+    else if (isSat) bits.push("Saturday reset from 9:00, done by midday.");
     if (dow === 5) bits.push("Next week's meal plan goes on the fridge, and Aurora and Dad do the shop.");
+    const c = collectedOn(today);
+    if (c) bits.push("Bin day: the " + c + " comes back in (" + ownerOf("living", week, "weekday") + ").");
     const b = binsEve(today);
     if (b) bits.push("Bins out tonight: the " + b + " (" + ownerOf("living", week, "weekday") + ").");
     h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + esc(bits.join(" ")) + "</p>";
@@ -1257,26 +1359,41 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     picker.appendChild(b);
   });
 
+  // With a name picked, a card shows only on the days it's due. Everyone sees every card.
+  const dueToday = (card) => {
+    const q = card.getAttribute("data-quarter");
+    const days = card.getAttribute("data-days");
+    const p = card.getAttribute("data-period");
+    const on = card.getAttribute("data-when");
+    if (q && +q !== quarter) return false;
+    if (days && days.split(" ").indexOf(String(dow)) < 0) return false;
+    if (on === "laundry") return LAUNDRY[dow] === who;
+    if (on === "bins-eve") return !!binsEve(today);
+    if (on === "bins-day") return !!collectedOn(today);
+    if (p === "m" || p === "q") return listDue(card);
+    return true;
+  };
+
   function apply() {
     Array.from(picker.querySelectorAll("button")).forEach((b) => b.setAttribute("aria-pressed", String(b.value === who)));
     renderWeek();
     cards.forEach((card) => {
-      const q = card.getAttribute("data-quarter");
-      const days = card.getAttribute("data-days");
       const w = cardWeek(card);
       const kind = cardKind(card);
-      let show = matches(card.getAttribute("data-who") || "all", who, w, kind);
-      if (who && ((q && +q !== quarter) || notYet(card) || (days && days.split(" ").indexOf(String(dow)) < 0))) show = false;
-      card.hidden = !show;
       // Steps and notes can carry data-who and data-days too, as cards do.
       Array.from(card.querySelectorAll("[data-who], [data-days]")).forEach((el) => {
         const d = el.getAttribute("data-days");
         el.hidden = !matches(el.getAttribute("data-who") || "all", who, w, kind) || !!(who && d && d.split(" ").indexOf(String(dow)) < 0);
       });
+      card.hidden = !matches(card.getAttribute("data-who") || "all", who, w, kind) || !!(who && !dueToday(card));
       card.querySelector(".tags").innerHTML = tagsFor(card, who).map((t) => '<span class="tag">' + esc(t) + "</span>").join("");
       progress(card);
     });
-    Array.from(document.querySelectorAll("section.cadence")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
+    Array.from(document.querySelectorAll("section.gate")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
+    Array.from(document.querySelectorAll(".jump a")).forEach((a) => {
+      const target = document.getElementById(a.getAttribute("href").slice(1));
+      a.hidden = !!(target && target.hidden);
+    });
     renderSkills();
   }
 
