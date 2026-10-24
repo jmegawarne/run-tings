@@ -200,7 +200,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 
 <section class="gate" id="g-reset" aria-labelledby="g-reset-h">
   <h2 id="g-reset-h">Saturday reset</h2>
-  <p class="intro">Saturday from 9:00, everyone together, done by midday. Dad works alongside. Do the cards in order: Leo's shirts go in first, and he dusts while the others do their bedrooms. His floors come last.</p>
+  <p class="intro">Saturday from 9:00, everyone together, done by midday. Dad works alongside. Do the cards in order: Leo's shirts go in first, he dusts while the others do their bedrooms, and his slow cooker is on by 11:00. His floors come last.</p>
 
   <details class="sop" id="shirts" data-who="leo" data-period="w" data-sat data-days="6" data-time="35 min hands-on">
     <summary>Your shirts</summary>
@@ -230,11 +230,26 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     </div>
   </details>
 
+  <details class="sop" id="slow-cooker" data-who="leo" data-period="w" data-sat data-days="6" data-time="45 min">
+    <summary>Slow-cooker dinner</summary>
+    <div class="body">
+      <p class="when">On by 11:00, after your dusting.</p>
+      <ol class="steps">
+        <li>Sink empty and worktops clear.</li>
+        <li>Everything prepped and in the pot, as the recipe says.</li>
+        <li>Slow cooker on, lid on, at the recipe's setting.</li>
+        <li>Unused ingredients back in the fridge or cupboard.</li>
+        <li>Boards, knives, and bowls in the dishwasher or washed, and the worktops wiped.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the slow cooker is on by 11:00 with its lid on, and the worktops are clear.</p>
+    </div>
+  </details>
+
   <details class="sop" id="room-weekly" data-who="all" data-period="w" data-sat data-days="6" data-time="40 min">
     <summary>Your bedroom</summary>
     <div class="body">
       <p class="when">Beds stripped first. The bedding goes in after the shirts.</p>
-      <p class="note" data-who="leo">Leo: strip your bed first, then do the rest after your dusting.</p>
+      <p class="note" data-who="leo">Leo: strip your bed first, then do the rest once the slow cooker's on.</p>
       <ol class="steps">
         <li>Bed stripped and bedding in the wash (Bedding programme).</li>
         <li>Surfaces dusted with the small duster.</li>
@@ -252,7 +267,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   <details class="sop" id="kitchen-weekly" data-who="zone:kitchen" data-period="w" data-sat data-days="6" data-time="40 min">
     <summary>Kitchen</summary>
     <div class="body">
-      <p class="when">Saturday reset. Leo does the floor.</p>
+      <p class="when">Saturday reset, once Leo's slow cooker is on. Leo does the floor.</p>
       <ol class="steps">
         <li>Fridge: anything out of date binned, and the shelves, drawers, and door seal wiped.</li>
         <li>Microwave cleaned inside.</li>
@@ -713,13 +728,14 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 
 <section class="gate" id="g-meal" aria-labelledby="g-meal-h">
   <h2 id="g-meal-h">After the main meal</h2>
-  <p class="intro">Weekends: after Saturday's takeaway, and after Sunday lunch.</p>
+  <p class="intro">Weekends: after Saturday's dinner, and after Sunday lunch.</p>
 
   <details class="sop" id="weekend-cleanup" data-who="zone:kitchen" data-period="d" data-days="0 6" data-time="40 min">
     <summary>Weekend clean-up</summary>
     <div class="body">
-      <p class="when">After a Saturday takeaway and Sunday lunch.</p>
+      <p class="when">After Saturday's dinner and Sunday lunch.</p>
       <ol class="steps">
+        <li data-days="6">Saturday: slow cooker off.</li>
         <li>Table cleared.</li>
         <li>Food scraps in the kitchen bin.</li>
         <li>Dishwasher loaded and on.</li>
@@ -736,7 +752,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   <details class="sop" id="floors-daily" data-who="leo" data-period="d" data-days="0 6" data-time="10 min">
     <summary>Kitchen floor</summary>
     <div class="body">
-      <p class="when">After Saturday's takeaway and Sunday lunch, once the clean-up is done.</p>
+      <p class="when">After Saturday's dinner and Sunday lunch, once the clean-up is done.</p>
       <ol class="steps">
         <li>Kitchen floor swept.</li>
       </ol>
@@ -814,11 +830,12 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       <ol class="steps">
         <li data-who="aurora dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
         <li data-who="aurora dad">Next week's dinner ingredients added.</li>
+        <li>Leo, with Aurora: tomorrow's slow-cooker ingredients added.</li>
         <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
         <li data-who="aurora dad">Dad: order approved and paid.</li>
         <li data-who="aurora dad">Shopping put away, fridge and freezer things first and new behind old.</li>
       </ol>
-      <p class="dw"><b>Done when:</b> staples, next week's dinners, and any food tech ingredients covered, and everything put away.</p>
+      <p class="dw"><b>Done when:</b> staples, next week's dinners, tomorrow's slow-cooker dinner, and any food tech ingredients covered, and everything put away.</p>
     </div>
   </details>
 </section>
@@ -960,7 +977,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   <h2>How it works</h2>
   <ul class="rules">
     <li><b>Your jobs.</b> Pick your name at the top. You'll see this week's zone, and today's jobs under the moments in the day they belong to. When a moment comes, do the cards under it.</li>
-    <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Weekday dinners are always Aurora and Eshaal's.</li>
+    <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Weekday dinners are always Aurora and Eshaal's, and Saturday's slow-cooker dinner is Leo's.</li>
     <li><b>The standard.</b> "Done when" is the standard. If it isn't met, it isn't done.</li>
     <li><b>Ticks.</b> Ticks stay on your phone and nobody else sees them. They clear themselves overnight, on Mondays, and when the month or quarter turns over.</li>
     <li><b>Your own dishes.</b> Straight into the dishwasher, every time.</li>
@@ -1012,7 +1029,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
     { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
     { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
-    { cooks: [], label: "Eating out or ordering in", short: "Out or takeaway" }
+    { cooks: ["Leo"], label: "Leo's slow-cooker dinner", short: "Leo's slow cooker" }
   ];
   const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
   const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
@@ -1255,13 +1272,13 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     if (cookDays.length) {
       const partner = MEALS[cookDays[0]].cooks.filter((n) => n !== p);
       const weekdays = cookDays.length === 5 && cookDays.every((d) => d >= 1 && d <= 5);
-      const when = weekdays ? "every weekday" : and(cookDays.map((d) => DAYS[d] + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : "")));
+      const when = weekdays ? "every weekday" : and(cookDays.map((d) => DAYS[d] + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : " dinner")));
       out.push("You cook " + when + (partner.length ? " with " + and(partner) : "") + ".");
     }
     if (p === "Aurora") out.push("On Friday you and Eshaal agree next week's dinners, then you put the plan on the fridge and do the shop with Dad.");
     if (p === "Eshaal") out.push("On Friday you and Aurora agree next week's dinners.");
     if (p === "Dad") out.push("Friday's shop is yours and Aurora's.");
-    if (p === "Leo") out.push("On Friday you and Aurora add any food tech ingredients to the shop.");
+    if (p === "Leo") out.push("On Friday you and Aurora add Saturday's slow-cooker ingredients, and any food tech ones, to the shop.");
     const ld = LAUNDRY.indexOf(p);
     if (ld > -1) out.push("Your laundry day is " + DAYS[ld] + ".");
     if (wd.indexOf("bathrooms") > -1) out.push("Friday's household wash is yours.");
@@ -1292,7 +1309,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     const meal = MEALS[dow];
     const links = meal.cooks.length ? recipeLinks(today) : [];
     const mealHtml = meal.cooks.length
-      ? esc(meal.label + (meal.label.indexOf("lunch") > -1 ? "" : " cook dinner")) + (links.length ? ": " + and(links) : "") + "."
+      ? esc(meal.label + (/lunch|dinner/.test(meal.label) ? "" : " cook dinner")) + (links.length ? ": " + and(links) : "") + "."
       : esc(meal.label + " tonight.");
     bits.push(laundrySentence(dow));
     if (quarterSat) bits.push("Saturday reset from 9:00, then the quarterly session, about 2½ hours more with everyone.");
