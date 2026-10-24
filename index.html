@@ -610,7 +610,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
         <li data-who="leo">Out of uniform: shirt in your wash basket, and the rest hung up.</li>
         <li data-who="leo">PE day? PE kit in your wash basket.</li>
         <li data-who="aurora eshaal">Windows open, if the weather's right.</li>
-        <li data-who="aurora eshaal">Dinner started, then a short break.</li>
+        <li data-who="aurora eshaal" data-days="1 2 3 4">Dinner started, then a short break.</li>
         <li data-who="leo">Homework: real progress made before anything else.</li>
       </ol>
       <p class="dw"><b>Done when:</b> coat, shoes, bag, and uniform away, slippers on, and dinner or homework under way.</p>
@@ -692,10 +692,10 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
 <section class="gate" id="g-dinner" aria-labelledby="g-dinner-h">
   <h2 id="g-dinner-h">Dinner</h2>
 
-  <details class="sop" id="dinner" data-who="aurora eshaal" data-period="d" data-days="1 2 3 4 5" data-time="2 hours">
+  <details class="sop" id="dinner" data-who="aurora eshaal" data-period="d" data-days="1 2 3 4" data-time="2 hours">
     <summary>Weekday dinner</summary>
     <div class="body">
-      <p class="when">Monday to Friday, together. Dinner at 7pm.</p>
+      <p class="when">Monday to Thursday, together. Dinner at 7pm.</p>
       <p class="sub">Before you start</p>
       <ol class="steps">
         <li>Tonight's meal and who does what agreed.</li>
@@ -815,7 +815,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     <div class="body">
       <p class="when">Friday, before the shop.</p>
       <ol class="steps">
-        <li>Five dinners agreed.</li>
+        <li>Four dinners agreed.</li>
         <li>Their ingredients on the shopping list.</li>
         <li data-who="aurora">Meal plan written up on the fridge.</li>
       </ol>
@@ -977,7 +977,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   <h2>How it works</h2>
   <ul class="rules">
     <li><b>Your jobs.</b> Pick your name at the top. You'll see this week's zone, and today's jobs under the moments in the day they belong to. When a moment comes, do the cards under it.</li>
-    <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Weekday dinners are always Aurora and Eshaal's, and Saturday's slow-cooker dinner is Leo's.</li>
+    <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Aurora and Eshaal always cook dinner from Monday to Thursday, and Saturday's slow-cooker dinner is Leo's. On Fridays we eat out.</li>
     <li><b>The standard.</b> "Done when" is the standard. If it isn't met, it isn't done.</li>
     <li><b>Ticks.</b> Ticks stay on your phone and nobody else sees them. They clear themselves overnight, on Mondays, and when the month or quarter turns over.</li>
     <li><b>Your own dishes.</b> Straight into the dishwasher, every time.</li>
@@ -1028,7 +1028,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
     { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
     { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
-    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: [], label: "Eating out", short: "Eating out" },
     { cooks: ["Leo"], label: "Leo's slow-cooker dinner", short: "Leo's slow cooker" }
   ];
   const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
@@ -1225,7 +1225,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     const ownLaundry = l && l !== "Household" && l !== "Bedding";
     const weekday = dow >= 1 && dow <= 5;
     if (id === "dinner") {
-      if (weekday) out.push(person ? "Tonight" : "Tonight: " + MEALS[dow].label);
+      if (weekday && MEALS[dow].cooks.length) out.push(person ? "Tonight" : "Tonight: " + MEALS[dow].label);
     } else if (id === "weekend-cleanup") {
       if (!weekday) out.push("Today");
     } else if (id === "laundry") {
@@ -1271,8 +1271,11 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     for (let i = 1; i <= 7; i++) { const d = i % 7; if (MEALS[d].cooks.indexOf(p) > -1) cookDays.push(d); }
     if (cookDays.length) {
       const partner = MEALS[cookDays[0]].cooks.filter((n) => n !== p);
-      const weekdays = cookDays.length === 5 && cookDays.every((d) => d >= 1 && d <= 5);
-      const when = weekdays ? "every weekday" : and(cookDays.map((d) => DAYS[d] + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : " dinner")));
+      // Three or more weekdays in a row read as a span: "every weekday", or "dinner from Monday to Thursday".
+      const span = cookDays.length > 2 && cookDays.every((d, i) => d >= 1 && d <= 5 && (i === 0 || d === cookDays[i - 1] + 1));
+      const when = span
+        ? (cookDays.length === 5 ? "every weekday" : "dinner from " + DAYS[cookDays[0]] + " to " + DAYS[cookDays[cookDays.length - 1]])
+        : and(cookDays.map((d) => DAYS[d] + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : " dinner")));
       out.push("You cook " + when + (partner.length ? " with " + and(partner) : "") + ".");
     }
     if (p === "Aurora") out.push("On Friday you and Eshaal agree next week's dinners, then you put the plan on the fridge and do the shop with Dad.");
@@ -1301,7 +1304,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   const rowsHtml = (rows) => rows.map(([z, n]) => "<div><dt>" + esc(z) + "</dt><dd>" + esc(n) + "</dd></div>").join("");
   const renderWeek = () => {
     let h = '<p class="next">' + esc(range()) + "</p>";
-    h += '<p class="sub">Weekdays</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekday").concat([["Dinners", "Aurora and Eshaal"]])) + "</dl>";
+    h += '<p class="sub">Weekdays</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekday").concat([["Dinners, Mon to Thu", "Aurora and Eshaal"]])) + "</dl>";
     h += '<p class="sub">Weekend</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekend").concat([["Floors and dusting", "Leo"]])) + "</dl>";
     const nx = (kind) => rotaRows(week + 1, kind).map(([z, n]) => z + " " + n).join(", ");
     h += '<p class="next">Next week: weekdays ' + esc(nx("weekday")) + "; weekend " + esc(nx("weekend")) + ".</p>";
