@@ -1,40 +1,9 @@
 {
-  "2026-10-19": [
-    { "dish": "Chicken shawarma wraps", "deck": "1iGeQaxLqC0UK1Z2y4T76nFve7iCgMKjhbJlNLJxU5aM", "doc": "19baFurtImQ4fC9r6KlMbe5nEsrdCBTWi5kOwaHVtG3Q" }
-  ],
-  "2026-10-20": [
-    { "dish": "Spaghetti bolognese", "deck": "1IPeAGraLPuZYcSU3CJw8000iVcZ5o7chW6WDAvRb6hc", "doc": "1kFcS87EUg7voxqZ66rUGq0tMsjvax43lda_tYBbQYOE" }
-  ],
-  "2026-10-21": [
-    { "dish": "Slow-cooker chicken, chickpea, and spinach curry", "deck": "1HwTK-Acdq1SzUmZpMwWpooubT5lQ1YqO-rqkNuOGyYY", "doc": "1EZC549Y5z9HMST_AMH85cguhcV3B3hQbKTM7_GV0wJc" }
-  ],
-  "2026-10-22": [
-    { "dish": "Ramen with soft-boiled eggs", "deck": "16VJD1bWmkb4_0wCjQRnReD-g9mm3qazNa-u5i4tcQt8", "doc": "15R6qlQ64si4Ai2Apal9KOeLjbQmGprwiqRdggdoP_iY" }
-  ],
-  "2026-10-23": [
-    { "dish": "Air-fryer fish and chips", "deck": "1fmkfvuEmV07KSZfzCtejKsJEIuG86ZUjD961W-NXBew", "doc": "1Hym4ts6Fefi46nk1Y7VDr4ETsPcoPXVNNj2C2-N272U" }
-  ],
-  "2026-10-24": [
-    { "dish": "Steak fajitas with guacamole", "deck": "1k_-PE1LLtn5BrULt9cgyqYY5eVebTq6dX6WKdO-yh4E", "doc": "1J7EH6QZTrE6g2ILK9b0mdRiOqbC3_0QdeN-14JYlU9k" }
-  ],
-  "2026-10-25": [
-    { "dish": "Slow-roast lamb shoulder with all the trimmings", "deck": "1gTXzabCgiOJdNNNJKXgmVSBXLP9jsMLj5n0tqqMd6jc", "doc": "16VVgVuADIzTPF5DD3QVFtX1LwAocVY70BFGhsyvXY8I" },
-    { "dish": "Apple crumble and custard", "deck": "1FBTEKLw33MR4GNuSzq_SaTDVW6UF21Gpx6GZDQQZ4Mc", "doc": "1vUoYXGqmSFpTO-3jxlPhI6vlHvB7XvPLZCVZ1gfNsyE" }
-  ],
   "2026-10-26": [
     { "dish": "Shakshuka with peppers, spinach, and fried halloumi", "deck": "10VS1EPJP9yWElHJBIY5_NPYHSVWmHoxV986-FgDhvao", "doc": "1uMU2kdZ6W37xBL0YEbcI9qnvhweswFGGDzucKAOuMbs" }
   ],
-  "2026-10-27": [
-    { "dish": "Prawn egg fried rice", "deck": "1XnyPS5RI_Aq95bo96C1m3wMKGjBbXR1OGO3l1qD5HfU", "doc": "1TpeQJYU-VK4dDP8bW15n-FOVv3ulP6lrTEQ_Joo1wiM" }
-  ],
-  "2026-10-28": [
-    { "dish": "Air-fryer lemon and oregano chicken", "deck": "1Huw9Uyv7kSNvmY52BunnZSJpOgbt3iOZ8FEDN_St7mQ", "doc": "1Q0_a6LxhJEvcNOC6IBnyPWSM5Bi5hL6RKCEWOfyPuwk" }
-  ],
-  "2026-10-29": [
-    { "dish": "Keema with peas", "deck": "1MZvGLN_d4K3TyquE0BX9gpQVNhcDZnzXxOkfLJmxMl0", "doc": "1_saAdt2kHG4nrkr_0lECx2wMh0awhJa6hPSMMf--fQI" }
-  ],
   "2026-10-31": [
-    { "dish": "Slow-cooker BBQ pulled chicken buns", "deck": "1IhT67p9i2XbITiFmyd70B3hQKUdVejoJ_zBz5ewUXRg", "doc": "15kz6FCu2f-yNLnQpz-S-1E_KCMNr8vplP1_xVPwRpq4" }
+    { "dish": "Air-fryer lemon and oregano chicken", "deck": "1Huw9Uyv7kSNvmY52BunnZSJpOgbt3iOZ8FEDN_St7mQ", "doc": "1Q0_a6LxhJEvcNOC6IBnyPWSM5Bi5hL6RKCEWOfyPuwk" }
   ],
   "2026-11-01": [
     { "dish": "Fish pie with peas and glazed carrots", "deck": "1xsxhLmw64zD74Kcy8FUlO53UPndxMmAMKbXlS1bwYns", "doc": "1cH6wiaQDM3eXnnyzZm0uo-vGYaOfnwUGOFfhyPvcH2U" },
