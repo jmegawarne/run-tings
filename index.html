@@ -8,135 +8,348 @@
 <title>Routines</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: one narrow column. Name picker and this-week box on top, then collapsible SOP cards under the moments in the day they're done at. */
+/* Layout: one narrow column. Name picker and points bar on top, then this week, then collapsible SOP
+   cards under the moments in the day they're done at, then the scoreboard, skills, and safety.
+   Colour has jobs: cyan is progress and ticks, gold is points, magenta is levels and awards. */
+@font-face {
+  font-family: "Lilita One";
+  src: url("fonts/lilita-one-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
 :root {
-  --bg: #f6f7f5;
+  --bg: #f1eeff;
+  --glow: #dcd2ff;
   --surface: #ffffff;
-  --fg: #1c201e;
-  --muted: #59615d;
-  --line: #d5dbd7;
-  --accent: #23695b;
-  --accent-soft: #e0eee9;
-  --done: #2c7a3f;
-  --warn: #8a4b00;
+  --raise: #f4f1ff;
+  --fg: #1d1745;
+  --muted: #5d5884;
+  --line: #ddd6f6;
+  --lip: #d3caf2;
+  --go: #00788c;
+  --go-fill: #19c6e3;
+  --go-soft: #d9f5fa;
+  --go-ink: #04323c;
+  --pts: #8f5200;
+  --pts-fill: #ffc22e;
+  --pts-soft: #fff0c4;
+  --pts-ink: #3b2400;
+  --pts-lip: #b88400;
+  --award: #b3126a;
+  --award-fill: #d81b7f;
+  --award-soft: #fde1f0;
+  --award-lip: #8f0d55;
+  --warn: #9a4a00;
+  --display: "Lilita One", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --gl: max(16px, env(safe-area-inset-left, 0px));
+  --gr: max(16px, env(safe-area-inset-right, 0px));
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121514;
-    --surface: #1a1e1c;
-    --fg: #e5e9e7;
-    --muted: #a0aaa5;
-    --line: #2c3330;
-    --accent: #6cc2ad;
-    --accent-soft: #1d3530;
-    --done: #79c98b;
-    --warn: #e6a95a;
+    --bg: #191340;
+    --glow: #33227a;
+    --surface: #241c57;
+    --raise: #2d246a;
+    --fg: #f3f1ff;
+    --muted: #b2acdf;
+    --line: #3b3285;
+    --lip: #100b30;
+    --go: #4fe3fb;
+    --go-fill: #22cfec;
+    --go-soft: #173e66;
+    --pts: #ffd24a;
+    --pts-soft: #46345a;
+    --award: #ff74c4;
+    --award-soft: #4a1d63;
+    --award-lip: #7d0b4a;
+    --warn: #ffb54d;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121514;
-  --surface: #1a1e1c;
-  --fg: #e5e9e7;
-  --muted: #a0aaa5;
-  --line: #2c3330;
-  --accent: #6cc2ad;
-  --accent-soft: #1d3530;
-  --done: #79c98b;
-  --warn: #e6a95a;
+  --bg: #191340;
+  --glow: #33227a;
+  --surface: #241c57;
+  --raise: #2d246a;
+  --fg: #f3f1ff;
+  --muted: #b2acdf;
+  --line: #3b3285;
+  --lip: #100b30;
+  --go: #4fe3fb;
+  --go-fill: #22cfec;
+  --go-soft: #173e66;
+  --pts: #ffd24a;
+  --pts-soft: #46345a;
+  --award: #ff74c4;
+  --award-soft: #4a1d63;
+  --award-lip: #7d0b4a;
+  --warn: #ffb54d;
   color-scheme: dark;
 }
+html {
+  background: radial-gradient(40rem 20rem at 50% -8rem, var(--glow), transparent 70%) no-repeat, var(--bg);
+  scroll-behavior: smooth;
+}
 body {
-  background: var(--bg);
   color: var(--fg);
   font: 16px/1.5 var(--font);
   max-width: 42rem;
   margin: 0 auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 8px 48px;
+  padding-left: var(--gl);
+  padding-right: var(--gr);
+  padding-block: 8px 56px;
+  counter-reset: stage;
 }
-h1 { font-size: 1.6rem; line-height: 1.2; margin: 16px 0 4px; }
-h2 { font-size: 1.25rem; line-height: 1.3; margin: 32px 0 6px; text-wrap: balance; }
-h3 { font-size: 1.05rem; margin: 20px 0 6px; }
+h1, h2, h3, .who button, .lvl, .hud-pts b, .win button {
+  font-family: var(--display);
+  font-weight: 800;
+  font-synthesis: none;
+  letter-spacing: 0.01em;
+}
+h1 { font-size: 2.9rem; line-height: 1; margin: 20px 0 8px; text-shadow: 0 3px 0 var(--award-fill); }
+h2 { font-size: 1.55rem; line-height: 1.15; margin: 36px 0 8px; text-wrap: balance; }
+h3 { font-size: 1.2rem; margin: 22px 0 8px; }
+h3 small { font: 600 0.85rem var(--font); color: var(--muted); margin-left: 6px; }
 p { margin: 0 0 8px; }
-a { color: var(--accent); }
-.lede, .intro, .when, .next, .note { color: var(--muted); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--go); text-underline-offset: 2px; }
+.lede, .intro, .when, .note, .nudge { color: var(--muted); }
+.lede { font-size: 1.05rem; margin-bottom: 4px; }
+.note { font-size: 0.875rem; }
+:focus-visible { outline: 3px solid var(--go); outline-offset: 2px; border-radius: 6px; }
+section, .sop { scroll-margin-top: 84px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.who { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+/* Name picker: chunky buttons that press down. */
+.who { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 6px; }
 .who button {
-  font: inherit; padding: 8px 14px; border-radius: 999px; cursor: pointer;
-  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  font-size: 1.05rem; line-height: 1; padding: 11px 16px 10px; border-radius: 14px; cursor: pointer;
+  border: 2px solid var(--line); background: var(--surface); color: var(--fg);
+  box-shadow: 0 3px 0 var(--lip); touch-action: manipulation;
+  transition: transform 0.08s, box-shadow 0.08s;
 }
-.who button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+.who button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lip); }
+.who button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: #fff; box-shadow: 0 3px 0 var(--award-lip); }
 
-.week { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 4px 14px 10px; }
-.week h2 { margin-top: 10px; }
-.zones { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; margin: 4px 0 8px; }
-.zones div { display: contents; }
-.zones dt { color: var(--muted); }
-.zones dd { margin: 0; font-weight: 600; }
-.today, .you { border-top: 1px solid var(--line); padding-top: 8px; }
+/* Points bar: sticks to the top once a name is picked. Tapping it goes to the scoreboard. */
+.hud {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: flex; align-items: center; gap: 12px;
+  margin: 12px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl));
+  padding: 8px var(--gr) 8px var(--gl);
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-block: 2px solid var(--line);
+  color: var(--fg); text-decoration: none;
+}
+.lvl {
+  flex: none; display: grid; place-items: center;
+  width: 2.75rem; height: 3rem; color: #fff; font-size: 1.35rem; line-height: 1;
+  background: linear-gradient(160deg, var(--award-fill), #7a2bd8);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.hud-mid { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.hud-who { display: flex; gap: 8px; align-items: baseline; white-space: nowrap; overflow: hidden; }
+.hud-who b { font-size: 1rem; }
+.hud-who span { color: var(--award); font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.hud-sub { display: flex; gap: 10px; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.hud-pts { flex: none; text-align: right; line-height: 1; }
+.hud-pts b { display: block; font-size: 1.7rem; color: var(--pts); font-variant-numeric: tabular-nums; }
+.hud-pts small { font-size: 0.75rem; color: var(--muted); }
+.bar { display: block; height: 10px; border-radius: 99px; background: var(--raise); box-shadow: inset 0 0 0 2px var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; width: calc(var(--v, 0) * 100%); background: var(--go-fill); border-radius: inherit; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.bar.lv i { background: linear-gradient(90deg, var(--award-fill), #7a2bd8); }
 
-.jump { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 16px 0 0; }
+/* This week: zone grid, today's line, and your week in short. */
+.week { border: 2px solid var(--line); border-radius: 20px; background: var(--surface); padding: 6px 14px 12px; margin-top: 16px; box-shadow: 0 3px 0 var(--lip); }
+.week h2 { margin: 10px 0 6px; font-size: 1.35rem; }
+.zt { width: 100%; border-collapse: separate; border-spacing: 0 2px; font-size: 0.95rem; }
+.zt th, .zt td { padding: 3px 8px; border: 0; text-align: left; vertical-align: baseline; }
+.zt thead th, .zt .rng { font-size: 0.8rem; font-weight: 600; color: var(--muted); padding-block: 0 2px; }
+.zt .rng, .zt tbody th { padding-left: 0; }
+.zt tbody th { font-weight: 500; color: var(--muted); }
+.zt tbody td { font-weight: 700; }
+.zt td.me { background: var(--go-soft); color: var(--go); border-radius: 8px; }
+.today { margin: 10px 0 8px; padding: 8px 12px; border-radius: 12px; background: var(--raise); }
+.today > b:first-child { color: var(--go); }
+ul.you { list-style: none; padding: 0; margin: 8px 0 4px; display: flex; flex-wrap: wrap; gap: 6px; }
+ul.you li { background: var(--raise); border-radius: 10px; padding: 3px 10px; font-size: 0.875rem; }
+ul.you b { margin-right: 4px; }
+.plan > summary { cursor: pointer; color: var(--go); font-weight: 600; margin: 6px 0 0; width: max-content; }
+.plan table { font-size: 0.8125rem; margin-top: 6px; }
+.plan td:nth-child(2) { width: 46%; }
+.plan tr.now { background: var(--go-soft); }
+.plan td a { display: block; margin-top: 4px; }
 
-.sop { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); margin: 8px 0; }
+/* Jump links: one row that scrolls sideways on its own. */
+.jump {
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  margin: 18px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl));
+  padding: 4px var(--gr) 6px var(--gl);
+}
+.jump::-webkit-scrollbar { display: none; }
+.jump a { flex: none; padding: 7px 13px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+
+/* Gates: numbered in the order the day runs. A gate's number turns into a tick once its cards are cleared. */
+section.gate { counter-increment: stage; }
+section.gate > h2 { display: flex; align-items: center; gap: 10px; }
+section.gate > h2::before {
+  content: counter(stage); flex: none; display: grid; place-items: center;
+  width: 2.1rem; height: 2.1rem; border-radius: 11px; font-size: 1.15rem;
+  background: var(--go-soft); color: var(--go); box-shadow: inset 0 0 0 2px var(--go);
+}
+section.gate.cleared > h2::before { content: "✓"; background: var(--go-fill); color: var(--go-ink); box-shadow: 0 3px 0 var(--go); }
+section.gate.just > h2::before { animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+/* Cards. The line along the bottom of each summary fills as its steps are ticked. */
+.sop { border: 2px solid var(--line); border-radius: 16px; background: var(--surface); margin: 10px 0; box-shadow: 0 3px 0 var(--lip); overflow: hidden; }
+.sop.due { border-color: var(--go); }
+.sop.done { border-color: var(--go-fill); }
 .sop > summary {
+  position: relative;
   display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
-  padding: 12px 14px; cursor: pointer; list-style: none;
+  padding: 13px 14px 14px; cursor: pointer; list-style: none;
 }
+.sop > summary:focus-visible { outline-offset: -4px; border-radius: 14px; }
 .sop > summary::-webkit-details-marker { display: none; }
 .sop > summary::before { content: "▸"; color: var(--muted); display: inline-block; transition: transform 0.15s; }
 .sop[open] > summary::before { transform: rotate(90deg); }
-.sop .t { font-weight: 600; flex: 1 1 10rem; min-width: 0; }
-.sop .m { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: baseline; color: var(--muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
-.sop.done .t::before { content: "✓ "; color: var(--done); }
-.sop.done .p { color: var(--done); font-weight: 600; }
-.sop .body { padding: 0 14px 12px; }
-.tag { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 1px 8px; font-size: 0.8125rem; font-weight: 600; }
+.sop > summary::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 4px;
+  width: calc(var(--pct, 0) * 100%); background: var(--go-fill);
+  transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sop .t { font-weight: 700; flex: 1 1 10rem; min-width: 0; }
+.sop .m { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; color: var(--muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.sop.done .t::before { content: "✓ "; color: var(--go); }
+.sop.done .p { color: var(--go); font-weight: 700; }
+.sop .pts { font: 800 0.85rem/1 var(--display); font-synthesis: none; color: var(--pts); background: var(--pts-soft); border-radius: 999px; padding: 4px 8px 3px; }
+.sop.done .pts { background: var(--pts-fill); color: var(--pts-ink); }
+.sop .body { padding: 2px 14px 14px; }
+.sop.flash { animation: flash 0.9s ease-out; }
+.tag { background: var(--raise); color: var(--fg); border-radius: 999px; padding: 2px 9px; font-size: 0.8rem; font-weight: 700; }
+.tag.due { background: var(--go-soft); color: var(--go); }
 
-ol.steps { list-style: none; padding: 0; margin: 8px 0 10px; display: grid; gap: 8px; }
-ol.steps li { display: flex; gap: 10px; align-items: flex-start; }
-ol.steps input { width: 1.25rem; height: 1.25rem; margin: 2px 0 0; flex: none; accent-color: var(--accent); }
-ol.steps label { flex: 1; min-width: 0; cursor: pointer; }
-ol.steps input:checked + label { color: var(--muted); text-decoration: line-through; }
-.sub { margin: 14px 0 0; font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+ol.steps { list-style: none; padding: 0; margin: 8px 0 12px; display: grid; gap: 10px; }
+ol.steps li { position: relative; display: flex; gap: 12px; align-items: flex-start; }
+ol.steps label { flex: 1; min-width: 0; cursor: pointer; padding-top: 1px; }
+ol.steps input:checked + label { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 2px; }
+input[type="checkbox"] {
+  -webkit-appearance: none; appearance: none; flex: none; margin: 0;
+  width: 1.5rem; height: 1.5rem; border-radius: 8px; border: 2px solid var(--muted);
+  background: var(--surface) center / 72% no-repeat; cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+input[type="checkbox"]:checked {
+  background-color: var(--go-fill); border-color: var(--go-fill);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2304323c' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+input[type="checkbox"]:disabled { opacity: 0.45; cursor: not-allowed; }
+input.bump { animation: bump 0.25s ease-out; }
+.sub { margin: 16px 0 0; font-size: 0.9rem; font-weight: 700; color: var(--muted); }
 .warn { color: var(--warn); font-size: 0.9375rem; }
-.dw { border-top: 1px solid var(--line); padding-top: 8px; margin: 10px 0 0; }
+.dw { border-top: 2px dashed var(--line); padding-top: 10px; margin: 12px 0 0; }
+.dw b { color: var(--go); }
+
+/* Points as they're won: a number that floats up from the tick, and a ring round a cleared card. */
+.pop { position: absolute; left: -2px; top: -6px; z-index: 2; pointer-events: none; white-space: nowrap; font: 800 1rem/1 var(--display); font-synthesis: none; color: var(--pts); text-shadow: 0 2px 0 var(--surface); animation: rise 0.9s ease-out forwards; }
+.pop.big { left: auto; right: 14px; top: 30%; font-size: 1.15rem; }
 
 .tw { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 th, td { padding: 6px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-.plan summary { cursor: pointer; color: var(--accent); margin: 4px 0; }
-.plan tr.now { background: var(--accent-soft); }
-.plan table { font-size: 0.875rem; }
-.plan td a { display: block; margin-top: 4px; }
 table.guide { font-size: 0.9375rem; margin: 4px 0 8px; }
 table.guide th { font-weight: 400; color: var(--muted); }
 table.guide td { font-weight: 600; }
 table.skills td:not(:first-child), table.skills thead th:not(:first-child) { text-align: center; width: 3.6rem; }
 table.skills thead th { font-size: 0.8125rem; color: var(--muted); }
-table.skills tr.grp th { padding-top: 16px; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent); }
-.leo { font-size: 0.75rem; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
-.rules li, .stages li, .safety li { margin-bottom: 6px; }
-@media (prefers-reduced-motion: reduce) { .sop > summary::before { transition: none; } }
+table.skills tr.grp th { padding-top: 18px; font: 800 1.05rem var(--display); font-synthesis: none; color: var(--fg); }
+table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
+.leo { font-size: 0.75rem; font-weight: 700; color: var(--go); background: var(--go-soft); border-radius: 999px; padding: 0 7px; white-space: nowrap; }
+.safety li { margin-bottom: 6px; }
+
+/* Scoreboard: level, the day's tally, and awards. */
+.score { border: 2px solid var(--line); border-radius: 20px; background: var(--surface); padding: 14px; box-shadow: 0 3px 0 var(--lip); }
+.score .nudge { margin: 0; }
+.player { display: flex; gap: 14px; align-items: center; }
+.player > div { flex: 1; min-width: 0; }
+.lvl.big { width: 4rem; height: 4.4rem; font-size: 2rem; }
+.pname { font: 800 1.45rem/1.1 var(--display); font-synthesis: none; margin: 0; }
+.ptitle { color: var(--award); font-weight: 700; margin: 2px 0 6px; }
+.psub { font-size: 0.85rem; color: var(--muted); margin: 6px 0 0; }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 14px 0 0; }
+.stats div { background: var(--raise); border-radius: 12px; padding: 8px 12px; }
+.stats dt { font-size: 0.8rem; color: var(--muted); }
+.stats dd { margin: 0; font: 800 1.5rem/1.15 var(--display); font-synthesis: none; color: var(--pts); font-variant-numeric: tabular-nums; }
+.stats dd.streak { color: var(--award); }
+.daystate { margin: 12px 0 0; font-weight: 600; }
+.daystate.won { color: var(--go); }
+.awards { list-style: none; padding: 0; margin: 10px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.25rem, 1fr)); gap: 8px; }
+.awards li { border: 2px solid var(--award-soft); background: var(--award-soft); border-radius: 14px; padding: 10px; display: grid; gap: 2px; align-content: start; }
+.awards .i { font-size: 1.7rem; line-height: 1.15; }
+.awards b { font: 800 1rem/1.15 var(--display); font-synthesis: none; }
+.awards span:last-child { font-size: 0.8rem; color: var(--muted); }
+.locked > summary { cursor: pointer; color: var(--go); font-weight: 600; width: max-content; }
+.locked .awards li { background: transparent; border: 2px dashed var(--line); }
+.locked .awards .i { filter: grayscale(1); opacity: 0.45; }
+
+/* Award and level-up messages, under the points bar. */
+.toasts { position: fixed; z-index: 40; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 78px); transform: translateX(-50%); width: min(22rem, calc(100% - 32px)); display: grid; gap: 8px; pointer-events: none; }
+.toast { display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 16px; background: var(--surface); border: 2px solid var(--award-fill); box-shadow: 0 4px 0 var(--award-lip), 0 14px 30px -14px rgba(20, 0, 60, 0.55); animation: toast 3.2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
+.toast.up { border-color: var(--pts-fill); box-shadow: 0 4px 0 var(--pts-lip), 0 14px 30px -14px rgba(20, 0, 60, 0.55); }
+.toast .i { font-size: 1.7rem; line-height: 1; }
+.toast small { display: block; color: var(--award); font-weight: 700; font-size: 0.78rem; }
+.toast.up small { color: var(--pts); }
+.toast b { display: block; font: 800 1.05rem/1.15 var(--display); font-synthesis: none; }
+
+/* Clean sweep: the day's points, collected. */
+.win { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(12, 6, 40, 0.62); overflow: hidden; }
+.confetti { position: absolute; inset: 0; pointer-events: none; }
+.confetti i { position: absolute; top: -4vh; width: 9px; height: 14px; border-radius: 2px; background: var(--c); animation: fall var(--d) linear var(--w) both; }
+.win-card { position: relative; box-sizing: border-box; width: min(22rem, 100%); text-align: center; padding: 26px 20px 20px; border-radius: 24px; background: var(--surface); border: 3px solid var(--pts-fill); box-shadow: 0 6px 0 var(--pts-lip); animation: land 0.5s cubic-bezier(0.2, 1.5, 0.4, 1); }
+.win h2 { margin: 0 0 4px; font-size: 2.3rem; text-shadow: 0 3px 0 var(--award-fill); }
+.win-pts { margin: 6px 0 4px; color: var(--muted); }
+.win-pts b { display: block; font: 800 3rem/1 var(--display); font-synthesis: none; color: var(--pts); font-variant-numeric: tabular-nums; }
+.win .awards { grid-template-columns: 1fr; text-align: left; max-height: 36vh; overflow: auto; }
+.win button { margin-top: 12px; font-size: 1.2rem; padding: 12px 22px 11px; border-radius: 16px; border: 0; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); cursor: pointer; }
+.win button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--pts-lip); }
+
+@keyframes bump { 40% { transform: scale(1.22); } }
+@keyframes rise { 0% { opacity: 0; transform: translateY(6px) scale(0.8); } 20% { opacity: 1; transform: translateY(-6px) scale(1.1); } 100% { opacity: 0; transform: translateY(-30px); } }
+@keyframes flash { 0% { box-shadow: 0 3px 0 var(--lip), 0 0 0 0 var(--go-fill); } 30% { box-shadow: 0 3px 0 var(--lip), 0 0 0 6px var(--go-fill); } 100% { box-shadow: 0 3px 0 var(--lip), 0 0 0 16px transparent; } }
+@keyframes stamp { 0% { transform: scale(0.4) rotate(-20deg); } 100% { transform: none; } }
+@keyframes toast { 0% { opacity: 0; transform: translateY(-14px) scale(0.96); } 8% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
+@keyframes land { 0% { opacity: 0; transform: scale(0.7) translateY(20px); } 100% { opacity: 1; transform: none; } }
+@keyframes fall { to { transform: translate(var(--x), 110vh) rotate(var(--r)); } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
 <header>
   <h1>Routines</h1>
-  <p class="lede">How we run the house. Pick your name to see today's jobs, then tick each one off as you go. New here? Read <a href="#how">How it works</a> first.</p>
+  <p class="lede">Pick your name, clear today's cards, and rack up the points.</p>
   <div class="who" id="who" role="group" aria-label="Show jobs for"></div>
 </header>
+
+<a class="hud" id="hud" href="#score" hidden>
+  <span class="lvl"><span class="vh">Level </span><span id="hud-lvl">1</span></span>
+  <span class="hud-mid">
+    <span class="hud-who"><b id="hud-name"></b><span id="hud-title"></span></span>
+    <span class="bar" aria-hidden="true"><i id="hud-bar"></i></span>
+    <span class="hud-sub"><span id="hud-cards"></span><span id="hud-streak"></span></span>
+  </span>
+  <span class="hud-pts"><b id="hud-pts">0</b><small>points today</small></span>
+</a>
 
 <section class="week" id="week" aria-labelledby="week-h">
   <h2 id="week-h">This week</h2>
   <div id="week-body"><noscript><p>The rota needs JavaScript switched on. The routines below still work as lists.</p></noscript></div>
   <details class="plan" id="plan">
-    <summary>Dinners, laundry, and extras by day</summary>
+    <summary>Day by day</summary>
     <div class="tw">
       <table>
         <thead><tr><th scope="col">Day</th><th scope="col">Dinner</th><th scope="col">Laundry</th><th scope="col">Also</th></tr></thead>
@@ -159,8 +372,9 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   <a href="#g-after">After dinner</a>
   <a href="#g-bed">Before bed</a>
   <a href="#g-any">Any time</a>
+  <a href="#score">Scoreboard</a>
   <a href="#skills">Skills</a>
-  <a href="#how">How it works</a>
+  <a href="#safety">Safety</a>
 </nav>
 
 <!-- ============ GATES ============
@@ -914,6 +1128,14 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   </details>
 </section>
 
+<!-- ============ SCOREBOARD ============
+     Points come from ticks: a card is worth its time in minutes × 10, half shared across its steps and
+     half for clearing it. They're kept on each phone under the picked name, and never leave it. -->
+<section id="score" aria-labelledby="score-h">
+  <h2 id="score-h">Scoreboard</h2>
+  <div class="score" id="score-body"><noscript><p>Points need JavaScript switched on.</p></noscript></div>
+</section>
+
 <!-- ============ SKILLS ============ -->
 <section id="skills">
   <h2>Skills</h2>
@@ -976,31 +1198,9 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   </div>
 </section>
 
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how">
-  <h2>How it works</h2>
-  <ul class="rules">
-    <li><b>Your jobs.</b> Pick your name at the top. You'll see this week's zone, and today's jobs under the moments in the day they belong to. When a moment comes, do the cards under it.</li>
-    <li><b>Zones.</b> Zones rotate every Monday, so everyone learns every job. On weekdays, Aurora and Eshaal swap between Kitchen and Bathrooms, and Living &amp; outside. At the weekend, Aurora, Eshaal, and Leo rotate through all three. Leo's weekday evenings stay free, and floors and dusting are always his at the weekend. Aurora and Eshaal always cook dinner from Monday to Thursday, and Saturday's slow-cooker dinner is Leo's. On Fridays we eat out.</li>
-    <li><b>The standard.</b> "Done when" is the standard. If it isn't met, it isn't done.</li>
-    <li><b>Ticks.</b> Ticks stay on your phone and nobody else sees them. They clear themselves overnight, on Mondays, and when the month or quarter turns over.</li>
-    <li><b>Your own dishes.</b> Straight into the dishwasher, every time.</li>
-    <li><b>Running low.</b> Used the last of something? Tell Aurora before Friday's shop.</li>
-    <li><b>Meter readings.</b> When the energy company emails for them, Dad passes it to Aurora.</li>
-    <li><b>Swaps.</b> Agree a swap with the other person before the day, then tell Dad.</li>
-    <li><b>Broken or leaking.</b> Tell Dad the same day. If you smell gas, get out first, then call 0800 111 999.</li>
-    <li><b>A better way.</b> Tell Dad. If it's better, the page changes.</li>
-  </ul>
-
-  <h3>Stages</h3>
-  <ol class="stages">
-    <li><b>Learn.</b> Follow the list. One reminder per job is fine.</li>
-    <li><b>Own.</b> Nobody reminds you. Your jobs happen at their time.</li>
-    <li><b>Run.</b> You don't need the list any more.</li>
-  </ol>
-  <p>Target: everyone at Own by 1 February 2027. Dad's Saturday walk-rounds stop for each person when they reach Own.</p>
-
-  <h3>Safety rules</h3>
+<!-- ============ SAFETY ============ -->
+<section id="safety" aria-labelledby="safety-h">
+  <h2 id="safety-h">Safety</h2>
   <ol class="safety">
     <li>Never mix bleach with anything except water. Mixed with limescale remover or other cleaners, it gives off a toxic gas.</li>
     <li>Use the step stool, never a chair.</li>
@@ -1008,10 +1208,24 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     <li>Candles are Dad's job: he lights them and puts them out.</li>
     <li>Hob and oven off before you leave the kitchen.</li>
   </ol>
-
-  <h3>When the cleaner starts</h3>
-  <p>The cleaner takes the weekly zone cleans and most of the monthly lists. Daily jobs, dinners, laundry, bedrooms, bins, and the shop stay with us. A cleaner can only clean what they can get to, so tidy before they arrive.</p>
 </section>
+
+<!-- When the cleaner starts. Kept here, off the page, until it happens: then apply it, and delete this note.
+     The cleaner takes the weekly zone cleans and most of the monthly lists. Daily jobs, dinners, laundry,
+     bedrooms, bins, and the shop stay with us. A cleaner can only clean what they can get to, so tidy
+     before they arrive. -->
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="win" id="win" hidden role="dialog" aria-modal="true" aria-labelledby="win-h">
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+  <div class="win-card">
+    <h2 id="win-h">Clean sweep!</h2>
+    <p class="win-pts"><b id="win-pts">0</b>points today</p>
+    <p id="win-streak"></p>
+    <ul class="awards" id="win-awards"></ul>
+    <button type="button" id="win-ok">Collect points</button>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -1039,6 +1253,65 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
   // The week's recipes live in recipes.json beside this page, not here, so the menu never needs an edit to this file.
   /* ---------- End of settings ---------- */
+
+  /* ---------- Points and awards ---------- */
+  // A card is worth its time in minutes × PTS_PER_MIN: half shared across its steps, half for clearing it.
+  const PTS_PER_MIN = 10;
+  const LEVEL_AT = (l) => 500 * (l - 1) * l; // Total points to reach level l: 1,000 for level 2, 3,000 for 3, 6,000 for 4.
+  const TITLES = ["Sock Rookie", "Crumb Cadet", "Dish Apprentice", "Hoover Hopeful", "Squeegee Squire", "Laundry Ranger",
+    "Grime Fighter", "Dust Ninja", "Mop Mage", "Tidy Knight", "Spotless Sorcerer", "Order Overlord", "Kitchen Commander",
+    "Household Hero", "Domestic Legend", "Grand Master of Grime", "The Unflappable", "Living Legend", "Mythic", "Final Boss"];
+  // Awards with a card are won by clearing that card. Each person only sees the ones they can win.
+  const AWARDS = [
+    { id: "first", icon: "🎮", name: "Player One", desc: "Scored your first points." },
+    { id: "card", icon: "🎯", name: "Off the Mark", desc: "Cleared your first card." },
+    { id: "sweep", icon: "🧹", name: "Clean Sweep", desc: "Cleared every card on your day." },
+    { id: "streak3", icon: "🔥", name: "Hat-Trick", desc: "Three clean sweeps in a row." },
+    { id: "streak7", icon: "🌪️", name: "Unstoppable", desc: "A clean sweep every day for a week." },
+    { id: "streak30", icon: "👑", name: "Untouchable", desc: "Thirty clean sweeps in a row." },
+    { id: "weekend", icon: "🛡️", name: "Weekend Warrior", desc: "Clean sweeps on Saturday and Sunday." },
+    { id: "early", icon: "🐦", name: "Early Bird", desc: "Your morning cleared before 7:30." },
+    { id: "day1500", icon: "💪", name: "Grind Mode", desc: "1,500 points in one day." },
+    { id: "day3000", icon: "🎬", name: "Main Character", desc: "3,000 points in one day." },
+    { id: "lvl5", icon: "🖐️", name: "High Five", desc: "Reached level 5." },
+    { id: "lvl10", icon: "🔟", name: "Double Digits", desc: "Reached level 10." },
+    { id: "pts10k", icon: "💎", name: "Five Figures", desc: "10,000 points, all time." },
+    { id: "pts100k", icon: "🚀", name: "Six Figures", desc: "100,000 points, all time. Ridiculous." },
+    { id: "ten", icon: "🏆", name: "Trophy Cabinet", desc: "Found ten awards." },
+    { id: "undo", icon: "🤔", name: "Second Thoughts", desc: "Unticked something. We've all been there.", secret: true },
+    { card: "morning", icon: "🌅", name: "Rise and Shine", desc: "Bed made, window shut, room clear." },
+    { card: "dishwasher", icon: "🍽️", name: "Dishwasher Whisperer", desc: "Emptied the dishwasher. It purred." },
+    { card: "office-in", icon: "☕", name: "Brew Crew", desc: "Office open, and Dad's cuppa made." },
+    { card: "office-out", icon: "🍴", name: "Outlery Overlord", desc: "Office shut down, Outlery and all." },
+    { card: "coming-home", icon: "🏠", name: "Home Run", desc: "In, sorted, and straight to it." },
+    { card: "laundry-daily", icon: "🥇", name: "Fold Medal", desc: "Folded and put away. Gold standard." },
+    { card: "laundry", icon: "🌀", name: "Spin Doctor", desc: "A whole load, from pockets to put away." },
+    { card: "household-wash", icon: "🧺", name: "Towel Power", desc: "Clean towels back where they live." },
+    { card: "dinner", icon: "🍝", name: "Plate Expectations", desc: "Dinner on the table at 7pm, kitchen clear." },
+    { card: "weekend-cleanup", icon: "🧽", name: "Sink or Swim", desc: "Kitchen back to clear after the big meal." },
+    { card: "floors-daily", icon: "🍞", name: "Crumb Crusher", desc: "Not a crumb left standing." },
+    { card: "bath-daily", icon: "🧻", name: "Loo-tenant", desc: "Both bathrooms checked and stocked." },
+    { card: "living-daily", icon: "🛋️", name: "Cushion Commander", desc: "Living room reset. Cushions at attention." },
+    { card: "bins", icon: "🗑️", name: "Wheelie Good", desc: "Right bin, right kerb, right night." },
+    { card: "bins-in", icon: "↩️", name: "Kerb Your Enthusiasm", desc: "Bin back in. No bin left behind." },
+    { card: "dinner-plan", icon: "📋", name: "Menu Mastermind", desc: "Dinners planned and on the list." },
+    { card: "shop", icon: "🛒", name: "Trolley Dash", desc: "Friday's shop, sorted." },
+    { card: "evening", icon: "🌙", name: "Night Shift", desc: "Nothing left downstairs, phone on charge." },
+    { card: "shower", icon: "🚿", name: "Squeegee Supreme", desc: "Shower left gleaming." },
+    { card: "shirts", icon: "👔", name: "Crease Lightning", desc: "A week of shirts, ironed and hung." },
+    { card: "dusting-weekly", icon: "🐰", name: "Dust Bunny Hunter", desc: "No dust bunny survived." },
+    { card: "slow-cooker", icon: "🍲", name: "Low and Slow", desc: "Slow cooker on, lid on, worktops clear." },
+    { card: "room-weekly", icon: "🛏️", name: "Bedroom Boss", desc: "Fresh bedding, clear floor." },
+    { card: "kitchen-weekly", icon: "🍳", name: "Hob Goblin", desc: "Fridge sorted, hob gleaming." },
+    { card: "bath-weekly", icon: "🛁", name: "Porcelain Polisher", desc: "Saturday bathrooms, sparkling." },
+    { card: "living-weekly", icon: "🌿", name: "Garden Guardian", desc: "Living room hoovered, front garden tidy." },
+    { card: "stairs", icon: "🪜", name: "Step It Up", desc: "Stairs and landing, as a team." },
+    { card: "floors-weekly", icon: "🎤", name: "Mop Star", desc: "Every floor mopped. Take a bow." },
+    { id: "monthly", icon: "👾", name: "Monthly Monster", desc: "Finished a monthly list." },
+    { id: "quarterly", icon: "🗓️", name: "Quarter Master", desc: "Finished a quarterly list." },
+    { id: "gaffer", icon: "🧢", name: "The Gaffer", desc: "Dad's list, done." }
+  ];
+  /* ---------- End of points and awards ---------- */
 
   const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
   const SETS = [["kitchen"], ["bathrooms"], ["living"]];
@@ -1166,7 +1439,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     });
   };
 
-  /* ---------- Cards: summary line, ticks, progress ---------- */
+  /* ---------- Cards: summary line, ticks, progress, points ---------- */
   const cards = Array.from(document.querySelectorAll(".sop"));
 
   const stepBoxes = (card) => Array.from(card.querySelectorAll("ol.steps > li:not([hidden]) input"));
@@ -1176,7 +1449,17 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     const done = boxes.filter((b) => b.checked).length;
     card.querySelector(".p").textContent = boxes.length ? done + "/" + boxes.length : "";
     card.classList.toggle("done", boxes.length > 0 && done === boxes.length);
+    card.style.setProperty("--pct", boxes.length ? (done / boxes.length).toFixed(3) : "0");
   };
+
+  const fmt = (n) => Math.round(n).toLocaleString("en-GB");
+  const minutesOf = (card) => {
+    const m = /(\d+(?:\.\d+)?)\s*(min|hour)/.exec(card.getAttribute("data-time") || "");
+    return m ? +m[1] * (m[2] === "hour" ? 60 : 1) : 10;
+  };
+  const cardPts = (card) => minutesOf(card) * PTS_PER_MIN;
+  const clearPts = (card) => Math.round(cardPts(card) / 2);
+  const stepPts = (card) => Math.max(5, Math.round(cardPts(card) / 2 / Math.max(1, stepBoxes(card).length)));
 
   cards.forEach((card) => {
     const s = card.querySelector("summary");
@@ -1187,8 +1470,9 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     t.textContent = title;
     const m = document.createElement("span");
     m.className = "m";
-    m.innerHTML = '<span class="tags"></span><span class="time"></span><span class="p"></span>';
+    m.innerHTML = '<span class="tags"></span><span class="time"></span><span class="p"></span><span class="pts"></span>';
     m.querySelector(".time").textContent = card.getAttribute("data-time") || "";
+    m.querySelector(".pts").textContent = fmt(cardPts(card)) + " pts";
     s.appendChild(t);
     s.appendChild(m);
 
@@ -1199,12 +1483,13 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       box.type = "checkbox";
       box.id = "c-" + card.id + "-" + i;
       box.checked = get(key) === "1";
+      box.setAttribute("data-k", key);
       const label = document.createElement("label");
       label.htmlFor = box.id;
       while (li.firstChild) label.appendChild(li.firstChild);
       li.appendChild(box);
       li.appendChild(label);
-      box.addEventListener("change", () => { if (box.checked) set(key, "1"); else del(key); progress(card); });
+      box.addEventListener("change", () => { if (box.checked) set(key, "1"); else del(key); progress(card); scoreTick(card, box); });
     });
   });
 
@@ -1263,55 +1548,58 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
   };
 
   /* ---------- This week ---------- */
-  const youLine = (p) => {
+  // Your week in short, one fact to a chip. Zones aren't here: the grid shows them, with your name lit.
+  const youChips = (p) => {
     const out = [];
     const wd = zonesOf(p, week, "weekday");
     const we = zonesOf(p, week, "weekend");
-    const names = (zs) => and(zs.map((z) => ZONES[z]));
-    if (wd.length && we.length) out.push("This week: " + names(wd) + " on weekdays, and " + names(we) + " at the weekend.");
-    else if (we.length) out.push("This weekend you're on " + names(we) + ".");
-    if (p === "Leo") out.push("Your weekday evenings are free. Floors and dusting are always yours at the weekend, and so are your shirts on Saturday.");
+    const d3 = (d) => DAYS[d].slice(0, 3);
+    if (p === "Leo") out.push(["Evenings", "free on weekdays"], ["Weekend", "floors, dusting, and your shirts"]);
     const cookDays = [];
     for (let i = 1; i <= 7; i++) { const d = i % 7; if (MEALS[d].cooks.indexOf(p) > -1) cookDays.push(d); }
     if (cookDays.length) {
       const partner = MEALS[cookDays[0]].cooks.filter((n) => n !== p);
-      // Three or more weekdays in a row read as a span: "every weekday", or "dinner from Monday to Thursday".
+      // Three or more weekdays in a row read as a span: "every weekday", or "Mon to Thu".
       const span = cookDays.length > 2 && cookDays.every((d, i) => d >= 1 && d <= 5 && (i === 0 || d === cookDays[i - 1] + 1));
       const when = span
-        ? (cookDays.length === 5 ? "every weekday" : "dinner from " + DAYS[cookDays[0]] + " to " + DAYS[cookDays[cookDays.length - 1]])
-        : and(cookDays.map((d) => DAYS[d] + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : " dinner")));
-      out.push("You cook " + when + (partner.length ? " with " + and(partner) : "") + ".");
+        ? (cookDays.length === 5 ? "every weekday" : d3(cookDays[0]) + " to " + d3(cookDays[cookDays.length - 1]))
+        : and(cookDays.map((d) => d3(d) + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : " dinner")));
+      out.push(["Cook", when + (partner.length ? ", with " + and(partner) : "")]);
     }
-    if (p === "Aurora") out.push("On Friday you and Eshaal agree next week's dinners, then you put the plan on the fridge and do the shop with Dad.");
-    if (p === "Eshaal") out.push("On Friday you and Aurora agree next week's dinners.");
-    if (p === "Dad") out.push("Friday's shop is yours and Aurora's.");
-    if (p === "Leo") out.push("On Friday you and Aurora add Saturday's slow-cooker ingredients, and any food tech ones, to the shop.");
+    if (p === "Aurora") out.push(["Friday", "plan dinners with Eshaal, then the shop with Dad"]);
+    if (p === "Eshaal") out.push(["Friday", "dinners planned with Aurora"]);
+    if (p === "Dad") out.push(["Friday", "the shop with Aurora"]);
+    if (p === "Leo") out.push(["Friday", "slow-cooker and food tech shopping, with Aurora"]);
     const ld = LAUNDRY.indexOf(p);
-    if (ld > -1) out.push("Your laundry day is " + DAYS[ld] + ".");
-    if (wd.indexOf("bathrooms") > -1) out.push("Friday's household wash is yours.");
-    if (wd.indexOf("living") > -1) out.push("Bins go out the night before collection, and back in when you get home.");
-    if (we.indexOf("living") > -1) out.push("On Saturday you hoover the stairs while " + ownerOf("kitchen", week, "weekend") + " holds the unit.");
-    if (we.indexOf("kitchen") > -1) out.push("On Saturday you hold the hoover while " + ownerOf("living", week, "weekend") + " does the stairs.");
-    return out.join(" ");
+    if (ld > -1) out.push(["Laundry", DAYS[ld]]);
+    if (wd.indexOf("bathrooms") > -1) out.push(["Friday", "household wash"]);
+    if (wd.indexOf("living") > -1) out.push(["Bins", "out the night before, back in on the day"]);
+    if (we.indexOf("living") > -1) out.push(["Saturday", "you hoover the stairs, " + ownerOf("kitchen", week, "weekend") + " holds the unit"]);
+    if (we.indexOf("kitchen") > -1) out.push(["Saturday", "you hold the unit, " + ownerOf("living", week, "weekend") + " hoovers the stairs"]);
+    return out;
   };
 
-  const range = () => {
+  const shortRange = () => {
     const a = new Date(monday);
     const b = new Date(monday + 6 * DAY);
+    const mon = (d) => MONTHS[d.getUTCMonth()].slice(0, 3);
     return a.getUTCMonth() === b.getUTCMonth()
-      ? "Monday " + a.getUTCDate() + " to Sunday " + dm(+b)
-      : "Monday " + dm(+a) + " to Sunday " + dm(+b);
+      ? a.getUTCDate() + "–" + b.getUTCDate() + " " + mon(b)
+      : a.getUTCDate() + " " + mon(a) + " – " + b.getUTCDate() + " " + mon(b);
   };
 
-  const rotaRows = (w, kind) => (kind === "weekday" ? WEEKDAY_SETS : SETS)
-    .map((set) => [set.map((z) => ZONES[z]).join(" and "), ownerOf(set[0], w, kind)]);
-  const rowsHtml = (rows) => rows.map(([z, n]) => "<div><dt>" + esc(z) + "</dt><dd>" + esc(n) + "</dd></div>").join("");
+  // Who has each zone this week, weekdays and weekend side by side.
+  const zoneGrid = () => {
+    const cell = (n) => "<td" + (who && n === who ? ' class="me"' : "") + ">" + esc(n || "–") + "</td>";
+    let h = '<table class="zt"><thead><tr><td class="rng">' + esc(shortRange()) + '</td><th scope="col">Weekdays</th><th scope="col">Weekend</th></tr></thead><tbody>';
+    Object.keys(ZONES).forEach((z) => {
+      h += '<tr><th scope="row">' + esc(ZONES[z]) + "</th>" + cell(ownerOf(z, week, "weekday")) + cell(ownerOf(z, week, "weekend")) + "</tr>";
+    });
+    return h + "</tbody></table>";
+  };
+
   const renderWeek = () => {
-    let h = '<p class="next">' + esc(range()) + "</p>";
-    h += '<p class="sub">Weekdays</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekday").concat([["Dinners, Mon to Thu", "Aurora and Eshaal"]])) + "</dl>";
-    h += '<p class="sub">Weekend</p><dl class="zones">' + rowsHtml(rotaRows(week, "weekend").concat([["Floors and dusting", "Leo"]])) + "</dl>";
-    const nx = (kind) => rotaRows(week + 1, kind).map(([z, n]) => z + " " + n).join(", ");
-    h += '<p class="next">Next week: weekdays ' + esc(nx("weekday")) + "; weekend " + esc(nx("weekend")) + ".</p>";
+    let h = zoneGrid();
     const bits = [];
     const meal = MEALS[dow];
     const links = meal.cooks.length ? recipeLinks(today) : [];
@@ -1322,13 +1610,14 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     if (quarterSat) bits.push("Saturday reset from 9:00, then the quarterly session, about 2½ hours more with everyone.");
     else if (firstSat) bits.push("Saturday reset from 9:00, then the monthly lists. Dad does the weekly bathroom clean.");
     else if (isSat) bits.push("Saturday reset from 9:00, done by midday.");
-    if (dow === 5) bits.push("Next week's meal plan goes on the fridge, and Aurora and Dad do the shop.");
+    if (dow === 5) bits.push("The meal plan goes on the fridge, and Aurora and Dad do the shop.");
     const c = collectedOn(today);
     if (c) bits.push("Bin day: the " + c + " comes back in (" + ownerOf("living", week, "weekday") + ").");
     const b = binsEve(today);
     if (b) bits.push("Bins out tonight: the " + b + " (" + ownerOf("living", week, "weekday") + ").");
     h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + mealHtml + " " + esc(bits.join(" ")) + "</p>";
-    if (who) h += '<p class="you"><b>' + esc(who + ".") + "</b> " + esc(youLine(who)) + "</p>";
+    const chips = who ? youChips(who) : [];
+    if (chips.length) h += '<ul class="you" aria-label="Your week">' + chips.map(([k, v]) => "<li><b>" + esc(k) + "</b> " + esc(v) + "</li>").join("") + "</ul>";
     document.getElementById("week-body").innerHTML = h;
   };
 
@@ -1386,6 +1675,303 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
     skillSum();
   };
 
+  /* ---------- Points, levels, and awards. Kept on this phone under the picked name, never sent anywhere. ---------- */
+  const AWARD_BY = {};
+  AWARDS.forEach((a) => { a.id = a.id || "card:" + a.card; AWARD_BY[a.id] = a; });
+  const motion = !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const KEEP_DAYS = 70;
+  const gkey = (p) => "hsop|g:" + p;
+  const loadGame = (p) => {
+    let g = null;
+    try { g = JSON.parse(get(gkey(p)) || "null"); } catch (e) { g = null; }
+    g = g && typeof g === "object" ? g : {};
+    g = { total: +g.total || 0, old: +g.old || 0, days: g.days || {}, awards: g.awards || {}, got: g.got || {} };
+    // Records of which ticks scored go when their ticks do. The points stay.
+    Object.keys(g.got).forEach((k) => {
+      const per = k.split("|")[1] || "";
+      if ("dwmq".indexOf(per.charAt(0)) > -1 && per !== PERIOD[per.charAt(0)]) delete g.got[k];
+    });
+    const cut = ymd(today - KEEP_DAYS * DAY);
+    Object.keys(g.days).forEach((d) => { if (d < cut) { g.old = Math.max(g.old, +g.days[d].pts || 0); delete g.days[d]; } });
+    return g;
+  };
+  const saveGame = (p, g) => set(gkey(p), JSON.stringify(g));
+  const dayOf = (g, t) => g.days[ymd(t)] || (g.days[ymd(t)] = { pts: 0 });
+  // Each tick scores once. Untick it and its points come off the day they were won.
+  const award = (g, k, pts) => {
+    if (g.got[k]) return 0;
+    g.got[k] = [pts, ymd(today)];
+    g.total += pts;
+    dayOf(g, today).pts += pts;
+    return pts;
+  };
+  const unaward = (g, k) => {
+    const a = g.got[k];
+    if (!a) return 0;
+    delete g.got[k];
+    g.total = Math.max(0, g.total - a[0]);
+    if (g.days[a[1]]) g.days[a[1]].pts = Math.max(0, g.days[a[1]].pts - a[0]);
+    return a[0];
+  };
+  const clearKey = (card) => "hsop|" + PERIOD[card.getAttribute("data-period") || "o"] + "|" + card.id + "|clear";
+  const levelOf = (pts) => { let l = 1; while (LEVEL_AT(l + 1) <= pts) l++; return l; };
+  const titleOf = (l) => TITLES[Math.min(l, TITLES.length) - 1];
+  const bestOf = (g) => Object.keys(g.days).reduce((m, d) => Math.max(m, g.days[d].pts || 0), g.old);
+  const weekPts = (g) => { let s = 0; for (let t = monday; t <= today; t += DAY) s += (g.days[ymd(t)] || {}).pts || 0; return s; };
+  const streakOf = (g) => {
+    let t = today;
+    let n = 0;
+    if (!(g.days[ymd(t)] || {}).clear) t -= DAY;
+    while ((g.days[ymd(t)] || {}).clear) { n++; t -= DAY; }
+    return n;
+  };
+
+  // The day's cards: everything showing with steps to tick, apart from week-long lists like Dad's.
+  const dayCards = () => cards.filter((c) => !c.hidden && stepBoxes(c).length > 0 &&
+    !(c.getAttribute("data-period") === "w" && !c.hasAttribute("data-days") && !c.hasAttribute("data-when")));
+  const sweep = () => { const dc = dayCards(); return { all: dc.length, done: dc.filter(allTicked).length }; };
+  const markDay = (g) => { // True when this tick makes the day a clean sweep.
+    const s = sweep();
+    const d = dayOf(g, today);
+    const was = !!d.clear;
+    d.clear = s.all > 0 && s.done === s.all;
+    return d.clear && !was;
+  };
+
+  // Ticks made before points existed, or with no name picked, score once a name is picked.
+  const sync = (g) => {
+    const cleared = [];
+    cards.forEach((card) => {
+      if (card.hidden) return;
+      const boxes = stepBoxes(card);
+      boxes.forEach((b) => { if (b.checked) award(g, b.getAttribute("data-k"), stepPts(card)); else unaward(g, b.getAttribute("data-k")); });
+      if (boxes.length && allTicked(card)) { if (award(g, clearKey(card), clearPts(card))) cleared.push(card); } else unaward(g, clearKey(card));
+    });
+    return cleared;
+  };
+
+  // The awards a person can win: cards they can ever be given, and Dad's list for Dad.
+  const kindsOf = (card) => { const r = card.getAttribute("data-rota"); return r === "today" ? ["weekday", "weekend"] : [r === "weekday" ? "weekday" : "weekend"]; };
+  const canEver = (card, p) => kindsOf(card).some((kind) => [0, 1, 2, 3, 4, 5].some((w) => matches(card.getAttribute("data-who") || "all", p, w, kind)));
+  const awardsFor = (p) => AWARDS.filter((a) => {
+    if (a.card) { const c = document.getElementById(a.card); return !!c && canEver(c, p); }
+    if (a.id === "monthly" || a.id === "quarterly") return cards.some((c) => c.getAttribute("data-period") === a.id.charAt(0) && canEver(c, p));
+    if (a.id === "gaffer") return p === "Dad";
+    return true;
+  });
+
+  const checkAwards = (g, ev) => {
+    const fresh = [];
+    const mine = awardsFor(who).map((a) => a.id);
+    const win = (id) => { if (!g.awards[id] && mine.indexOf(id) > -1) { g.awards[id] = ymd(today); fresh.push(id); } };
+    if (g.total > 0) win("first");
+    ev.cleared.forEach((card) => {
+      win("card");
+      win("card:" + card.id);
+      const per = card.getAttribute("data-period");
+      if (per === "m") win("monthly");
+      if (per === "q") win("quarterly");
+      if (card.id.indexOf("dad-") === 0) win("gaffer");
+      const t = new Date();
+      if (card.id === "morning" && ev.live && t.getHours() * 60 + t.getMinutes() < 450) win("early");
+    });
+    const d = g.days[ymd(today)] || {};
+    if (d.clear) {
+      win("sweep");
+      const s = streakOf(g);
+      if (s >= 3) win("streak3");
+      if (s >= 7) win("streak7");
+      if (s >= 30) win("streak30");
+      if (dow === 0 && (g.days[ymd(today - DAY)] || {}).clear) win("weekend");
+    }
+    if ((d.pts || 0) >= 1500) win("day1500");
+    if ((d.pts || 0) >= 3000) win("day3000");
+    const l = levelOf(g.total);
+    if (l >= 5) win("lvl5");
+    if (l >= 10) win("lvl10");
+    if (g.total >= 1e4) win("pts10k");
+    if (g.total >= 1e5) win("pts100k");
+    if (ev.undo) win("undo");
+    if (Object.keys(g.awards).length >= 10) win("ten");
+    return fresh;
+  };
+
+  /* Points bar and scoreboard */
+  const hud = document.getElementById("hud");
+  const scoreBody = document.getElementById("score-body");
+  const tile = (a, locked) => {
+    const hide = locked && a.secret;
+    return '<li><span class="i" aria-hidden="true">' + (hide ? "❔" : a.icon) + "</span><b>" + esc(hide ? "Secret" : a.name) + "</b><span>" + esc(hide ? "Keep playing to find this one." : a.desc) + "</span></li>";
+  };
+  const countUp = (el, from, to) => {
+    if (!motion || from === to || !window.requestAnimationFrame) { el.textContent = fmt(to); return; }
+    let t0 = null;
+    const run = (ts) => {
+      if (t0 === null) t0 = ts;
+      const k = Math.min(1, (ts - t0) / 600);
+      el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) window.requestAnimationFrame(run);
+    };
+    window.requestAnimationFrame(run);
+  };
+  let shown = null; // [name, points] last shown in the points bar, so a tick counts up from there.
+
+  const renderGame = (g) => {
+    hud.hidden = !who;
+    if (!who) {
+      shown = null;
+      scoreBody.innerHTML = '<p class="nudge">Pick your name at the top to start scoring.</p>';
+      return;
+    }
+    g = g || loadGame(who);
+    const s = sweep();
+    const l = levelOf(g.total);
+    const pts = (g.days[ymd(today)] || {}).pts || 0;
+    const st = streakOf(g);
+    document.getElementById("hud-lvl").textContent = l;
+    document.getElementById("hud-name").textContent = who;
+    document.getElementById("hud-title").textContent = titleOf(l);
+    document.getElementById("hud-bar").style.setProperty("--v", s.all ? (s.done / s.all).toFixed(3) : "0");
+    document.getElementById("hud-cards").textContent = s.done + " of " + s.all + " cards";
+    document.getElementById("hud-streak").textContent = st > 1 ? "🔥 " + st + " days" : "";
+    countUp(document.getElementById("hud-pts"), shown && shown[0] === who ? shown[1] : pts, pts);
+    shown = [who, pts];
+
+    const base = LEVEL_AT(l);
+    const next = LEVEL_AT(l + 1);
+    const mine = awardsFor(who);
+    const have = mine.filter((a) => g.awards[a.id]).sort((a, b) => (g.awards[a.id] < g.awards[b.id] ? 1 : g.awards[a.id] > g.awards[b.id] ? -1 : 0));
+    const todo = mine.filter((a) => !g.awards[a.id]);
+    const stat = (k, v, cls) => "<div><dt>" + k + "</dt><dd" + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</dd></div>";
+    const swept = s.all > 0 && s.done === s.all;
+    const open = !!scoreBody.querySelector("details.locked[open]");
+    let h = '<div class="player"><span class="lvl big"><span class="vh">Level </span>' + l + "</span><div>";
+    h += '<p class="pname">' + esc(who) + '</p><p class="ptitle">' + esc(titleOf(l)) + "</p>";
+    h += '<span class="bar lv" aria-hidden="true"><i style="--v:' + ((g.total - base) / (next - base)).toFixed(3) + '"></i></span>';
+    h += '<p class="psub">' + fmt(g.total) + " points. " + fmt(next - g.total) + " more to level " + (l + 1) + ".</p></div></div>";
+    h += '<dl class="stats">' + stat("Today", fmt(pts)) + stat("This week", fmt(weekPts(g))) + stat("Best day", fmt(bestOf(g))) + stat("Streak", st + (st === 1 ? " day" : " days"), "streak") + "</dl>";
+    h += '<p class="daystate' + (swept ? " won" : "") + '">' + (swept ? "Clean sweep: every card done today." : s.done + " of " + s.all + " cards cleared today.") + "</p>";
+    h += "<h3>Awards <small>" + have.length + " of " + mine.length + "</small></h3>";
+    h += have.length ? '<ul class="awards">' + have.map((a) => tile(a)).join("") + "</ul>" : '<p class="note">Tick something to win your first.</p>';
+    if (todo.length) h += '<details class="locked"' + (open ? " open" : "") + "><summary>Still to find (" + todo.length + ')</summary><ul class="awards">' + todo.map((a) => tile(a, true)).join("") + "</ul></details>";
+    h += '<p class="note">Your points stay on this phone, like your ticks.</p>';
+    scoreBody.innerHTML = h;
+  };
+
+  /* Effects: they answer a tick, and skip the movement when the phone asks for less motion. */
+  const toastBox = document.getElementById("toasts");
+  const toast = (icon, kicker, title, cls) => {
+    const t = document.createElement("div");
+    t.className = "toast" + (cls ? " " + cls : "");
+    t.innerHTML = '<span class="i" aria-hidden="true"></span><span><small></small><b></b></span>';
+    t.querySelector(".i").textContent = icon;
+    t.querySelector("small").textContent = kicker;
+    t.querySelector("b").textContent = title;
+    toastBox.appendChild(t);
+    while (toastBox.children.length > 3) toastBox.removeChild(toastBox.firstChild);
+    setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 3300);
+  };
+  const toastAwards = (ids) => {
+    if (ids.length > 2) toast("🏆", "Awards unlocked", ids.length + " new awards on the scoreboard");
+    else ids.forEach((id) => toast(AWARD_BY[id].icon, "Award unlocked", AWARD_BY[id].name));
+  };
+  const pop = (el, text, cls) => {
+    if (!motion || !el) return;
+    const s = document.createElement("span");
+    s.className = "pop" + (cls ? " " + cls : "");
+    s.setAttribute("aria-hidden", "true");
+    s.textContent = text;
+    el.appendChild(s);
+    setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 950);
+  };
+  const replay = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
+  const gateStates = (live) => {
+    Array.from(document.querySelectorAll("section.gate")).forEach((sec) => {
+      const cs = Array.from(sec.querySelectorAll(".sop")).filter((c) => !c.hidden && stepBoxes(c).length > 0);
+      const was = sec.classList.contains("cleared");
+      const now = cs.length > 0 && cs.every(allTicked);
+      sec.classList.toggle("cleared", now);
+      if (live && now && !was && motion) replay(sec, "just", 500);
+    });
+  };
+
+  // Clean sweep: every card on the day cleared. The day's points, collected.
+  const winEl = document.getElementById("win");
+  let winFrom = null;
+  const confetti = () => {
+    if (!motion) return;
+    const colours = ["#19c6e3", "#ffc22e", "#d81b7f", "#7a2bd8", "#ffffff"];
+    let h = "";
+    for (let i = 0; i < 42; i++) {
+      h += '<i style="left:' + (Math.random() * 100).toFixed(1) + "%;--c:" + colours[i % colours.length] +
+        ";--d:" + (1.8 + Math.random() * 1.6).toFixed(2) + "s;--w:" + (Math.random() * 0.6).toFixed(2) +
+        "s;--x:" + Math.round(Math.random() * 140 - 70) + "px;--r:" + Math.round(Math.random() * 900 - 450) + 'deg"></i>';
+    }
+    document.getElementById("confetti").innerHTML = h;
+  };
+  const showWin = (g, fresh) => {
+    const st = streakOf(g);
+    document.getElementById("win-streak").textContent = st > 1 ? "🔥 " + st + " clean sweeps in a row." : "Every card on your day, done.";
+    document.getElementById("win-awards").innerHTML = fresh.map((id) => tile(AWARD_BY[id])).join("");
+    winFrom = document.activeElement;
+    winEl.hidden = false;
+    countUp(document.getElementById("win-pts"), 0, (g.days[ymd(today)] || {}).pts || 0);
+    confetti();
+    document.getElementById("win-ok").focus({ preventScroll: true });
+  };
+  const closeWin = () => {
+    winEl.hidden = true;
+    document.getElementById("confetti").innerHTML = "";
+    if (winFrom && winFrom.focus) winFrom.focus({ preventScroll: true });
+  };
+  document.getElementById("win-ok").addEventListener("click", closeWin);
+  winEl.addEventListener("click", (e) => { if (e.target === winEl) closeWin(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !winEl.hidden) closeWin(); });
+
+  const scoreTick = (card, box) => {
+    if (box.checked && motion) replay(box, "bump", 260);
+    gateStates(true);
+    if (!who) { renderGame(); return; }
+    const g = loadGame(who);
+    const was = levelOf(g.total);
+    const ev = { cleared: [], undo: !box.checked, live: true };
+    let step = 0;
+    let bonus = 0;
+    if (box.checked) {
+      step = award(g, box.getAttribute("data-k"), stepPts(card));
+      if (allTicked(card)) { bonus = award(g, clearKey(card), clearPts(card)); if (bonus) ev.cleared.push(card); }
+    } else {
+      unaward(g, box.getAttribute("data-k"));
+      unaward(g, clearKey(card));
+    }
+    const swept = markDay(g);
+    const fresh = checkAwards(g, ev);
+    saveGame(who, g);
+    renderGame(g);
+    if (step) pop(box.parentNode, "+" + fmt(step));
+    if (bonus) {
+      if (motion) replay(card, "flash", 950);
+      pop(card.querySelector("summary"), "Cleared +" + fmt(bonus), "big");
+    }
+    const l = levelOf(g.total);
+    if (l > was) toast("⭐", "Level up", "Level " + l + ": " + titleOf(l), "up");
+    if (swept) showWin(g, fresh);
+    else toastAwards(fresh);
+  };
+
+  // Picking a name: score any ticks not yet counted, then show that person's points.
+  const enterGame = () => {
+    gateStates(false);
+    if (!who) { renderGame(); return; }
+    const g = loadGame(who);
+    const ev = { cleared: sync(g), undo: false, live: false };
+    markDay(g);
+    const fresh = checkAwards(g, ev);
+    saveGame(who, g);
+    renderGame(g);
+    toastAwards(fresh);
+  };
+
   /* ---------- Name picker and filtering ---------- */
   const picker = document.getElementById("who");
   [["Everyone", ""]].concat(PEOPLE.map((n) => [n, n])).forEach(([label, value]) => {
@@ -1429,7 +2015,10 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
         el.hidden = !matches(el.getAttribute("data-who") || "all", who, w, kind) || !!(who && d && d.split(" ").indexOf(String(dow)) < 0);
       });
       card.hidden = !matches(card.getAttribute("data-who") || "all", who, w, kind) || !!(who && !dueToday(card));
-      card.querySelector(".tags").innerHTML = tagsFor(card, who).map((t) => '<span class="tag">' + esc(t) + "</span>").join("");
+      const tags = tagsFor(card, who);
+      const due = (t) => /^(Today|Tonight|Still to finish)/.test(t);
+      card.querySelector(".tags").innerHTML = tags.map((t) => '<span class="tag' + (due(t) ? " due" : "") + '">' + esc(t) + "</span>").join("");
+      card.classList.toggle("due", tags.some(due));
       progress(card);
     });
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
@@ -1438,6 +2027,7 @@ table.skills input { width: 1.2rem; height: 1.2rem; accent-color: var(--accent);
       a.hidden = !!(target && target.hidden);
     });
     renderSkills();
+    enterGame();
   }
 
   renderPlan();
