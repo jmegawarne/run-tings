@@ -20,6 +20,9 @@
 :root {
   --bg: #f1eeff;
   --glow: #dcd2ff;
+  --glow-2: #ffd6ee;
+  --bubble: rgba(91, 61, 245, 0.42);
+  --bubble-hi: rgba(255, 255, 255, 0.95);
   --surface: #ffffff;
   --raise: #f4f1ff;
   --fg: #1d1745;
@@ -49,6 +52,9 @@
   :root:not([data-theme="light"]) {
     --bg: #191340;
     --glow: #33227a;
+    --glow-2: #4b1763;
+    --bubble: rgba(150, 228, 255, 0.45);
+    --bubble-hi: rgba(255, 255, 255, 0.6);
     --surface: #241c57;
     --raise: #2d246a;
     --fg: #f3f1ff;
@@ -70,6 +76,9 @@
 :root[data-theme="dark"] {
   --bg: #191340;
   --glow: #33227a;
+  --glow-2: #4b1763;
+  --bubble: rgba(150, 228, 255, 0.45);
+  --bubble-hi: rgba(255, 255, 255, 0.6);
   --surface: #241c57;
   --raise: #2d246a;
   --fg: #f3f1ff;
@@ -88,7 +97,7 @@
   color-scheme: dark;
 }
 html {
-  background: radial-gradient(40rem 20rem at 50% -8rem, var(--glow), transparent 70%) no-repeat, var(--bg);
+  background: var(--bg);
   scroll-behavior: smooth;
 }
 body {
@@ -303,17 +312,47 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 .toast.up small { color: var(--pts); }
 .toast b { display: block; font: 800 1.05rem/1.15 var(--display); font-synthesis: none; }
 
-/* Clean sweep: the day's points, collected. */
-.win { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(12, 6, 40, 0.62); overflow: hidden; }
+/* End of the day: the results screen, from Close the day or a clean sweep. Built to be compared. */
+.close-day, .win button { font-family: var(--display); font-weight: 800; font-synthesis: none; border: 0; border-radius: 16px; cursor: pointer; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); }
+.close-day { display: block; width: 100%; margin: 0 0 16px; font-size: 1.3rem; padding: 14px 18px 13px; }
+.close-day:active, .win button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--pts-lip); }
+.win { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(12, 6, 40, 0.62); overflow: hidden; }
 .confetti { position: absolute; inset: 0; pointer-events: none; }
 .confetti i { position: absolute; top: -4vh; width: 9px; height: 14px; border-radius: 2px; background: var(--c); animation: fall var(--d) linear var(--w) both; }
-.win-card { position: relative; box-sizing: border-box; width: min(22rem, 100%); text-align: center; padding: 26px 20px 20px; border-radius: 24px; background: var(--surface); border: 3px solid var(--pts-fill); box-shadow: 0 6px 0 var(--pts-lip); animation: land 0.5s cubic-bezier(0.2, 1.5, 0.4, 1); }
-.win h2 { margin: 0 0 4px; font-size: 2.3rem; text-shadow: 0 3px 0 var(--award-fill); }
-.win-pts { margin: 6px 0 4px; color: var(--muted); }
-.win-pts b { display: block; font: 800 3rem/1 var(--display); font-synthesis: none; color: var(--pts); font-variant-numeric: tabular-nums; }
-.win .awards { grid-template-columns: 1fr; text-align: left; max-height: 36vh; overflow: auto; }
-.win button { margin-top: 12px; font-size: 1.2rem; padding: 12px 22px 11px; border-radius: 16px; border: 0; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); cursor: pointer; }
-.win button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--pts-lip); }
+.win-card {
+  position: relative; box-sizing: border-box; width: min(23rem, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px);
+  overflow-y: auto; overscroll-behavior: contain; text-align: center; padding: 20px 18px 16px; border-radius: 24px;
+  background: var(--surface); border: 3px solid var(--pts-fill); box-shadow: 0 6px 0 var(--pts-lip); animation: land 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+.win-who { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 8px; text-align: left; }
+.win-who .lvl { width: 2.3rem; height: 2.5rem; font-size: 1.1rem; }
+.win-who b { display: block; font: 800 1.2rem/1.1 var(--display); font-synthesis: none; }
+.win-who small { display: block; font-size: 0.8rem; color: var(--muted); }
+.win h2 { margin: 0 0 4px; font-size: 2.1rem; text-shadow: 0 3px 0 var(--award-fill); }
+.win-pct { margin: 0 0 8px; color: var(--muted); }
+.win-pct b { display: block; font: 800 3.4rem/1 var(--display); font-synthesis: none; color: var(--go); font-variant-numeric: tabular-nums; }
+.win-card .bar { margin-bottom: 12px; }
+.win-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 10px; }
+.win-stats div { background: var(--raise); border-radius: 12px; padding: 6px 4px; }
+.win-stats dt { font-size: 0.75rem; color: var(--muted); }
+.win-stats dd { margin: 0; font: 800 1.25rem/1.2 var(--display); font-synthesis: none; font-variant-numeric: tabular-nums; }
+.win-stats dd.p { color: var(--pts); }
+.win-stats dd.s { color: var(--award); }
+.win-lv { font-weight: 700; color: var(--award); margin: 0 0 12px; }
+.week7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 64px; margin: 0 0 4px; }
+.week7 > span { display: grid; grid-template-rows: 1fr auto; gap: 3px; height: 100%; }
+.week7 i { align-self: end; height: max(4px, calc(var(--v, 0) * 100%)); border-radius: 5px; background: var(--line); }
+.week7 .has i { background: var(--go-fill); }
+.week7 .full i { background: var(--pts-fill); }
+.week7 b { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+.week7 .now b { color: var(--fg); font-weight: 800; }
+.win-weekcap { font-size: 0.85rem; color: var(--muted); margin: 0 0 10px; }
+ul.won { list-style: none; padding: 0; margin: 0 0 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10px; font-size: 0.85rem; font-weight: 600; }
+.win-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+.win button { font-size: 1.15rem; padding: 12px 20px 11px; }
+.win button.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--line); }
+.win-note { font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; white-space: pre-line; }
 
 @keyframes bump { 40% { transform: scale(1.22); } }
 @keyframes rise { 0% { opacity: 0; transform: translateY(6px) scale(0.8); } 20% { opacity: 1; transform: translateY(-6px) scale(1.1); } 100% { opacity: 0; transform: translateY(-30px); } }
@@ -322,13 +361,50 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 @keyframes toast { 0% { opacity: 0; transform: translateY(-14px) scale(0.96); } 8% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
 @keyframes land { 0% { opacity: 0; transform: scale(0.7) translateY(20px); } 100% { opacity: 1; transform: none; } }
 @keyframes fall { to { transform: translate(var(--x), 110vh) rotate(var(--r)); } }
+
+/* Background: two glows drifting slowly, and soap bubbles rising behind the cards. */
+.bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.bg::before, .bg::after {
+  content: ""; position: absolute; width: 75vmax; height: 75vmax; border-radius: 50%;
+  background: radial-gradient(closest-side, var(--glow), transparent);
+  animation: drift 34s ease-in-out infinite alternate;
+}
+.bg::before { left: -32vmax; top: -30vmax; }
+.bg::after { right: -38vmax; bottom: -34vmax; background: radial-gradient(closest-side, var(--glow-2), transparent); animation-duration: 42s; animation-direction: alternate-reverse; }
+.bg i {
+  position: absolute; bottom: -10vh; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
+  border: 2px solid var(--bubble);
+  background: radial-gradient(circle at 32% 30%, var(--bubble-hi) 0 10%, transparent 12%), radial-gradient(circle, transparent 58%, var(--bubble) 100%);
+  opacity: 0; animation: bubble var(--d) linear var(--w) infinite;
+}
+@keyframes drift { to { transform: translate(14vmax, 12vmax) scale(1.12); } }
+@keyframes bubble {
+  0% { opacity: 0; transform: translate(0, 0); }
+  8% { opacity: 1; }
+  50% { transform: translate(var(--sway), -58vh); }
+  92% { opacity: 1; }
+  100% { opacity: 0; transform: translate(0, -122vh); }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .bg i { display: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
 </head>
 <body>
+<div class="bg" aria-hidden="true">
+  <i style="--x:6%;--s:22px;--d:26s;--w:-2s;--sway:16px"></i>
+  <i style="--x:18%;--s:12px;--d:19s;--w:-11s;--sway:-10px"></i>
+  <i style="--x:29%;--s:34px;--d:31s;--w:-20s;--sway:22px"></i>
+  <i style="--x:41%;--s:16px;--d:23s;--w:-6s;--sway:-14px"></i>
+  <i style="--x:53%;--s:26px;--d:28s;--w:-15s;--sway:12px"></i>
+  <i style="--x:64%;--s:10px;--d:17s;--w:-9s;--sway:-8px"></i>
+  <i style="--x:74%;--s:30px;--d:33s;--w:-25s;--sway:-20px"></i>
+  <i style="--x:84%;--s:14px;--d:21s;--w:-4s;--sway:10px"></i>
+  <i style="--x:92%;--s:20px;--d:25s;--w:-17s;--sway:-12px"></i>
+  <i style="--x:47%;--s:40px;--d:38s;--w:-30s;--sway:26px"></i>
+</div>
 <header>
   <h1>Routines</h1>
   <p class="lede">Pick your name, clear today's cards, and rack up the points.</p>
@@ -1219,11 +1295,21 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 <div class="win" id="win" hidden role="dialog" aria-modal="true" aria-labelledby="win-h">
   <div class="confetti" id="confetti" aria-hidden="true"></div>
   <div class="win-card">
+    <p class="win-who"><span class="lvl"><span class="vh">Level </span><span id="win-lvl">1</span></span><span><b id="win-name"></b><small id="win-date"></small></span></p>
     <h2 id="win-h">Clean sweep!</h2>
-    <p class="win-pts"><b id="win-pts">0</b>points today</p>
-    <p id="win-streak"></p>
-    <ul class="awards" id="win-awards"></ul>
-    <button type="button" id="win-ok">Collect points</button>
+    <p class="win-pct"><b><span id="win-pct">0</span>%</b>of your day done</p>
+    <span class="bar" aria-hidden="true"><i id="win-bar"></i></span>
+    <dl class="win-stats">
+      <div><dt>Points today</dt><dd class="p" id="win-pts">0</dd></div>
+      <div><dt>Cards</dt><dd id="win-cards"></dd></div>
+      <div><dt>Streak</dt><dd class="s" id="win-streak"></dd></div>
+    </dl>
+    <p class="win-lv" id="win-lv"></p>
+    <div class="week7" id="win-week"></div>
+    <p class="win-weekcap" id="win-weekcap"></p>
+    <ul class="won" id="win-awards"></ul>
+    <div class="win-actions"><button type="button" id="win-share">Share result</button><button type="button" class="ghost" id="win-ok">Done</button></div>
+    <p class="win-note" id="win-note" role="status"></p>
   </div>
 </div>
 
@@ -1311,6 +1397,8 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
     { id: "quarterly", icon: "🗓️", name: "Quarter Master", desc: "Finished a quarterly list." },
     { id: "gaffer", icon: "🧢", name: "The Gaffer", desc: "Dad's list, done." }
   ];
+  // The end-of-day headline, by the share of your own day done. Everyone can reach 100%, whatever their load.
+  const TIERS = [[100, "Clean sweep!"], [90, "So close"], [70, "Strong day"], [40, "Halfway hero"], [1, "Warm-up round"], [0, "Fresh start tomorrow"]];
   /* ---------- End of points and awards ---------- */
 
   const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
@@ -1685,7 +1773,7 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
     let g = null;
     try { g = JSON.parse(get(gkey(p)) || "null"); } catch (e) { g = null; }
     g = g && typeof g === "object" ? g : {};
-    g = { total: +g.total || 0, old: +g.old || 0, days: g.days || {}, awards: g.awards || {}, got: g.got || {} };
+    g = { total: +g.total || 0, old: +g.old || 0, days: g.days || {}, awards: g.awards || {}, got: g.got || {}, since: g.since || ymd(today) };
     // Records of which ticks scored go when their ticks do. The points stay.
     Object.keys(g.got).forEach((k) => {
       const per = k.split("|")[1] || "";
@@ -1730,12 +1818,30 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
   const dayCards = () => cards.filter((c) => !c.hidden && stepBoxes(c).length > 0 &&
     !(c.getAttribute("data-period") === "w" && !c.hasAttribute("data-days") && !c.hasAttribute("data-when")));
   const sweep = () => { const dc = dayCards(); return { all: dc.length, done: dc.filter(allTicked).length }; };
+  // The share of the day's points on offer that you've won, so a light day and a heavy day both top out at 100.
+  const dayPct = () => {
+    const dc = dayCards();
+    if (!dc.length) return 0;
+    if (dc.every(allTicked)) return 100;
+    let all = 0;
+    let won = 0;
+    dc.forEach((c) => { const b = stepBoxes(c); all += cardPts(c); won += (cardPts(c) * b.filter((x) => x.checked).length) / b.length; });
+    return Math.min(99, Math.floor((100 * won) / all));
+  };
   const markDay = (g) => { // True when this tick makes the day a clean sweep.
     const s = sweep();
     const d = dayOf(g, today);
     const was = !!d.clear;
     d.clear = s.all > 0 && s.done === s.all;
+    d.pct = dayPct();
     return d.clear && !was;
+  };
+  // This week's average share, counting days missed as nothing, from the first day this phone scored.
+  const weekPct = (g) => {
+    let n = 0;
+    let sum = 0;
+    for (let t = monday; t <= today; t += DAY) { if (ymd(t) < g.since) continue; n++; sum += (g.days[ymd(t)] || {}).pct || 0; }
+    return n ? Math.round(sum / n) : 0;
   };
 
   // Ticks made before points existed, or with no name picked, score once a name is picked.
@@ -1845,7 +1951,8 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
     const stat = (k, v, cls) => "<div><dt>" + k + "</dt><dd" + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</dd></div>";
     const swept = s.all > 0 && s.done === s.all;
     const open = !!scoreBody.querySelector("details.locked[open]");
-    let h = '<div class="player"><span class="lvl big"><span class="vh">Level </span>' + l + "</span><div>";
+    let h = '<button type="button" class="close-day" id="close-day">Close the day</button>';
+    h += '<div class="player"><span class="lvl big"><span class="vh">Level </span>' + l + "</span><div>";
     h += '<p class="pname">' + esc(who) + '</p><p class="ptitle">' + esc(titleOf(l)) + "</p>";
     h += '<span class="bar lv" aria-hidden="true"><i style="--v:' + ((g.total - base) / (next - base)).toFixed(3) + '"></i></span>';
     h += '<p class="psub">' + fmt(g.total) + " points. " + fmt(next - g.total) + " more to level " + (l + 1) + ".</p></div></div>";
@@ -1895,8 +2002,10 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
     });
   };
 
-  // Clean sweep: every card on the day cleared. The day's points, collected.
+  // The end of the day: Close the day, or a clean sweep, brings up the results. They're built to be compared,
+  // so the headline is the share of your own day done, and Share result sends them as text, with no link.
   const winEl = document.getElementById("win");
+  const byId = (id) => document.getElementById(id);
   let winFrom = null;
   const confetti = () => {
     if (!motion) return;
@@ -1909,22 +2018,81 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
     }
     document.getElementById("confetti").innerHTML = h;
   };
-  const showWin = (g, fresh) => {
-    const st = streakOf(g);
-    document.getElementById("win-streak").textContent = st > 1 ? "🔥 " + st + " clean sweeps in a row." : "Every card on your day, done.";
-    document.getElementById("win-awards").innerHTML = fresh.map((id) => tile(AWARD_BY[id])).join("");
+  const dayName = DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()];
+  const result = (g) => {
+    const s = sweep();
+    return {
+      pct: dayPct(), pts: (g.days[ymd(today)] || {}).pts || 0, cards: s.done + " of " + s.all, streak: streakOf(g),
+      level: levelOf(g.total), week: weekPct(g), won: awardsFor(who).filter((a) => g.awards[a.id] === ymd(today))
+    };
+  };
+  const shareText = (r) => {
+    const full = Math.floor(r.pct / 10);
+    const won = r.won.map((a) => a.icon + " " + a.name);
+    return "Routines: " + who + ", " + dayName + "\n" +
+      "🟩".repeat(full) + "⬜".repeat(10 - full) + " " + r.pct + "%\n" +
+      fmt(r.pts) + " points, " + r.cards + " cards" + (r.streak > 1 ? ", 🔥 " + r.streak + " days" : "") + "\n" +
+      "Level " + r.level + ": " + titleOf(r.level) + ". This week " + r.week + "%." +
+      (won.length ? "\nWon today: " + won.slice(0, 4).join(", ") + (won.length > 4 ? ", and " + (won.length - 4) + " more" : "") : "");
+  };
+  const showEnd = (g, swept) => {
+    const r = result(g);
+    byId("win-lvl").textContent = r.level;
+    byId("win-name").textContent = who;
+    byId("win-date").textContent = dayName;
+    byId("win-h").textContent = swept ? "Clean sweep!" : TIERS.find((t) => r.pct >= t[0])[1];
+    byId("win-bar").style.setProperty("--v", (r.pct / 100).toFixed(2));
+    byId("win-cards").textContent = r.cards;
+    byId("win-streak").textContent = r.streak + (r.streak === 1 ? " day" : " days");
+    const from = levelOf(g.total - r.pts);
+    byId("win-lv").textContent = "Level " + r.level + ": " + titleOf(r.level) + (r.level > from ? ", up from " + from + " today" : "");
+    let h = "";
+    for (let i = 0; i < 7; i++) {
+      const t = monday + i * DAY;
+      const day = DAYS[(i + 1) % 7];
+      const rec = g.days[ymd(t)];
+      const v = t === today ? r.pct : t < today && rec ? rec.pct || 0 : 0;
+      const cls = (t <= today && (rec || t === today) ? "has" : "") + (v === 100 ? " full" : "") + (t === today ? " now" : "");
+      h += '<span class="' + cls + '" style="--v:' + (v / 100).toFixed(2) + '"><i></i><b aria-hidden="true">' + day.charAt(0) + '</b><span class="vh">' +
+        day + ": " + (t > today ? "to come" : v + "%") + "</span></span>";
+    }
+    byId("win-week").innerHTML = h;
+    byId("win-weekcap").textContent = "This week: " + r.week + "% of your days done";
+    const won = r.won.slice(0, 6).map((a) => "<li>" + a.icon + " " + esc(a.name) + "</li>");
+    if (r.won.length > 6) won.push("<li>and " + (r.won.length - 6) + " more</li>");
+    byId("win-awards").innerHTML = won.join("");
+    byId("win-note").textContent = "Share it to compare with the others.";
     winFrom = document.activeElement;
     winEl.hidden = false;
-    countUp(document.getElementById("win-pts"), 0, (g.days[ymd(today)] || {}).pts || 0);
-    confetti();
-    document.getElementById("win-ok").focus({ preventScroll: true });
+    countUp(byId("win-pct"), 0, r.pct);
+    countUp(byId("win-pts"), 0, r.pts);
+    if (r.pct === 100) confetti();
+    byId("win-ok").focus({ preventScroll: true });
   };
   const closeWin = () => {
     winEl.hidden = true;
-    document.getElementById("confetti").innerHTML = "";
+    byId("confetti").innerHTML = "";
     if (winFrom && winFrom.focus) winFrom.focus({ preventScroll: true });
   };
-  document.getElementById("win-ok").addEventListener("click", closeWin);
+  byId("win-share").addEventListener("click", () => {
+    const text = shareText(result(loadGame(who)));
+    const note = byId("win-note");
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => { /* cancelled */ });
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => { note.textContent = "Copied. Paste it in your chat to compare."; }, () => { note.textContent = text; });
+    } else {
+      note.textContent = text;
+    }
+  });
+  scoreBody.addEventListener("click", (e) => {
+    if (!who || !e.target.closest || !e.target.closest("#close-day")) return;
+    const g = loadGame(who);
+    markDay(g);
+    saveGame(who, g);
+    showEnd(g, false);
+  });
+  byId("win-ok").addEventListener("click", closeWin);
   winEl.addEventListener("click", (e) => { if (e.target === winEl) closeWin(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !winEl.hidden) closeWin(); });
 
@@ -1955,7 +2123,7 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
     }
     const l = levelOf(g.total);
     if (l > was) toast("⭐", "Level up", "Level " + l + ": " + titleOf(l), "up");
-    if (swept) showWin(g, fresh);
+    if (swept) showEnd(g, true);
     else toastAwards(fresh);
   };
 
