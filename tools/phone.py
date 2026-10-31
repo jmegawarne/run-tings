@@ -10,9 +10,10 @@
 # Needs Python Playwright with Chromium. The cloud session has both; elsewhere:
 #   pip install playwright && python3 -m playwright install chromium
 # The page is served from a local web server, so it reads recipes.json as it does live.
-# Each visible section (This week, each gate, Skills, How it works) gets its own screenshot,
-# named date-scheme-person-section.png, in a folder outside the repo (printed at the end),
-# so they never get committed. Exits non-zero if the page throws, or scrolls sideways.
+# The header, the points bar, the jump links, and each visible section (This week, each gate,
+# Scoreboard, Skills, Safety) get their own screenshot, named date-scheme-person-section.png,
+# in a folder outside the repo (printed at the end), so they never get committed. Animations
+# are settled before each shot. Exits non-zero if the page throws, or scrolls sideways.
 
 import argparse
 import datetime
@@ -88,10 +89,13 @@ def main():
                         page.wait_for_timeout(100)
                         sideways = page.evaluate("document.documentElement.scrollWidth > window.innerWidth")
                         shown = []
-                        for section in page.locator("body > section[id]").all():
-                            if section.is_visible():
-                                name = section.get_attribute("id").replace("g-", "", 1)
-                                section.screenshot(path=os.path.join(args.out, "%s-%s-%s-%s.png" % (d, scheme, person, name)))
+                        parts = [("header", page.locator("body > header")), ("hud", page.locator("#hud")), ("jump", page.locator("body > nav"))]
+                        parts += [(s.get_attribute("id").replace("g-", "", 1), s) for s in page.locator("body > section[id]").all()]
+                        for name, part in parts:
+                            if part.count() and part.is_visible():
+                                # The points bar sticks to the top of the screen, so it's unstuck for the other shots or it lands on them.
+                                part.screenshot(path=os.path.join(args.out, "%s-%s-%s-%s.png" % (d, scheme, person, name)), animations="disabled",
+                                                style="" if name == "hud" else ".hud { position: static !important; }")
                                 shown.append(name)
                         problems = (["scrolls sideways"] if sideways else []) + (["script error: " + "; ".join(errors)] if errors else [])
                         failed = failed or bool(problems)
