@@ -286,6 +286,7 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 .lvl.big { width: 4rem; height: 4.4rem; font-size: 2rem; }
 .pname { font: 800 1.45rem/1.1 var(--display); font-synthesis: none; margin: 0; }
 .ptitle { color: var(--award); font-weight: 700; margin: 2px 0 6px; }
+.hcap { display: inline-block; margin-left: 4px; font-size: 0.78rem; font-weight: 700; color: var(--pts); background: var(--pts-soft); border-radius: 999px; padding: 1px 8px; vertical-align: 1px; }
 .psub { font-size: 0.85rem; color: var(--muted); margin: 6px 0 0; }
 .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 14px 0 0; }
 .stats div { background: var(--raise); border-radius: 12px; padding: 8px 12px; }
@@ -1205,8 +1206,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 </section>
 
 <!-- ============ SCOREBOARD ============
-     Points come from ticks: a card is worth its time in minutes × 10, half shared across its steps and
-     half for clearing it. They're kept on each phone under the picked name, and never leave it. -->
+     Points come from ticks: a card is worth its time in minutes × 10, times your handicap, half shared across
+     its steps and half for clearing it. They're kept on each phone under the picked name, and never leave it. -->
 <section id="score" aria-labelledby="score-h">
   <h2 id="score-h">Scoreboard</h2>
   <div class="score" id="score-body"><noscript><p>Points need JavaScript switched on.</p></noscript></div>
@@ -1343,6 +1344,9 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   /* ---------- Points and awards ---------- */
   // A card is worth its time in minutes × PTS_PER_MIN: half shared across its steps, half for clearing it.
   const PTS_PER_MIN = 10;
+  // Handicaps, from age and ability: every point a person wins is multiplied by theirs, so nobody is out-scored
+  // for being younger or newer to a job. Dad's call; they come down as people grow up and get better.
+  const HANDICAP = { Aurora: 1.2, Eshaal: 1.2, Leo: 1.6, Dad: 1 };
   const LEVEL_AT = (l) => 500 * (l - 1) * l; // Total points to reach level l: 1,000 for level 2, 3,000 for 3, 6,000 for 4.
   const TITLES = ["Sock Rookie", "Crumb Cadet", "Dish Apprentice", "Hoover Hopeful", "Squeegee Squire", "Laundry Ranger",
     "Grime Fighter", "Dust Ninja", "Mop Mage", "Tidy Knight", "Spotless Sorcerer", "Order Overlord", "Kitchen Commander",
@@ -1546,8 +1550,11 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     return m ? +m[1] * (m[2] === "hour" ? 60 : 1) : 10;
   };
   const cardPts = (card) => minutesOf(card) * PTS_PER_MIN;
-  const clearPts = (card) => Math.round(cardPts(card) / 2);
-  const stepPts = (card) => Math.max(5, Math.round(cardPts(card) / 2 / Math.max(1, stepBoxes(card).length)));
+  const hc = (p) => HANDICAP[p] || 1;
+  const hcText = (p) => "×" + hc(p).toFixed(1);
+  // What a card pays the picked person: its points times their handicap.
+  const clearPts = (card) => Math.round((cardPts(card) * hc(who)) / 2);
+  const stepPts = (card) => Math.max(5, Math.round((cardPts(card) * hc(who)) / 2 / Math.max(1, stepBoxes(card).length)));
 
   cards.forEach((card) => {
     const s = card.querySelector("summary");
@@ -1773,7 +1780,20 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     let g = null;
     try { g = JSON.parse(get(gkey(p)) || "null"); } catch (e) { g = null; }
     g = g && typeof g === "object" ? g : {};
-    g = { total: +g.total || 0, old: +g.old || 0, days: g.days || {}, awards: g.awards || {}, got: g.got || {}, since: g.since || ymd(today) };
+    g = { total: +g.total || 0, old: +g.old || 0, days: g.days || {}, awards: g.awards || {}, got: g.got || {}, since: g.since || ymd(today), hc: +g.hc || 1 };
+    // A new handicap counts from today: points already won today are re-scored at it, and earlier days stay as they were.
+    if (g.hc !== hc(p)) {
+      const t = ymd(today);
+      Object.keys(g.got).forEach((k) => {
+        const a = g.got[k];
+        if (a[1] !== t) return;
+        const v = Math.round((a[0] * hc(p)) / g.hc);
+        g.total += v - a[0];
+        if (g.days[t]) g.days[t].pts += v - a[0];
+        a[0] = v;
+      });
+      g.hc = hc(p);
+    }
     // Records of which ticks scored go when their ticks do. The points stay.
     Object.keys(g.got).forEach((k) => {
       const per = k.split("|")[1] || "";
@@ -1953,7 +1973,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const open = !!scoreBody.querySelector("details.locked[open]");
     let h = '<button type="button" class="close-day" id="close-day">Close the day</button>';
     h += '<div class="player"><span class="lvl big"><span class="vh">Level </span>' + l + "</span><div>";
-    h += '<p class="pname">' + esc(who) + '</p><p class="ptitle">' + esc(titleOf(l)) + "</p>";
+    h += '<p class="pname">' + esc(who) + '</p><p class="ptitle">' + esc(titleOf(l)) + ' <span class="hcap">Handicap ' + hcText(who) + "</span></p>";
     h += '<span class="bar lv" aria-hidden="true"><i style="--v:' + ((g.total - base) / (next - base)).toFixed(3) + '"></i></span>';
     h += '<p class="psub">' + fmt(g.total) + " points. " + fmt(next - g.total) + " more to level " + (l + 1) + ".</p></div></div>";
     h += '<dl class="stats">' + stat("Today", fmt(pts)) + stat("This week", fmt(weekPts(g))) + stat("Best day", fmt(bestOf(g))) + stat("Streak", st + (st === 1 ? " day" : " days"), "streak") + "</dl>";
@@ -2031,7 +2051,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const won = r.won.map((a) => a.icon + " " + a.name);
     return "Routines: " + who + ", " + dayName + "\n" +
       "🟩".repeat(full) + "⬜".repeat(10 - full) + " " + r.pct + "%\n" +
-      fmt(r.pts) + " points, " + r.cards + " cards" + (r.streak > 1 ? ", 🔥 " + r.streak + " days" : "") + "\n" +
+      fmt(r.pts) + " points at " + hcText(who) + ", " + r.cards + " cards" + (r.streak > 1 ? ", 🔥 " + r.streak + " days" : "") + "\n" +
       "Level " + r.level + ": " + titleOf(r.level) + ". This week " + r.week + "%." +
       (won.length ? "\nWon today: " + won.slice(0, 4).join(", ") + (won.length > 4 ? ", and " + (won.length - 4) + " more" : "") : "");
   };
@@ -2039,7 +2059,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const r = result(g);
     byId("win-lvl").textContent = r.level;
     byId("win-name").textContent = who;
-    byId("win-date").textContent = dayName;
+    byId("win-date").textContent = dayName + ", handicap " + hcText(who);
     byId("win-h").textContent = swept ? "Clean sweep!" : TIERS.find((t) => r.pct >= t[0])[1];
     byId("win-bar").style.setProperty("--v", (r.pct / 100).toFixed(2));
     byId("win-cards").textContent = r.cards;
@@ -2187,6 +2207,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       const due = (t) => /^(Today|Tonight|Still to finish)/.test(t);
       card.querySelector(".tags").innerHTML = tags.map((t) => '<span class="tag' + (due(t) ? " due" : "") + '">' + esc(t) + "</span>").join("");
       card.classList.toggle("due", tags.some(due));
+      card.querySelector(".pts").textContent = fmt(cardPts(card) * hc(who)) + " pts";
       progress(card);
     });
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
