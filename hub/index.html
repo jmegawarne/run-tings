@@ -13,14 +13,22 @@
   #stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; touch-action: pan-y; }
   #slide { max-width: 100%; max-height: 100%; object-fit: contain; }
   #bar { height: 80px; display: flex; align-items: stretch; background: var(--bar); }
-  #bar button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 24px; padding: 0 26px; }
+  #bar button, #stations button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 24px;
+    padding: 0 26px; }
   #bar button:disabled { color: #555; }
   #bar #next { margin-left: auto; color: var(--accent); font-weight: 700; }
   #where { align-self: center; color: var(--dim); font-size: 20px; padding: 0 12px; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis; }
   #radio { flex: none; }
   #radio[data-state="connecting"], #radio[data-state="unavailable"] { color: var(--dim); }
-  #radio[data-state="on"] { color: var(--accent); }
+  #radio[data-state="on"], #stations .on { color: var(--accent); }
+  #picker { position: fixed; inset: 0; }
+  #stations { position: absolute; bottom: 88px; display: flex; flex-direction: column; padding: 6px 0;
+    border-radius: 10px; background: #2c2c2c; box-shadow: 0 6px 30px #000; }
+  #stations button { height: 72px; text-align: left; }
+  #stations button::before { content: '✓'; display: inline-block; width: 36px; visibility: hidden; }
+  #stations .on::before { visibility: visible; }
+  #stations #stop { border-top: 1px solid #444; }
   #days { position: fixed; inset: 0; overflow-y: auto; padding: 28px 40px 40px; background: var(--bar); }
   #days h1 { font-size: 30px; margin: 0 0 18px; }
   #days .day { margin: 18px 0 6px; color: var(--dim); font-size: 20px; }
@@ -37,18 +45,22 @@
   <div id="bar">
     <button id="back" aria-label="Previous slide">&lsaquo; Back</button>
     <button id="list" aria-label="Choose a day">Days</button>
-    <button id="radio" data-state="off">♪ Smooth Chill</button>
+    <button id="radio" data-state="off">♪ Radio</button>
     <span id="where"></span>
     <button id="next" aria-label="Next slide">Next &rsaquo;</button>
   </div>
+  <div id="picker" hidden>
+    <div id="stations">
+      <!-- Each station's streams, tried in turn until one plays: AAC first, as that's what plays on the Hub. -->
+      <button data-streams="https://media-ssl.musicradio.com/SmoothChill https://media-ssl.musicradio.com/SmoothChillMP3">Smooth Chill</button>
+      <button data-streams="https://media-ssl.musicradio.com/RadioX00s https://media-ssl.musicradio.com/RadioX00sMP3">Radio X 00s</button>
+      <button data-streams="https://media-ssl.musicradio.com/CapitalXTRAReloaded https://media-ssl.musicradio.com/CapitalXTRAReloadedMP3">Capital XTRA Reloaded</button>
+      <button id="stop" hidden>Stop radio</button>
+    </div>
+  </div>
 </div>
 <div id="days" hidden></div>
-<audio id="stream" preload="none">
-  <source src="https://media-ssl.musicradio.com/SmoothChill">
-  <source src="https://media-ssl.musicradio.com/SmoothChillMP3">
-  <source src="https://media-ssl.musicradio.com/Chill">
-  <source src="https://media-ssl.musicradio.com/ChillMP3">
-</audio>
+<audio id="stream" preload="none"></audio>
 <script>
 'use strict';
 // The kitchen screen for our Hub decks: each deck's slides as images, tapped through on the
@@ -189,25 +201,39 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'Escape') showDays('');
 });
 
-// The radio: Smooth Chill, played by this page so the slides and the sound share one cast
-// (casting anything else to the Hub closes this page). It starts only on a tap and plays on
-// while the slides and days change, since none of that reloads the page. The browser tries
-// each <source> in turn until one plays.
-const radio = $('radio'), stream = $('stream'), sources = [...stream.children];
-let radioState = 'off', radioTimer = 0;
+// The radio: a few stations, played by this page so the slides and the sound share one cast
+// (casting anything else to the Hub closes this page). A station starts only on a tap and plays
+// on while the slides and days change, since none of that reloads the page. While the list of
+// stations is open it sits on a layer over the whole page, so a tap off the list only closes it.
+const radio = $('radio'), stream = $('stream'), picker = $('picker');
+const stations = [...picker.querySelectorAll('[data-streams]')];
+let radioState = 'off', station = null, radioTimer = 0;
 const radioBusy = () => radioState === 'connecting' || radioState === 'on';
 function showRadio(state) {
+  const name = station && station.textContent;
   radioState = state;
   radio.dataset.state = state;
-  radio.textContent = { off: '♪ Smooth Chill', connecting: '♪ Connecting…', on: '♪ Stop radio',
-                        unavailable: 'Radio unavailable' }[state];
+  radio.textContent = { off: '♪ Radio', connecting: '♪ Connecting…', on: '♪ ' + name,
+                        unavailable: name + ' unavailable' }[state];
+  for (const s of stations) s.classList.toggle('on', s === station && radioBusy());
+  $('stop').hidden = !radioBusy();
+}
+function tune(s) {
+  clearTimeout(radioTimer);
+  station = s;
+  showRadio('connecting');
+  // The browser tries each <source> in turn until one plays.
+  stream.replaceChildren(...s.dataset.streams.split(' ').map((src) =>
+    Object.assign(document.createElement('source'), { src })));
+  stream.load();   // it's live, so start from now rather than from anything buffered earlier
+  stream.play().catch((err) => { if (err.name !== 'AbortError') radioFailed(); });
 }
 function stopRadio() {
   stream.pause();
   stream.currentTime = 0;
   // Take the sources out first: once it has played, Chrome ignores preload="none" and a bare
   // load() would fetch the stream all over again. With none left, it drops it and fetches nothing.
-  for (const s of sources) s.remove();
+  stream.replaceChildren();
   stream.load();
   showRadio('off');
 }
@@ -217,16 +243,21 @@ function radioFailed() {
   showRadio('unavailable');
   radioTimer = setTimeout(() => showRadio('off'), 4000);
 }
-radio.addEventListener('click', (e) => {
-  e.stopPropagation();   // this tap is for the radio, never the slides
-  clearTimeout(radioTimer);
-  if (radioBusy()) return stopRadio();
-  showRadio('connecting');
-  stream.append(...sources);
-  stream.load();   // it's live, so start from now rather than from anything buffered earlier
-  stream.play().catch((err) => { if (err.name !== 'AbortError') radioFailed(); });
+function showPicker(open) {
+  picker.hidden = !open;
+  $('stations').style.left = radio.offsetLeft + 'px';   // just above the button
+}
+radio.onclick = () => showPicker(picker.hidden);
+picker.onclick = (e) => {
+  const s = e.target.closest('button');
+  showPicker(false);
+  if (s && s.id === 'stop') stopRadio();
+  else if (s && !(s === station && radioBusy())) tune(s);   // the station that's on stays on
+};
+document.addEventListener('keydown', (e) => {   // keys for the radio never reach the slides
+  if (!picker.hidden) { e.stopPropagation(); if (e.key === 'Escape') showPicker(false); }
+  else if (e.target === radio && e.key === ' ') e.stopPropagation();
 });
-radio.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') e.stopPropagation(); });
 stream.addEventListener('playing', () => { if (radioState === 'connecting') showRadio('on'); });
 stream.addEventListener('pause', () => { if (radioBusy()) stopRadio(); });   // e.g. the stream ended
 // A <source> that fails fires its own error and the browser moves on to the next one. An error
