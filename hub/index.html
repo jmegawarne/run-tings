@@ -11,25 +11,7 @@
     font-family: Roboto, Arial, sans-serif; overflow: hidden; user-select: none; -webkit-user-select: none; }
   #deck { position: fixed; inset: 0; display: flex; flex-direction: column; }
   #stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; touch-action: pan-y; }
-  /* The slides and the steam share one 16:9 box, the largest the stage holds (sized in the script),
-     so the steam can be placed in percentages of the slide. */
-  #frame { position: relative; width: 100%; height: 100%; overflow: hidden; }
-  #frame img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; }
-  #ghost, #steam { pointer-events: none; }
-  /* Steam on a title slide, in the empty band between its meta line (which ends at 62%) and its
-     foot line (from 88%): three soft streaks that rise, lean, widen and fade, never above 0.2. */
-  #steam { position: absolute; left: 0; top: 63%; width: 100%; height: 21%; overflow: hidden; }
-  #steam span { position: absolute; bottom: 0; width: 2.4%; height: 55%; opacity: 0; transform-origin: 50% 100%;
-    background: radial-gradient(closest-side, #fff, rgba(255, 255, 255, .5) 55%, rgba(255, 255, 255, 0));
-    animation: steam 7s ease-in-out infinite backwards; }
-  #steam span:nth-child(1) { left: 37.8%; animation-delay: 2.3s; }
-  #steam span:nth-child(2) { left: 48.8%; animation-duration: 6.5s; }
-  #steam span:nth-child(3) { left: 59.8%; animation-delay: 4.6s; animation-duration: 7.5s; }
-  @keyframes steam {
-    0% { opacity: 0; transform: translate(0, 0) scale(.8, .7) skewX(0deg); }
-    40% { opacity: .2; }
-    100% { opacity: 0; transform: translate(40%, -65%) scale(1.6, 1.1) skewX(-14deg); }
-  }
+  #slide { max-width: 100%; max-height: 100%; object-fit: contain; }
   #bar { height: 80px; display: flex; align-items: stretch; background: var(--bar); }
   #bar button, #stations button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 24px;
     padding: 0 26px; }
@@ -59,8 +41,7 @@
 </head>
 <body>
 <div id="deck" hidden>
-  <div id="stage"><div id="frame"><img id="ghost" alt="" hidden><img id="slide" alt="">
-    <div id="steam"><span></span><span></span><span></span></div></div></div>
+  <div id="stage"><img id="slide" alt=""></div>
   <div id="bar">
     <button id="back" aria-label="Previous slide">&lsaquo; Back</button>
     <button id="list" aria-label="Choose a day">Days</button>
@@ -113,7 +94,7 @@ function saved() {
   } catch (e) { return null; }
 }
 
-function openDeck(list, index, slide, dir) {   // dir: 1 or -1 when Next or Back moves on to another dish
+function openDeck(list, index, slide) {
   const r = list[index], info = decks[r.deck];
   if (!info) {
     showDays(r.dish + ' isn’t on the kitchen screen yet.');
@@ -122,12 +103,12 @@ function openDeck(list, index, slide, dir) {   // dir: 1 or -1 when Next or Back
   current = { list, index, slide: Math.min(Math.max(slide || 1, 1), info.slides) };
   $('days').hidden = true;
   $('deck').hidden = false;
-  draw(dir || 0);
+  draw();
 }
 
-function draw(dir) {
+function draw() {
   const r = current.list[current.index], n = decks[r.deck].slides, s = current.slide;
-  show(src(r.deck, s), dir, s === 1);
+  $('slide').src = src(r.deck, s);
   $('slide').alt = r.dish + ', slide ' + s + ' of ' + n;
   $('where').textContent = s + ' / ' + n + '  ·  ' + r.dish;
   $('back').disabled = s === 1 && current.index === 0;
@@ -144,17 +125,16 @@ function step(by) {
   if (!current) return;
   const n = decks[current.list[current.index].deck].slides;
   const s = current.slide + by;
-  if (s >= 1 && s <= n) { current.slide = s; draw(by); }
-  else if (s > n && current.index < current.list.length - 1) openDeck(current.list, current.index + 1, 1, 1);
+  if (s >= 1 && s <= n) { current.slide = s; draw(); }
+  else if (s > n && current.index < current.list.length - 1) openDeck(current.list, current.index + 1, 1);
   else if (s < 1 && current.index > 0) {
     const prev = current.list[current.index - 1];
-    openDeck(current.list, current.index - 1, decks[prev.deck] ? decks[prev.deck].slides : 1, -1);
+    openDeck(current.list, current.index - 1, decks[prev.deck] ? decks[prev.deck].slides : 1);
   }
 }
 
 function showDays(note) {
   $('deck').hidden = true;
-  showSteam();
   const box = $('days');
   box.innerHTML = '<h1>What are we cooking?</h1>' + (note ? '<p class="note"></p>' : '');
   if (note) box.querySelector('.note').textContent = note;
@@ -266,7 +246,6 @@ function radioFailed() {
 function showPicker(open) {
   picker.hidden = !open;
   $('stations').style.left = radio.offsetLeft + 'px';   // just above the button
-  showSteam();
 }
 radio.onclick = () => showPicker(picker.hidden);
 picker.onclick = (e) => {
@@ -286,51 +265,6 @@ stream.addEventListener('pause', () => { if (radioBusy()) stopRadio(); });   // 
 stream.addEventListener('error', (e) => {
   if (e.target === stream || e.target === stream.lastElementChild) radioFailed();
 }, true);
-
-// Motion. Each new slide is decoded first, then slides in from the side it comes from, over the
-// last one, which stays on show beneath it (the ghost) until it's covered; a new dish or day just
-// fades in. The latest change wins: one still loading is dropped, and one in flight jumps to its
-// end. Title slides get steam. Only transform and opacity move, and nothing at all with reduced motion.
-const frame = $('frame'), slide = $('slide'), ghost = $('ghost'), steam = $('steam');
-const still = matchMedia('(prefers-reduced-motion: reduce)');
-let seq = 0, fx = null, onTitle = false;
-steam.remove();
-new ResizeObserver(() => {   // the frame: the largest 16:9 box the stage holds (kept while the deck is hidden)
-  const st = $('stage'), k = Math.min(st.clientWidth / 16, st.clientHeight / 9);
-  if (!k) return;
-  frame.style.width = 16 * k + 'px';
-  frame.style.height = 9 * k + 'px';
-}).observe($('stage'));
-function show(url, dir, title) {   // dir: 1 forward, -1 back, 0 a new dish or day
-  const n = ++seq, img = new Image();
-  if (fx) fx.finish();
-  if (!dir) {   // nothing of the last dish shows while this one loads
-    slide.style.visibility = 'hidden';
-    ghost.hidden = true;
-    onTitle = false;
-    showSteam();
-  }
-  img.src = url;
-  img.decode().catch(() => {}).then(() => {
-    if (n !== seq) return;
-    const was = dir && !slide.style.visibility && !still.matches && slide.src;
-    if (was) ghost.src = was;   // already loaded, so it shows at once
-    ghost.hidden = !(was && ghost.complete);
-    slide.src = url;
-    slide.style.visibility = '';
-    onTitle = title;
-    showSteam();
-    if (still.matches) return;
-    const a = fx = slide.animate([{ opacity: 0, transform: 'translateX(' + 3.5 * dir + '%)' },
-      { opacity: 1, transform: 'translateX(0)' }], { duration: 250, easing: 'ease-out' });
-    a.onfinish = () => { if (fx === a) ghost.hidden = true; };
-  });
-}
-function showSteam() {   // only while a title slide is on show; gone, not hidden, the rest of the time
-  if (!onTitle || $('deck').hidden || !picker.hidden || still.matches) steam.remove();
-  else if (!steam.isConnected) frame.append(steam);
-}
-still.onchange = showSteam;
 
 // On a phone or tablet, keep the screen awake while a recipe is up.
 async function stayAwake() {
