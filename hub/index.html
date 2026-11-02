@@ -36,6 +36,16 @@
   #days button { display: block; width: 100%; text-align: left; border: 0; border-radius: 10px; margin: 6px 0;
     padding: 18px 22px; background: #2c2c2c; color: var(--ink); font: inherit; font-size: 24px; }
   #days .note { color: var(--dim); font-size: 22px; }
+  #send { position: fixed; top: 14px; right: 14px; z-index: 2; border: 0; border-radius: 24px; padding: 12px 20px;
+    background: var(--accent); color: #fff; font: inherit; font-size: 20px; font-weight: 700; box-shadow: 0 4px 18px #000; }
+  #send:disabled { opacity: 0.85; }
+  .can-send #days { padding-top: 84px; scroll-padding-top: 76px; }
+  @media (max-width: 600px) {   /* a phone: the bar's buttons on one line, without the slide count */
+    #bar { height: 64px; }
+    #bar button { font-size: 18px; padding: 0 14px; white-space: nowrap; }
+    #where { display: none; }
+    #stations { bottom: 72px; }
+  }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -60,11 +70,14 @@
   </div>
 </div>
 <div id="days" hidden></div>
+<button id="send" hidden>Send to Hub</button>
 <audio id="stream" preload="none"></audio>
 <script>
 'use strict';
 // The kitchen screen for our Hub decks: each deck's slides as images, tapped through on the
-// Nest Hub's own screen once the page has been cast to it, so no phone has to stay connected.
+// Nest Hub's own screen once the page has been sent there, so no phone has to stay connected.
+// It gets there from its own Send to Hub button, in Chrome on an Android phone or a computer,
+// or with CATT (catt cast_site and this page's address).
 // Reads ../recipes.json for what's on which day and decks.json for each deck's slide count.
 // Query options: ?date=YYYY-MM-DD shows that day; ?deck=<deck id> opens one deck.
 
@@ -164,7 +177,7 @@ async function start() {
     decks = await d.json();
   } catch (e) {
     $('days').hidden = false;
-    $('days').textContent = 'Couldn’t load the recipes. Check the Wi-Fi, then cast this page again.';
+    $('days').textContent = 'Couldn’t load the recipes. Check the Wi-Fi, then send this page again.';
     return;
   }
   const want = params.get('deck');
@@ -273,6 +286,74 @@ async function stayAwake() {
 document.addEventListener('visibilitychange', stayAwake);
 addEventListener('click', stayAwake, { once: true });
 
+// Sending this page to the Hub, so nobody needs a laptop: Chrome's Cast starts DashCast on the
+// Hub (the receiver CATT uses) and tells it to load this page, which then takes the Hub over as
+// below, and the phone's free again. Only Chrome on Android or a computer can cast a web page,
+// not an iPhone, so the button shows only where Google's cast library says Cast is there.
+const DASHCAST = '84912283', DASHCAST_NS = 'urn:x-cast:es.offd.dashcast';
+const send = $('send');
+let wantSend = false, sendTimer = 0;
+function showSend(text, ms) {
+  clearTimeout(sendTimer);
+  send.textContent = text || 'Send to Hub';
+  send.disabled = text === 'Sending…';
+  if (text && ms) sendTimer = setTimeout(() => showSend(''), ms);
+}
+function hubLink() {   // this page as the Hub should open it: today, unless the link names a day or dish
+  const u = new URL('.', location.href);
+  for (const k of ['date', 'deck']) if (params.get(k)) u.searchParams.set(k, params.get(k));
+  return u.href;
+}
+async function deliver() {   // once there's a session with the Hub, tell DashCast there what to load
+  const ctx = cast.framework.CastContext.getInstance(), session = ctx.getCurrentSession();
+  if (!wantSend || !session) return;
+  wantSend = false;
+  try {
+    await session.sendMessage(DASHCAST_NS, { url: hubLink(), force: true, reload: false, reload_time: 0 });
+    showSend('On the Hub ✓', 5000);
+  } catch (e) {
+    ctx.endCurrentSession(false);   // drop a session that's gone stale, so trying again starts afresh
+    showSend('Couldn’t send it. Try again?', 6000);
+  }
+}
+send.onclick = async () => {
+  const ctx = cast.framework.CastContext.getInstance();
+  send.blur();
+  wantSend = true;
+  showSend('Sending…');
+  if (!ctx.getCurrentSession()) {
+    // Chrome's own list of cast devices. It rejects with an error code, or 'cancel' if closed.
+    const err = await ctx.requestSession().then((v) => v || null, (e) => e || 'error');
+    if (err) {
+      wantSend = false;
+      if (err === 'cancel') showSend('');
+      else showSend(err === 'receiver_unavailable' ? 'No Hub found. On the home Wi-Fi?'
+                                                   : 'Couldn’t reach the Hub. Try again?', 6000);
+      return;
+    }
+  }
+  deliver();
+};
+function setUpSend() {
+  const ctx = cast.framework.CastContext.getInstance();
+  ctx.setOptions({ receiverApplicationId: DASHCAST, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
+  // Android reports a new session as resumed, so either is the go-ahead (after a tap, not on load).
+  ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (e) => {
+    const s = cast.framework.SessionState;
+    if (e.sessionState === s.SESSION_STARTED || e.sessionState === s.SESSION_RESUMED) deliver();
+  });
+  document.body.classList.add('can-send');
+  send.hidden = false;
+}
+if (!/CrKey/.test(navigator.userAgent)) {
+  window.__onGCastApiAvailable = (ok) => {
+    if (ok) try { setUpSend(); } catch (e) { console.log('cast sender setup failed', e); }
+  };
+  const s = document.createElement('script');
+  s.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+  document.head.appendChild(s);
+}
+
 // On the Nest Hub: a cast web page is closed after about ten minutes with nothing playing,
 // and the Cast framework lays a media-controls layer over the page that swallows touches.
 // So start a Cast receiver, play an invisible image every nine minutes, and remove that layer.
@@ -307,6 +388,17 @@ function startCast() {
   const options = new cast.framework.CastReceiverOptions();
   options.disableIdleTimeout = true;
   options.statusText = 'Kitchen recipes';
+  // Sending the page again while it's up reaches this page rather than DashCast, which it replaced,
+  // so answer for DashCast: load what was sent, if it's one of this folder's pages.
+  options.customNamespaces = { [DASHCAST_NS]: cast.framework.system.MessageType.JSON };
+  ctx.addCustomMessageListener(DASHCAST_NS, (e) => {
+    try {
+      const msg = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+      if (!msg || typeof msg.url !== 'string') return;
+      const url = new URL(msg.url, location.href);
+      if (url.href.startsWith(new URL('.', location.href).href)) location.href = url.href;
+    } catch (err) { console.log('unreadable send', err); }
+  });
   ctx.start(options);
 }
 if (/CrKey/.test(navigator.userAgent)) {
