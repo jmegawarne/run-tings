@@ -39,6 +39,8 @@
   #send { position: fixed; top: 14px; right: 14px; z-index: 2; border: 0; border-radius: 24px; padding: 12px 20px;
     background: var(--accent); color: #fff; font: inherit; font-size: 20px; font-weight: 700; box-shadow: 0 4px 18px #000; }
   #send:disabled { opacity: 0.85; }
+  #log { position: fixed; left: 8px; right: 8px; bottom: 90px; z-index: 3; max-height: 40vh; overflow: auto; margin: 0;
+    padding: 8px; background: #000d; color: #fff; font: 12px/1.35 monospace; white-space: pre-wrap; }
   .can-send #days { padding-top: 84px; scroll-padding-top: 76px; }
   @media (max-width: 600px) {   /* a phone: the bar's buttons on one line, without the slide count */
     #bar { height: 64px; }
@@ -292,28 +294,73 @@ addEventListener('click', stayAwake, { once: true });
 // not an iPhone, so the button shows only where Google's cast library says Cast is there.
 const DASHCAST = '84912283', DASHCAST_NS = 'urn:x-cast:es.offd.dashcast';
 const send = $('send');
-let wantSend = false, sendTimer = 0;
+let wantSend = false, sending = false, sendTimer = 0;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function showSend(text, ms) {
   clearTimeout(sendTimer);
   send.textContent = text || 'Send to Hub';
-  send.disabled = text === 'Sending…';
+  send.disabled = /…$/.test(text || '');      // no second tap while one is under way
   if (text && ms) sendTimer = setTimeout(() => showSend(''), ms);
+}
+function note(text) {   // with ?debug in the link, the phone lists what each step of a send did
+  if (!params.has('debug')) return;
+  const log = $('log') || document.body.appendChild(Object.assign(document.createElement('pre'), { id: 'log' }));
+  log.textContent += (performance.now() / 1000).toFixed(1) + 's  ' + text + '\n';
 }
 function hubLink() {   // this page as the Hub should open it: today, unless the link names a day or dish
   const u = new URL('.', location.href);
   for (const k of ['date', 'deck']) if (params.get(k)) u.searchParams.set(k, params.get(k));
   return u.href;
 }
-async function deliver() {   // once there's a session with the Hub, tell DashCast there what to load
-  const ctx = cast.framework.CastContext.getInstance(), session = ctx.getCurrentSession();
-  if (!wantSend || !session) return;
+function namespaces(session) {   // what the app on the Hub has said it listens on
+  try { return (session.getSessionObj().namespaces || []).map((n) => n.name); } catch (e) { return []; }
+}
+function hearBack(session) {   // .heard resolves once the page on the Hub says it's up
+  let listener = null;
+  const heard = new Promise((resolve) => {
+    listener = (ns, message) => {
+      try { if (JSON.parse(message).kitchen === 'ready') { note('the Hub says the page is up'); resolve(true); } }
+      catch (e) { /* not ours */ }
+    };
+    try { session.addMessageListener(DASHCAST_NS, listener); } catch (e) { note('can\'t listen: ' + e); }
+  });
+  return { heard, stop: () => { try { session.removeMessageListener(DASHCAST_NS, listener); } catch (e) {} } };
+}
+// Once there's a session with the Hub, tell DashCast there what to load. DashCast takes a moment to
+// start, and a message sent before it says it's listening is lost, so wait for that, then send again
+// until the page on the Hub says it's up (5 Nov 2026: the Hub opened DashCast and nothing loaded).
+async function deliver() {
+  const ctx = cast.framework.CastContext.getInstance();
+  if (!wantSend || sending || !ctx.getCurrentSession()) return;
   wantSend = false;
+  sending = true;
+  showSend('Waiting for the Hub…');
+  let back = null;
   try {
-    await session.sendMessage(DASHCAST_NS, { url: hubLink(), force: true, reload: false, reload_time: 0 });
-    showSend('On the Hub ✓', 5000);
+    let session = ctx.getCurrentSession();
+    note('session; the Hub listens on: ' + (namespaces(session).join(', ') || 'nothing yet'));
+    for (let t = 0; !namespaces(session).includes(DASHCAST_NS) && t < 15000; t += 250) {
+      await sleep(250);
+      session = ctx.getCurrentSession();
+      if (!session) throw new Error('the session ended');
+    }
+    note(namespaces(session).includes(DASHCAST_NS) ? 'DashCast is listening' : 'no word from DashCast; sending anyway');
+    back = hearBack(session);
+    const msg = { url: hubLink(), force: true, reload: false, reload_time: 0 };
+    let up = false;
+    for (let attempt = 1; attempt <= 3 && !up; attempt++) {
+      await session.sendMessage(DASHCAST_NS, msg);
+      note('sent ' + msg.url + ' (try ' + attempt + ')');
+      up = await Promise.race([back.heard, sleep(7000).then(() => false)]);
+    }
+    showSend(up ? 'On the Hub ✓' : 'Sent. Still blank? Tap again', 8000);
   } catch (e) {
+    note('failed: ' + (e && e.message || e));
     ctx.endCurrentSession(false);   // drop a session that's gone stale, so trying again starts afresh
     showSend('Couldn’t send it. Try again?', 6000);
+  } finally {
+    if (back) back.stop();
+    sending = false;
   }
 }
 send.onclick = async () => {
@@ -324,6 +371,7 @@ send.onclick = async () => {
   if (!ctx.getCurrentSession()) {
     // Chrome's own list of cast devices. It rejects with an error code, or 'cancel' if closed.
     const err = await ctx.requestSession().then((v) => v || null, (e) => e || 'error');
+    note('picked a device: ' + (err || 'yes'));
     if (err) {
       wantSend = false;
       if (err === 'cancel') showSend('');
@@ -340,6 +388,7 @@ function setUpSend() {
   // Android reports a new session as resumed, so either is the go-ahead (after a tap, not on load).
   ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (e) => {
     const s = cast.framework.SessionState;
+    note('session ' + e.sessionState);
     if (e.sessionState === s.SESSION_STARTED || e.sessionState === s.SESSION_RESUMED) deliver();
   });
   document.body.classList.add('can-send');
@@ -391,14 +440,24 @@ function startCast() {
   // Sending the page again while it's up reaches this page rather than DashCast, which it replaced,
   // so answer for DashCast: load what was sent, if it's one of this folder's pages.
   options.customNamespaces = { [DASHCAST_NS]: cast.framework.system.MessageType.JSON };
+  const loaded = Date.now();
   ctx.addCustomMessageListener(DASHCAST_NS, (e) => {
     try {
       const msg = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
       if (!msg || typeof msg.url !== 'string') return;
       const url = new URL(msg.url, location.href);
-      if (url.href.startsWith(new URL('.', location.href).href)) location.href = url.href;
+      if (!url.href.startsWith(new URL('.', location.href).href)) return;
+      // the phone sends again until it hears back, so a copy that crossed this page loading isn't a reload
+      if (url.href === location.href && Date.now() - loaded < 25000) return;
+      location.href = url.href;
     } catch (err) { console.log('unreadable send', err); }
   });
+  // Tell the phone that sent this page that it's up, so it can stop sending.
+  const hello = (senderId) => {
+    try { ctx.sendCustomMessage(DASHCAST_NS, senderId, { kitchen: 'ready' }); } catch (err) { console.log('no hello', err); }
+  };
+  ctx.addEventListener(cast.framework.system.EventType.READY, () => hello(undefined));
+  ctx.addEventListener(cast.framework.system.EventType.SENDER_CONNECTED, (e) => hello(e.senderId));
   ctx.start(options);
 }
 if (/CrKey/.test(navigator.userAgent)) {
