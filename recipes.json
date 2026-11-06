@@ -1,14 +1,4 @@
 {
-  "2026-10-26": [
-    { "dish": "Shakshuka with peppers, spinach, and fried halloumi", "deck": "10VS1EPJP9yWElHJBIY5_NPYHSVWmHoxV986-FgDhvao", "doc": "1uMU2kdZ6W37xBL0YEbcI9qnvhweswFGGDzucKAOuMbs" }
-  ],
-  "2026-10-31": [
-    { "dish": "Air-fryer lemon and oregano chicken", "deck": "1Huw9Uyv7kSNvmY52BunnZSJpOgbt3iOZ8FEDN_St7mQ", "doc": "1Q0_a6LxhJEvcNOC6IBnyPWSM5Bi5hL6RKCEWOfyPuwk" }
-  ],
-  "2026-11-01": [
-    { "dish": "Fish pie with peas and glazed carrots", "deck": "1xsxhLmw64zD74Kcy8FUlO53UPndxMmAMKbXlS1bwYns", "doc": "1cH6wiaQDM3eXnnyzZm0uo-vGYaOfnwUGOFfhyPvcH2U" },
-    { "dish": "Lemon and lime meringue pie", "deck": "105T_pJ0mStApRmRggBID_V9bhcnXOhkpDDj1VFTweLc", "doc": "1YaBalICiFXRWAy3hUgTU3D9o_TY-MCCNUiMzDaJXnmw" }
-  ],
   "2026-11-02": [
     { "dish": "Cajun salmon with crushed potatoes and green beans", "deck": "1MyCHBPNSSif0qM4ujx0QYaB6PjdJPVzWfFObXq99Bys", "doc": "1tOKzU6Rzqr5i3f00DEpd1_e2qPB7JwRd9bJ7EKsnFQY" }
   ],
@@ -27,5 +17,24 @@
   "2026-11-08": [
     { "dish": "Lamb biryani with mint raita and kachumber", "deck": "1QGX63e2_RA66FgehE2-fmy68k69wGotOKlUgxMghQUQ", "doc": "1Vhw9sIKBeNZSHBWHdSJP21aTU7tXpBpd9UfDCdaLdvU" },
     { "dish": "Saffron and cardamom bread and butter pudding", "deck": "168SilXyHLw5xcFn7ggLsuSaxqDFIWdHznRQVHgpDUCk", "doc": "1hHTlHv1m6CINN8oaeGE8MwJCq345SxdCOC0v3G39R5Q" }
+  ],
+  "2026-11-09": [
+    { "dish": "Keema pav", "deck": "1BNRzB_46t4OG-cxZ7tzdvGKy61QtXdKngdqQbbDPvRU", "doc": "1PSSCiGMsk2QGp40wP-fLSSBpYjwnIQHIdMJVjAp82jc", "before": { "morning": "Keema and fish pie out of the freezer and into the fridge, and the sour cream if it's frozen.", "night": "Keema, fish pie, and sour cream in the fridge, not the freezer." } }
+  ],
+  "2026-11-10": [
+    { "dish": "Air-fryer lemon and oregano chicken", "deck": "1Huw9Uyv7kSNvmY52BunnZSJpOgbt3iOZ8FEDN_St7mQ", "doc": "1Q0_a6LxhJEvcNOC6IBnyPWSM5Bi5hL6RKCEWOfyPuwk", "before": { "night": "Chicken thighs in the fridge, not the freezer." } }
+  ],
+  "2026-11-11": [
+    { "dish": "Air-fryer teriyaki salmon with rice and tenderstem", "deck": "1jQEwCOBR6grLIrDWlt4Lx1SlFbJUP6R3QoKRDEIG2HM", "doc": "1QVKLimPVysmRRq2EUZg8wIA87rQsT1YRcN2NwM_7gJU", "before": { "morning": "Nothing to take out: the salmon cooks from frozen.", "night": "Wednesday's lunches boxed, and the salmon left in the freezer: it cooks from frozen." } }
+  ],
+  "2026-11-12": [
+    { "dish": "Air-fryer garlic prawns with chorizo", "deck": "1fCVCal6OVklTilnJIiccDSYZDKR9_F5KIccEFqw2tOw", "doc": "1_3VurjSF6DuVmm4ioqKXR2kr1HueGuz2R1jdek95G_c", "before": { "night": "Prawns out of the freezer and into the fridge." } }
+  ],
+  "2026-11-14": [
+    { "dish": "Slow-cooker meatballs with spaghetti", "deck": "1txkkVRIZF5oqI7FrN2leYVEqosgIJUOn0yB5n-qITUc", "doc": "15iEp97q3eU3tq6vcyOw6hhF5vuHjqOMIDrJmh5sKPHU", "before": { "morning": "Mince out of the freezer and into the fridge.", "night": "Mince in the fridge, not the freezer, ready for Leo at 12:45." } }
+  ],
+  "2026-11-15": [
+    { "dish": "Sausages with pommes aligot", "deck": "13lCHZ0MY9kP5n7wv1gDKO6RRKzxWviENN_EMoNDgRrw", "doc": "1i1nvXahT28m33P6N7mLtu0LwE3A7kRfaBP4TFT_DOas", "before": { "morning": "Sausages out of the freezer and into the fridge.", "night": "Sausages in the fridge, not the freezer." } },
+    { "dish": "French apple tart", "deck": "1t65ouiJ-Bm8u99FtNY5HLYwjA3E0eEl9w3wMfyHU7qE", "doc": "1TkUPwBSjy-U0ueOTFUTKuRIY9uO2_svEylm6xsJ3OPk" }
   ]
 }
