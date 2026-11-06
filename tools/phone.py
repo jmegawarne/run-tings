@@ -10,10 +10,11 @@
 # Needs Python Playwright with Chromium. The cloud session has both; elsewhere:
 #   pip install playwright && python3 -m playwright install chromium
 # The page is served from a local web server, so it reads recipes.json as it does live.
-# The header, the points bar, the jump links, and each visible section (This week, each gate,
-# Scoreboard, Skills, Safety) get their own screenshot, named date-scheme-person-section.png,
-# in a folder outside the repo (printed at the end), so they never get committed. Animations
-# are settled before each shot. Exits non-zero if the page throws, or scrolls sideways.
+# The header, the points bar, the tabs as the page opens them, and each visible section (This week,
+# each moment, its tab opened first, then Scoreboard, Skills, Safety) get their own screenshot,
+# named date-scheme-person-section.png, in a folder outside the repo (printed at the end), so they
+# never get committed. Each line of output names the moment the page opened on for that person.
+# Animations are settled before each shot. Exits non-zero if the page throws, or scrolls sideways.
 
 import argparse
 import datetime
@@ -87,11 +88,18 @@ def main():
                         page.click("#who-" + person)
                         page.evaluate("document.querySelectorAll('details').forEach((el) => { el.open = true; })")
                         page.wait_for_timeout(100)
+                        opens = page.evaluate("(document.querySelector('#tabs [aria-selected=\"true\"]') || { id: '' }).id.replace('tab-g-', '')")
                         sideways = page.evaluate("document.documentElement.scrollWidth > window.innerWidth")
                         shown = []
-                        parts = [("header", page.locator("body > header")), ("hud", page.locator("#hud")), ("jump", page.locator("body > nav"))]
-                        parts += [(s.get_attribute("id").replace("g-", "", 1), s) for s in page.locator("body > section[id]").all()]
-                        for name, part in parts:
+                        parts = [("header", page.locator("body > header"), None), ("hud", page.locator("#hud"), None), ("tabs", page.locator("#tabs"), None)]
+                        for s in page.locator("body > section[id]").all():
+                            sid = s.get_attribute("id")
+                            parts.append((sid.replace("g-", "", 1), s, page.locator("#tab-" + sid)))
+                        for name, part, tab in parts:
+                            # A moment's cards only show while its tab is open.
+                            if tab is not None and tab.count() and tab.is_visible():
+                                tab.click()
+                                page.wait_for_timeout(50)
                             if part.count() and part.is_visible():
                                 # The points bar sticks to the top of the screen, so it's unstuck for the other shots or it lands on them.
                                 part.screenshot(path=os.path.join(args.out, "%s-%s-%s-%s.png" % (d, scheme, person, name)), animations="disabled",
@@ -99,7 +107,7 @@ def main():
                                 shown.append(name)
                         problems = (["scrolls sideways"] if sideways else []) + (["script error: " + "; ".join(errors)] if errors else [])
                         failed = failed or bool(problems)
-                        print("%s  %-5s  %-8s  %-4s  %s" % (d, scheme, person, ", ".join(problems) or "ok", " ".join(shown)))
+                        print("%s  %-5s  %-8s  %-4s  opens %-10s %s" % (d, scheme, person, ", ".join(problems) or "ok", opens or "-", " ".join(shown)))
                         errors.clear()
                     context.close()
             browser.close()

@@ -8,8 +8,8 @@
 <title>Routines</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: one narrow column. Name picker and points bar on top, then this week, then collapsible SOP
-   cards under the moments in the day they're done at, then the scoreboard, skills, and safety.
+/* Layout: one narrow column. Name picker and points bar on top, then this week, then a tab for each
+   moment in the day, holding the collapsible cards done at it, then the scoreboard, skills, and safety.
    Colour has jobs: cyan is progress and ticks, gold is points, magenta is levels and awards. */
 @font-face {
   font-family: "Lilita One";
@@ -108,7 +108,6 @@ body {
   padding-left: var(--gl);
   padding-right: var(--gr);
   padding-block: 8px 56px;
-  counter-reset: stage;
 }
 h1, h2, h3, .who button, .lvl, .hud-pts b, .win button {
   font-family: var(--display);
@@ -126,7 +125,7 @@ a { color: var(--go); text-underline-offset: 2px; }
 .lede { font-size: 1.05rem; margin-bottom: 4px; }
 .note { font-size: 0.875rem; }
 :focus-visible { outline: 3px solid var(--go); outline-offset: 2px; border-radius: 6px; }
-section, .sop { scroll-margin-top: 84px; }
+section, .sop, .jump { scroll-margin-top: 84px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Name picker: chunky buttons that press down. */
@@ -191,24 +190,28 @@ ul.you b { margin-right: 4px; }
 .plan tr.now { background: var(--go-soft); }
 .plan td a { display: block; margin-top: 4px; }
 
-/* Jump links: one row that scrolls sideways on its own. */
+/* Tabs: one per moment in the day, in a row that scrolls sideways on its own. Only the open moment's cards show. */
 .jump {
-  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  position: relative; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
   margin: 18px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl));
   padding: 4px var(--gr) 6px var(--gl);
 }
 .jump::-webkit-scrollbar { display: none; }
-.jump a { flex: none; padding: 7px 13px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.jump a { flex: none; display: flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.jump a[data-n] { padding-left: 6px; }
+.jump a[aria-selected="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+section.gate.off { display: none; }
 
-/* Gates: numbered in the order the day runs. A gate's number turns into a tick once its cards are cleared. */
-section.gate { counter-increment: stage; }
+/* Gates: numbered in the order the day runs, on the tab and the heading. A number turns into a tick once its cards are cleared. */
 section.gate > h2 { display: flex; align-items: center; gap: 10px; }
-section.gate > h2::before {
-  content: counter(stage); flex: none; display: grid; place-items: center;
+section.gate > h2[data-n]::before, .jump a[data-n]::before {
+  content: attr(data-n); flex: none; display: grid; place-items: center;
   width: 2.1rem; height: 2.1rem; border-radius: 11px; font-size: 1.15rem;
   background: var(--go-soft); color: var(--go); box-shadow: inset 0 0 0 2px var(--go);
 }
-section.gate.cleared > h2::before { content: "✓"; background: var(--go-fill); color: var(--go-ink); box-shadow: 0 3px 0 var(--go); }
+.jump a[data-n]::before { width: 1.45rem; height: 1.45rem; border-radius: 8px; font: 800 0.85rem/1 var(--display); font-synthesis: none; }
+section.gate.cleared > h2[data-n]::before, .jump a.cleared[data-n]::before { content: "✓"; background: var(--go-fill); color: var(--go-ink); box-shadow: 0 3px 0 var(--go); }
+.jump a.cleared[data-n]::before { box-shadow: none; }
 section.gate.just > h2::before { animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
 
 /* Cards. The line along the bottom of each summary fills as its steps are ticked. */
@@ -436,7 +439,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   </details>
 </section>
 
-<nav class="jump" aria-label="Sections">
+<nav class="jump" id="tabs" aria-label="Moments in the day">
   <a href="#g-morning">Morning</a>
   <a href="#g-reset">Saturday reset</a>
   <a href="#g-monthly">Monthly</a>
@@ -449,16 +452,14 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   <a href="#g-after">After dinner</a>
   <a href="#g-bed">Before bed</a>
   <a href="#g-any">Any time</a>
-  <a href="#score">Scoreboard</a>
-  <a href="#skills">Skills</a>
-  <a href="#safety">Safety</a>
 </nav>
 
 <!-- ============ GATES ============
-     The moments in a day, in order. Each card sits under the moment it's done at.
+     The moments in a day, in order, one tab each. Each card sits under the moment it's done at.
      With a name picked, only today's cards show (see dueToday in the script).
      data-we moves a card to another gate at the weekend; data-when shows a card
-     only on your laundry day, the evening before collection, or collection day. -->
+     only on your laundry day, the evening before collection, collection day, or the
+     evening before you cook. A step with data-who="cook:next" shows to tomorrow's cooks. -->
 <section class="gate" id="g-morning" aria-labelledby="g-morning-h">
   <h2 id="g-morning-h" data-weekday="Before you leave the house" data-weekend="When you get up">Morning</h2>
 
@@ -476,6 +477,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
         <li data-who="aurora" data-days="1 2 3 4 5">Any lunch ingredients packed.</li>
         <li data-who="dad" data-days="1 2 3 4 5">Supplements packed for the office.</li>
         <li data-who="aurora eshaal leo" data-days="1 2 3 4 5">Phone, wallet, and keys on you.</li>
+        <li data-who="cook:next"><span class="tag">Tomorrow's meal</span> <span data-ahead="morning">Anything frozen? Out of the freezer and into the fridge.</span></li>
       </ol>
       <p class="dw"><b>Done when:</b> bed made, floor clear, window shut, and no dishes in your room.</p>
     </div>
@@ -1111,25 +1113,37 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       <ol class="steps">
         <li>Four dinners agreed.</li>
         <li>Their ingredients on the shopping list.</li>
-        <li data-who="aurora">Meal plan written up on the fridge.</li>
+        <li data-who="aurora eshaal">Meal plan written up on the fridge.</li>
       </ol>
       <p class="dw"><b>Done when:</b> next week's dinners agreed, on the shopping list, and on the fridge.</p>
     </div>
   </details>
 
-  <details class="sop" id="shop" data-who="aurora dad leo" data-period="w" data-days="5" data-time="1 hour">
+  <details class="sop" id="shop" data-who="aurora eshaal dad leo" data-period="w" data-days="5" data-time="1 hour">
     <summary>Weekly shop</summary>
     <div class="body">
-      <p class="when">Friday. Aurora and Dad.</p>
+      <p class="when">Friday. Aurora, Eshaal, and Dad.</p>
       <ol class="steps">
-        <li data-who="aurora dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
-        <li data-who="aurora dad">Next week's dinner ingredients added.</li>
+        <li data-who="aurora eshaal dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
+        <li data-who="aurora eshaal dad">Next week's dinner ingredients added.</li>
         <li>Leo, with Aurora: tomorrow's slow-cooker ingredients added.</li>
         <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
-        <li data-who="aurora dad">Dad: order approved and paid.</li>
-        <li data-who="aurora dad">Shopping put away, fridge and freezer things first and new behind old.</li>
+        <li data-who="aurora eshaal dad">Dad: order approved and paid.</li>
+        <li data-who="aurora eshaal dad">Shopping put away, fridge and freezer things first and new behind old.</li>
       </ol>
       <p class="dw"><b>Done when:</b> staples, next week's dinners, tomorrow's slow-cooker dinner, and any food tech ingredients covered, and everything put away.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="night-before" data-who="all" data-period="d" data-when="cook-eve" data-time="10 min">
+    <summary>Tomorrow's meal</summary>
+    <div class="body">
+      <p class="when">The evening before you cook. <span id="eve-dish"></span></p>
+      <ol class="steps">
+        <li><span data-ahead="night">Tomorrow's recipe checked, and anything it needs tonight done.</span></li>
+        <li>Nothing for it still in the freezer.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> tomorrow's meal has everything it needs from tonight, and nothing for it is still frozen.</p>
     </div>
   </details>
 </section>
@@ -1319,20 +1333,27 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   "use strict";
 
   /* ---------- Settings. Change these, then republish. ---------- */
-  const ROTA = ["Aurora", "Eshaal", "Leo"];   // Weekend zones: weekend daily jobs, Saturday cleans, and the monthly and quarterly lists.
-  const WEEKDAY_ROTA = ["Aurora", "Eshaal"];  // Weekday zones. Leo's weekday evenings stay clear.
+  const NAMES = ["Aurora", "Eshaal", "Leo", "Dad"]; // The name buttons, in order.
+  // Zones rotate weekly. Each rota needs one zone set per person in it.
+  const ROTA = ["Aurora", "Leo"];                    // Weekend zones: weekend daily jobs, Saturday cleans, and the monthly and quarterly lists.
+  const SETS = [["kitchen"], ["bathrooms", "living"]];
+  const WEEKDAY_ROTA = ["Aurora"];                   // Weekday zones. Leo's weekday evenings stay clear.
+  const WEEKDAY_SETS = [["kitchen", "bathrooms", "living"]];
+  // Someone alongside another person does that person's household jobs with them, zones and cooking included,
+  // and is named with them. Their own morning, evening, bedroom, and laundry stay their own.
+  const ALONGSIDE = { Eshaal: "Aurora" };
   const EPOCH = "2026-10-19";                 // Monday of rota week 0.
   // Bin collection: Wednesday, grey and red on alternate weeks.
   const BIN_DAY = 3;
   const GREY_DATE = "2026-10-21";
   const BIN_MOVES = { "2026-12-30": "2027-01-02" }; // Usual date to moved date (Christmas 2026).
-  // Main meal by day, Sunday first.
+  // Main meal by day, Sunday first. A meal with no label is labelled with its cooks, and anyone alongside them.
   const MEALS = [
     { cooks: ["Dad"], label: "Dad's Sunday lunch", short: "Dad's lunch" },
-    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
-    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
-    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
-    { cooks: ["Aurora", "Eshaal"], label: "Aurora and Eshaal", short: "Aurora & Eshaal" },
+    { cooks: ["Aurora"] },
+    { cooks: ["Aurora"] },
+    { cooks: ["Aurora"] },
+    { cooks: ["Aurora"] },
     { cooks: [], label: "Eating out", short: "Eating out" },
     { cooks: ["Leo"], label: "Leo's slow-cooker dinner", short: "Leo's slow cooker" }
   ];
@@ -1386,6 +1407,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     { card: "bins-in", icon: "↩️", name: "Kerb Your Enthusiasm", desc: "Bin back in. No bin left behind." },
     { card: "dinner-plan", icon: "📋", name: "Menu Mastermind", desc: "Dinners planned and on the list." },
     { card: "shop", icon: "🛒", name: "Trolley Dash", desc: "Friday's shop, sorted." },
+    { card: "night-before", icon: "🧊", name: "Thaw Patrol", desc: "Tomorrow's meal sorted the night before." },
     { card: "evening", icon: "🌙", name: "Night Shift", desc: "Nothing left downstairs, phone on charge." },
     { card: "shower", icon: "🚿", name: "Squeegee Supreme", desc: "Shower left gleaming." },
     { card: "shirts", icon: "👔", name: "Crease Lightning", desc: "A week of shirts, ironed and hung." },
@@ -1406,9 +1428,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   /* ---------- End of points and awards ---------- */
 
   const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
-  const SETS = [["kitchen"], ["bathrooms"], ["living"]];
-  const WEEKDAY_SETS = [["kitchen", "bathrooms"], ["living"]];
-  const PEOPLE = ROTA.concat(["Dad"]);
+  const PEOPLE = NAMES;
   const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const DAY = 864e5;
@@ -1420,8 +1440,18 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   const dm = (t) => { const d = new Date(t); return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()]; };
   const ymd = (t) => new Date(t).toISOString().slice(0, 10);
 
-  // Recipes from recipes.json: { "YYYY-MM-DD": [{ "dish": "...", "deck": "<Drive ID>", "doc": "<Drive ID>" }] }.
+  // A person's household crew: them, and anyone alongside them.
+  const crew = (n) => (n ? [n].concat(Object.keys(ALONGSIDE).filter((k) => ALONGSIDE[k] === n)) : []);
+  const crewOf = (list) => list.reduce((out, n) => out.concat(crew(n).filter((m) => out.indexOf(m) < 0)), []);
+  MEALS.forEach((m) => { if (!m.label) { m.label = and(crewOf(m.cooks)); m.short = crewOf(m.cooks).join(" & "); } });
+  const cooksOn = (t) => crewOf(MEALS[new Date(t).getUTCDay()].cooks);
+
+  // Recipes from recipes.json: { "YYYY-MM-DD": [{ "dish": "...", "deck": "<Drive ID>", "doc": "<Drive ID>",
+  //   "before": { "morning": "...", "night": "..." } }] }.
   // The Hub deck wins over the recipe doc. Links are built from bare Drive IDs only, so no account IDs reach the page.
+  // "before" is optional: what the dish needs doing the morning and the night before the day it's cooked, each a
+  // finished state, like "Chicken thighs out of the freezer and into the fridge." The cooks see it in place of the
+  // general reminder on their morning card and their Tomorrow's meal card.
   let recipes = {};
   const DRIVE_ID = /^[\w-]{20,}$/;
   const recipeLinks = (t) => {
@@ -1429,6 +1459,12 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     return (Array.isArray(list) ? list : [])
       .filter((r) => r && r.dish && (DRIVE_ID.test(r.deck || "") || DRIVE_ID.test(r.doc || "")))
       .map((r) => '<a href="https://docs.google.com/' + (DRIVE_ID.test(r.deck || "") ? "presentation/d/" + r.deck : "document/d/" + r.doc) + '/edit">' + esc(r.dish) + "</a>");
+  };
+  const aheadOf = (t, when) => {
+    const list = recipes[ymd(t)];
+    return (Array.isArray(list) ? list : [])
+      .map((r) => (r && r.before && typeof r.before[when] === "string" ? r.before[when].trim() : ""))
+      .filter(Boolean);
   };
 
   // Dates as UTC midnights built from the local calendar date, so clock changes never shift a day.
@@ -1463,7 +1499,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   const zonesOf = (name, w, kind) => {
     const rota = kind === "weekday" ? WEEKDAY_ROTA : ROTA;
     const sets = kind === "weekday" ? WEEKDAY_SETS : SETS;
-    const i = rota.indexOf(name);
+    const i = rota.indexOf(ALONGSIDE[name] || name);
     return i < 0 ? [] : sets[mod(i + w, rota.length)] || [];
   };
   const ownerOf = (zone, w, kind) => (kind === "weekday" ? WEEKDAY_ROTA : ROTA).find((n) => zonesOf(n, w, kind).indexOf(zone) > -1) || "";
@@ -1485,13 +1521,13 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 
   const laundrySentence = (d) => {
     const l = LAUNDRY[d];
-    if (l === "Household") return "Household wash: " + ownerOf("bathrooms", week, "weekday") + ".";
+    if (l === "Household") return "Household wash: " + and(crew(ownerOf("bathrooms", week, "weekday"))) + ".";
     if (l === "Bedding") return "Bedding wash, everyone.";
     return l ? "Laundry: " + l + "." : "No laundry today.";
   };
   const laundryShort = (d) => {
     const l = LAUNDRY[d];
-    if (l === "Household") return "Household (" + ownerOf("bathrooms", week, "weekday") + ")";
+    if (l === "Household") return "Household (" + crew(ownerOf("bathrooms", week, "weekday")).join(" & ") + ")";
     if (l === "Bedding") return "Bedding, everyone";
     return l || "Free";
   };
@@ -1527,6 +1563,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     return tokens.split(/\s+/).some((t) => {
       if (t === "all") return true;
       if (t.indexOf("zone:") === 0) return zs.indexOf(t.slice(5)) > -1;
+      if (t === "cook:next") return cooksOn(today + DAY).indexOf(person) > -1;
       return t === person.toLowerCase();
     });
   };
@@ -1623,6 +1660,9 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     } else if (id === "bins-in") {
       const b = collectedOn(today);
       if (b) out.push("Today: " + b);
+    } else if (id === "night-before") {
+      const c = cooksOn(today + DAY);
+      if (c.length) out.push(person ? "Tonight" : "Tonight: " + and(c));
     } else if (id === "dinner-plan") {
       if (dow === 5) out.push("Today");
     } else if (id === "shop") {
@@ -1638,7 +1678,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     }
     if (q && +q === quarter) out.push("This quarter");
     if (id === "bath-weekly" && firstSat) out.push("Dad does this today");
-    else if (zones.length && !person) out.push(and(zones.map((z) => ownerOf(z.slice(5), cardWeek(card), cardKind(card)))));
+    else if (zones.length && !person) out.push(and(crewOf(zones.map((z) => ownerOf(z.slice(5), cardWeek(card), cardKind(card))))));
     return out;
   };
 
@@ -1651,9 +1691,9 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const d3 = (d) => DAYS[d].slice(0, 3);
     if (p === "Leo") out.push(["Evenings", "free on weekdays"], ["Weekend", "floors, dusting, and your shirts"]);
     const cookDays = [];
-    for (let i = 1; i <= 7; i++) { const d = i % 7; if (MEALS[d].cooks.indexOf(p) > -1) cookDays.push(d); }
+    for (let i = 1; i <= 7; i++) { const d = i % 7; if (crewOf(MEALS[d].cooks).indexOf(p) > -1) cookDays.push(d); }
     if (cookDays.length) {
-      const partner = MEALS[cookDays[0]].cooks.filter((n) => n !== p);
+      const partner = crewOf(MEALS[cookDays[0]].cooks).filter((n) => n !== p);
       // Three or more weekdays in a row read as a span: "every weekday", or "Mon to Thu".
       const span = cookDays.length > 2 && cookDays.every((d, i) => d >= 1 && d <= 5 && (i === 0 || d === cookDays[i - 1] + 1));
       const when = span
@@ -1661,16 +1701,21 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
         : and(cookDays.map((d) => d3(d) + (MEALS[d].label.indexOf("lunch") > -1 ? " lunch" : " dinner")));
       out.push(["Cook", when + (partner.length ? ", with " + and(partner) : "")]);
     }
-    if (p === "Aurora") out.push(["Friday", "plan dinners with Eshaal, then the shop with Dad"]);
-    if (p === "Eshaal") out.push(["Friday", "dinners planned with Aurora"]);
-    if (p === "Dad") out.push(["Friday", "the shop with Aurora"]);
+    const shoppers = crew("Aurora");
+    if (shoppers.indexOf(p) > -1) {
+      const mates = shoppers.filter((n) => n !== p);
+      out.push(["Friday", "plan dinners" + (mates.length ? " with " + and(mates) : "") + ", then the shop with Dad"]);
+    }
+    if (p === "Dad") out.push(["Friday", "the shop with " + and(shoppers)]);
     if (p === "Leo") out.push(["Friday", "slow-cooker and food tech shopping, with Aurora"]);
     const ld = LAUNDRY.indexOf(p);
     if (ld > -1) out.push(["Laundry", DAYS[ld]]);
     if (wd.indexOf("bathrooms") > -1) out.push(["Friday", "household wash"]);
     if (wd.indexOf("living") > -1) out.push(["Bins", "out the night before, back in on the day"]);
-    if (we.indexOf("living") > -1) out.push(["Saturday", "you hoover the stairs, " + ownerOf("kitchen", week, "weekend") + " holds the unit"]);
-    if (we.indexOf("kitchen") > -1) out.push(["Saturday", "you hold the unit, " + ownerOf("living", week, "weekend") + " hoovers the stairs"]);
+    const holds = crew(ownerOf("kitchen", week, "weekend"));
+    const hoovers = crew(ownerOf("living", week, "weekend"));
+    if (we.indexOf("living") > -1) out.push(["Saturday", "you hoover the stairs, " + and(holds) + (holds.length > 1 ? " hold" : " holds") + " the unit"]);
+    if (we.indexOf("kitchen") > -1) out.push(["Saturday", "you hold the unit, " + and(hoovers) + (hoovers.length > 1 ? " hoover" : " hoovers") + " the stairs"]);
     return out;
   };
 
@@ -1685,7 +1730,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 
   // Who has each zone this week, weekdays and weekend side by side.
   const zoneGrid = () => {
-    const cell = (n) => "<td" + (who && n === who ? ' class="me"' : "") + ">" + esc(n || "–") + "</td>";
+    const cell = (n) => "<td" + (who && crew(n).indexOf(who) > -1 ? ' class="me"' : "") + ">" + esc(crew(n).join(" & ") || "–") + "</td>";
     let h = '<table class="zt"><thead><tr><td class="rng">' + esc(shortRange()) + '</td><th scope="col">Weekdays</th><th scope="col">Weekend</th></tr></thead><tbody>';
     Object.keys(ZONES).forEach((z) => {
       h += '<tr><th scope="row">' + esc(ZONES[z]) + "</th>" + cell(ownerOf(z, week, "weekday")) + cell(ownerOf(z, week, "weekend")) + "</tr>";
@@ -1699,17 +1744,17 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const meal = MEALS[dow];
     const links = meal.cooks.length ? recipeLinks(today) : [];
     const mealHtml = meal.cooks.length
-      ? esc(meal.label + (/lunch|dinner/.test(meal.label) ? "" : " cook dinner")) + (links.length ? ": " + and(links) : "") + "."
+      ? esc(meal.label + (/lunch|dinner/.test(meal.label) ? "" : crewOf(meal.cooks).length > 1 ? " cook dinner" : " cooks dinner")) + (links.length ? ": " + and(links) : "") + "."
       : esc(meal.label + " tonight.");
     bits.push(laundrySentence(dow));
     if (quarterSat) bits.push("Saturday reset from 9:00, then the quarterly session, about 2½ hours more with everyone.");
     else if (firstSat) bits.push("Saturday reset from 9:00, then the monthly lists. Dad does the weekly bathroom clean.");
     else if (isSat) bits.push("Saturday reset from 9:00, done by midday.");
-    if (dow === 5) bits.push("The meal plan goes on the fridge, and Aurora and Dad do the shop.");
+    if (dow === 5) bits.push("The meal plan goes on the fridge, and " + and(crew("Aurora").concat(["Dad"])) + " do the shop.");
     const c = collectedOn(today);
-    if (c) bits.push("Bin day: the " + c + " comes back in (" + ownerOf("living", week, "weekday") + ").");
+    if (c) bits.push("Bin day: the " + c + " comes back in (" + and(crew(ownerOf("living", week, "weekday"))) + ").");
     const b = binsEve(today);
-    if (b) bits.push("Bins out tonight: the " + b + " (" + ownerOf("living", week, "weekday") + ").");
+    if (b) bits.push("Bins out tonight: the " + b + " (" + and(crew(ownerOf("living", week, "weekday"))) + ").");
     h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + mealHtml + " " + esc(bits.join(" ")) + "</p>";
     const chips = who ? youChips(who) : [];
     if (chips.length) h += '<ul class="you" aria-label="Your week">' + chips.map(([k, v]) => "<li><b>" + esc(k) + "</b> " + esc(v) + "</li>").join("") + "</ul>";
@@ -1728,6 +1773,18 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       rows += "<tr" + (t === today ? ' class="now"' : "") + '><th scope="row">' + DAYS[d].slice(0, 3) + "</th><td>" + esc(MEALS[d].short) + links.join("") + "</td><td>" + esc(laundryShort(d)) + "</td><td>" + esc(also.filter(Boolean).join(", ")) + "</td></tr>";
     }
     document.getElementById("plan-body").innerHTML = rows;
+  };
+
+  // Tomorrow's meal: its dishes on the evening card, and what the recipes say to do ahead in place of the general reminders.
+  const renderAhead = () => {
+    const t = today + DAY;
+    Array.from(document.querySelectorAll("[data-ahead]")).forEach((el) => {
+      if (!el.hasAttribute("data-default")) el.setAttribute("data-default", el.textContent);
+      const notes = aheadOf(t, el.getAttribute("data-ahead"));
+      el.textContent = notes.length ? notes.join(" ") : el.getAttribute("data-default");
+    });
+    const links = cooksOn(t).length ? recipeLinks(t) : [];
+    document.getElementById("eve-dish").innerHTML = links.length ? "Tomorrow: " + and(links) + "." : "";
   };
 
   /* ---------- Skills ---------- */
@@ -2018,6 +2075,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       const was = sec.classList.contains("cleared");
       const now = cs.length > 0 && cs.every(allTicked);
       sec.classList.toggle("cleared", now);
+      const tab = document.getElementById("tab-" + sec.id);
+      if (tab) tab.classList.toggle("cleared", now);
       if (live && now && !was && motion) replay(sec, "just", 500);
     });
   };
@@ -2160,6 +2219,74 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     toastAwards(fresh);
   };
 
+  /* ---------- Tabs: one moment in the day at a time ---------- */
+  // The page opens on the first moment with something left to tick, or on one named in the link, like
+  // run-tings/#g-home for a reminder that fires on getting home. That #g-home is then dropped from the
+  // address, so the page doesn't keep opening there.
+  const tabBar = document.getElementById("tabs");
+  const tabs = Array.from(tabBar.querySelectorAll("a"));
+  const panelOf = (a) => document.getElementById(a.getAttribute("aria-controls"));
+  let openId = "";
+  const openTab = (id, focus) => {
+    openId = id;
+    tabs.forEach((a) => {
+      const on = a.getAttribute("aria-controls") === id;
+      a.setAttribute("aria-selected", String(on));
+      a.tabIndex = on ? 0 : -1;
+      panelOf(a).classList.toggle("off", !on);
+      if (!on) return;
+      if (focus) a.focus();
+      const x = Math.max(0, a.offsetLeft - (tabBar.clientWidth - a.offsetWidth) / 2);
+      if (tabBar.scrollTo) tabBar.scrollTo({ left: x, behavior: motion ? "smooth" : "auto" }); else tabBar.scrollLeft = x;
+    });
+  };
+  tabBar.setAttribute("role", "tablist");
+  tabs.forEach((a) => {
+    const id = a.getAttribute("href").slice(1);
+    a.id = "tab-" + id;
+    a.setAttribute("role", "tab");
+    a.setAttribute("aria-controls", id);
+    document.getElementById(id).setAttribute("role", "tabpanel");
+    a.addEventListener("click", (e) => { e.preventDefault(); openTab(id); });
+  });
+  tabBar.addEventListener("keydown", (e) => {
+    const shown = tabs.filter((a) => !a.hidden);
+    const i = shown.findIndex((a) => a.getAttribute("aria-controls") === openId);
+    const j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: shown.length - 1 }[e.key];
+    if (j === undefined || !shown[j]) return;
+    e.preventDefault();
+    openTab(shown[j].getAttribute("aria-controls"), true);
+  });
+  // Today's moments get a tab each, numbered in order, and the first with something left opens.
+  const renderTabs = () => {
+    let n = 0;
+    tabs.forEach((a) => {
+      const p = panelOf(a);
+      const h = p.querySelector("h2");
+      a.hidden = p.hidden;
+      if (p.hidden) { a.removeAttribute("data-n"); h.removeAttribute("data-n"); return; }
+      n += 1;
+      a.setAttribute("data-n", n);
+      h.setAttribute("data-n", n);
+    });
+    const open = tabs.filter((a) => !a.hidden).map(panelOf);
+    if (!open.length) return;
+    const left = open.find((p) => Array.from(p.querySelectorAll(".sop")).some((c) => !c.hidden && stepBoxes(c).length > 0 && !allTicked(c)));
+    openTab((left || open[0]).id);
+  };
+  // A link to one of today's moments opens it and brings the tabs into view, whether it loads the page or not.
+  const followLink = () => {
+    const id = location.hash.slice(1);
+    const a = tabs.find((t) => t.getAttribute("aria-controls") === id);
+    if (!a) return;
+    if (!a.hidden) {
+      openTab(id);
+      if (tabBar.scrollIntoView) tabBar.scrollIntoView({ block: "start" });
+    }
+    if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+  };
+  window.addEventListener("hashchange", followLink);
+
   /* ---------- Name picker and filtering ---------- */
   const picker = document.getElementById("who");
   [["Everyone", ""]].concat(PEOPLE.map((n) => [n, n])).forEach(([label, value]) => {
@@ -2187,6 +2314,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     if (on === "laundry") return LAUNDRY[dow] === who;
     if (on === "bins-eve") return !!binsEve(today);
     if (on === "bins-day") return !!collectedOn(today);
+    if (on === "cook-eve") return cooksOn(today + DAY).indexOf(who) > -1;
     if (p === "m" || p === "q") return listDue(card);
     return true;
   };
@@ -2211,23 +2339,22 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       progress(card);
     });
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
-    Array.from(document.querySelectorAll(".jump a")).forEach((a) => {
-      const target = document.getElementById(a.getAttribute("href").slice(1));
-      a.hidden = !!(target && target.hidden);
-    });
+    renderTabs();
     renderSkills();
     enterGame();
   }
 
   renderPlan();
+  renderAhead();
   apply();
+  followLink();
 
   // Recipes arrive after the first render. No file, or a bad one, and the page is the same, just without links.
   if (window.fetch) {
     fetch("recipes.json", { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
-      .then((data) => { if (data && typeof data === "object") { recipes = data; renderPlan(); renderWeek(); } });
+      .then((data) => { if (data && typeof data === "object") { recipes = data; renderPlan(); renderWeek(); renderAhead(); } });
   }
 })();
 </script>
