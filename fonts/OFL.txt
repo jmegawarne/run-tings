@@ -1,4 +1,8 @@
 Copyright (c) 2011 Juan Montoreano (juan@remolacha.biz), with Reserved Font Names "Lilita One"
+Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
+Copyright 2021 The Pixelify Sans Project Authors (https://github.com/eifetx/Pixelify-Sans)
+Copyright 2020 The Grenze Gotisch Project Authors (https://github.com/Omnibus-Type/Grenze-Gotisch)
+Copyright 2019 The Oxanium Project Authors (https://github.com/sevmeyer/oxanium)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

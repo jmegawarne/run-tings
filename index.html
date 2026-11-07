@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f1eeff">
+<script>try { var p = localStorage.getItem("hsop-who"); if (p) document.documentElement.setAttribute("data-person", p.toLowerCase()); } catch (e) { /* No storage: the default look until a name is picked. */ }</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Routines</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -17,6 +19,14 @@
   font-weight: 400;
   font-display: swap;
 }
+/* Each theme's face, fetched only once a theme uses it. */
+@font-face { font-family: "VT323"; src: url("fonts/vt323-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; size-adjust: 130%; /* Small for its size. */ }
+@font-face { /* No digits: its 2 reads as an 8, so numbers come from the next face in Leo's list. */
+  font-family: "Pixelify Sans"; src: url("fonts/pixelify-sans-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap;
+  unicode-range: U+0000-002F, U+003A-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212;
+}
+@font-face { font-family: "Grenze Gotisch"; src: url("fonts/grenze-gotisch-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Oxanium"; src: url("fonts/oxanium-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 :root {
   --bg: #f1eeff;
   --glow: #dcd2ff;
@@ -47,6 +57,15 @@
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --gl: max(16px, env(safe-area-inset-left, 0px));
   --gr: max(16px, env(safe-area-inset-right, 0px));
+  /* Theme tokens. Each person's theme resets these along with the colours (see THEMES at the end). */
+  --award-ink: #fff;
+  --lvl-2: #7a2bd8;
+  --scrim: rgba(12, 6, 40, 0.62);
+  --rad: 1;                  /* Scales every rounded corner: 0 is square. */
+  --pill: 999px;             /* Chips, tags, and bars. */
+  --lift: 0 3px 0 var(--lip);
+  --heading-glow: none;
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2304323c' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -107,7 +126,7 @@ body {
   margin: 0 auto;
   padding-left: var(--gl);
   padding-right: var(--gr);
-  padding-block: 8px 56px;
+  padding-block: 8px calc(96px + env(safe-area-inset-bottom, 0px));
 }
 h1, h2, h3, .who button, .lvl, .hud-pts b, .win button {
   font-family: var(--display);
@@ -119,42 +138,44 @@ h1 { font-size: 2.9rem; line-height: 1; margin: 20px 0 8px; text-shadow: 0 3px 0
 h2 { font-size: 1.55rem; line-height: 1.15; margin: 36px 0 8px; text-wrap: balance; }
 h3 { font-size: 1.2rem; margin: 22px 0 8px; }
 h3 small { font: 600 0.85rem var(--font); color: var(--muted); margin-left: 6px; }
+h2, h3 { text-shadow: var(--heading-glow); }
 p { margin: 0 0 8px; }
 a { color: var(--go); text-underline-offset: 2px; }
 .lede, .intro, .when, .note, .nudge { color: var(--muted); }
 .lede { font-size: 1.05rem; margin-bottom: 4px; }
 .note { font-size: 0.875rem; }
-:focus-visible { outline: 3px solid var(--go); outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 3px solid var(--go); outline-offset: 2px; border-radius: calc(6px * var(--rad)); }
 section, .sop, .jump { scroll-margin-top: 84px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Name picker: chunky buttons that press down. */
 .who { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 6px; }
 .who button {
-  font-size: 1.05rem; line-height: 1; padding: 11px 16px 10px; border-radius: 14px; cursor: pointer;
+  font-size: 1.05rem; line-height: 1; padding: 11px 16px 10px; border-radius: calc(14px * var(--rad)); cursor: pointer;
   border: 2px solid var(--line); background: var(--surface); color: var(--fg);
-  box-shadow: 0 3px 0 var(--lip); touch-action: manipulation;
+  box-shadow: var(--lift); touch-action: manipulation;
   transition: transform 0.08s, box-shadow 0.08s;
 }
 .who button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lip); }
-.who button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: #fff; box-shadow: 0 3px 0 var(--award-lip); }
+.who button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: var(--award-ink); box-shadow: 0 3px 0 var(--award-lip); }
 
-/* Points bar: sticks to the top once a name is picked. Tapping it goes to the scoreboard. */
+/* Points bar: sticks to the top once a name is picked. Tapping it opens the scoreboard. */
 .hud {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
   display: flex; align-items: center; gap: 12px;
+  box-sizing: border-box; width: calc(100% + var(--gl) + var(--gr));
   margin: 12px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl));
   padding: 8px var(--gr) 8px var(--gl);
   background: var(--surface);
   background: color-mix(in srgb, var(--surface) 86%, transparent);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border-block: 2px solid var(--line);
-  color: var(--fg); text-decoration: none;
+  border: 0; border-block: 2px solid var(--line); border-radius: 0;
+  color: var(--fg); font: inherit; text-align: left; cursor: pointer; touch-action: manipulation;
 }
 .lvl {
   flex: none; display: grid; place-items: center;
-  width: 2.75rem; height: 3rem; color: #fff; font-size: 1.35rem; line-height: 1;
-  background: linear-gradient(160deg, var(--award-fill), #7a2bd8);
+  width: 2.75rem; height: 3rem; color: var(--award-ink); font-size: 1.35rem; line-height: 1;
+  background: linear-gradient(160deg, var(--award-fill), var(--lvl-2));
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
 }
 .hud-mid { flex: 1; min-width: 0; display: grid; gap: 4px; }
@@ -162,15 +183,16 @@ section, .sop, .jump { scroll-margin-top: 84px; }
 .hud-who b { font-size: 1rem; }
 .hud-who span { color: var(--award); font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
 .hud-sub { display: flex; gap: 10px; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
-.hud-pts { flex: none; text-align: right; line-height: 1; }
+.hud-pts { flex: none; text-align: right; line-height: 1; padding: 6px 10px 5px; border-radius: calc(12px * var(--rad)); background: var(--pts-soft); box-shadow: inset 0 0 0 2px var(--pts-fill); }
+.hud:active .hud-pts { transform: translateY(1px); }
 .hud-pts b { display: block; font-size: 1.7rem; color: var(--pts); font-variant-numeric: tabular-nums; }
-.hud-pts small { font-size: 0.75rem; color: var(--muted); }
-.bar { display: block; height: 10px; border-radius: 99px; background: var(--raise); box-shadow: inset 0 0 0 2px var(--line); overflow: hidden; }
+.hud-pts small { font-size: 0.75rem; color: var(--pts); font-weight: 600; }
+.bar { display: block; height: 10px; border-radius: var(--pill); background: var(--raise); box-shadow: inset 0 0 0 2px var(--line); overflow: hidden; }
 .bar i { display: block; height: 100%; width: calc(var(--v, 0) * 100%); background: var(--go-fill); border-radius: inherit; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.bar.lv i { background: linear-gradient(90deg, var(--award-fill), #7a2bd8); }
+.bar.lv i { background: linear-gradient(90deg, var(--award-fill), var(--lvl-2)); }
 
 /* This week: the link to the kitchen screen, zone grid, today's line, and your week in short. */
-.week { border: 2px solid var(--line); border-radius: 20px; background: var(--surface); padding: 6px 14px 12px; margin-top: 16px; box-shadow: 0 3px 0 var(--lip); }
+.week { border: 2px solid var(--line); border-radius: calc(20px * var(--rad)); background: var(--surface); padding: 6px 14px 12px; margin-top: 16px; box-shadow: var(--lift); }
 .week h2 { margin: 10px 0 6px; font-size: 1.35rem; }
 .week-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .week-top a { font-weight: 600; font-size: 0.9rem; white-space: nowrap; padding: 6px 0; }
@@ -180,26 +202,50 @@ section, .sop, .jump { scroll-margin-top: 84px; }
 .zt .rng, .zt tbody th { padding-left: 0; }
 .zt tbody th { font-weight: 500; color: var(--muted); }
 .zt tbody td { font-weight: 700; }
-.zt td.me { background: var(--go-soft); color: var(--go); border-radius: 8px; }
-.today { margin: 10px 0 8px; padding: 8px 12px; border-radius: 12px; background: var(--raise); }
+.zt td.me { background: var(--go-soft); color: var(--go); border-radius: calc(8px * var(--rad)); }
+.today { margin: 10px 0 8px; padding: 8px 12px; border-radius: calc(12px * var(--rad)); background: var(--raise); }
 .today > b:first-child { color: var(--go); }
 ul.you { list-style: none; padding: 0; margin: 8px 0 4px; display: flex; flex-wrap: wrap; gap: 6px; }
-ul.you li { background: var(--raise); border-radius: 10px; padding: 3px 10px; font-size: 0.875rem; }
+ul.you li { background: var(--raise); border-radius: calc(10px * var(--rad)); padding: 3px 10px; font-size: 0.875rem; }
 ul.you b { margin-right: 4px; }
 .plan > summary { cursor: pointer; color: var(--go); font-weight: 600; margin: 6px 0 0; width: max-content; }
 .plan table { font-size: 0.8125rem; margin-top: 6px; }
 .plan td:nth-child(2) { width: 46%; }
 .plan tr.now { background: var(--go-soft); }
 .plan td a { display: block; margin-top: 4px; }
+.cta {
+  display: flex; justify-content: center; align-items: baseline; width: 100%; margin: 16px 0 0; padding: 15px 18px 14px;
+  border: 0; border-radius: calc(18px * var(--rad)); background: var(--go-fill); color: var(--go-ink); box-shadow: 0 4px 0 var(--go);
+  font: 800 1.35rem/1 var(--display); font-synthesis: none; cursor: pointer; touch-action: manipulation;
+}
+.cta:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--go); }
 
-/* Tabs: one per moment in the day, in a row that scrolls sideways on its own. Only the open moment's cards show. */
+/* Views: the bar along the bottom that switches between This week, Tasks, and Skills. */
+.views {
+  position: fixed; z-index: 30; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: center; gap: 6px;
+  padding: 8px var(--gr) calc(8px + env(safe-area-inset-bottom, 0px)) var(--gl);
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 2px solid var(--line);
+}
+.views button {
+  flex: 1; max-width: 9rem; padding: 11px 6px 10px; border: 0; border-radius: calc(14px * var(--rad));
+  background: transparent; color: var(--muted); font: 800 1.05rem/1 var(--display); font-synthesis: none; cursor: pointer; touch-action: manipulation;
+}
+.views button[aria-current="page"] { background: var(--fg); color: var(--bg); }
+
+/* Tabs: one per moment in the day, in a row that scrolls sideways on its own and ends with Close the day.
+   Only the open moment's cards show. */
 .jump {
   position: relative; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
   margin: 18px calc(-1 * var(--gr)) 0 calc(-1 * var(--gl));
   padding: 4px var(--gr) 6px var(--gl);
 }
 .jump::-webkit-scrollbar { display: none; }
-.jump a { flex: none; display: flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.tabs { flex: none; display: flex; gap: 8px; }
+.jump a { flex: none; display: flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: var(--pill); border: 2px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
 .jump a[data-n] { padding-left: 6px; }
 .jump a[aria-selected="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
 section.gate.off { display: none; }
@@ -208,16 +254,16 @@ section.gate.off { display: none; }
 section.gate > h2 { display: flex; align-items: center; gap: 10px; }
 section.gate > h2[data-n]::before, .jump a[data-n]::before {
   content: attr(data-n); flex: none; display: grid; place-items: center;
-  width: 2.1rem; height: 2.1rem; border-radius: 11px; font-size: 1.15rem;
+  width: 2.1rem; height: 2.1rem; border-radius: calc(11px * var(--rad)); font-size: 1.15rem;
   background: var(--go-soft); color: var(--go); box-shadow: inset 0 0 0 2px var(--go);
 }
-.jump a[data-n]::before { width: 1.45rem; height: 1.45rem; border-radius: 8px; font: 800 0.85rem/1 var(--display); font-synthesis: none; }
+.jump a[data-n]::before { width: 1.45rem; height: 1.45rem; border-radius: calc(8px * var(--rad)); font: 800 0.85rem/1 var(--display); font-synthesis: none; }
 section.gate.cleared > h2[data-n]::before, .jump a.cleared[data-n]::before { content: "✓"; background: var(--go-fill); color: var(--go-ink); box-shadow: 0 3px 0 var(--go); }
 .jump a.cleared[data-n]::before { box-shadow: none; }
 section.gate.just > h2::before { animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
 
 /* Cards. The line along the bottom of each summary fills as its steps are ticked. */
-.sop { border: 2px solid var(--line); border-radius: 16px; background: var(--surface); margin: 10px 0; box-shadow: 0 3px 0 var(--lip); overflow: hidden; }
+.sop { border: 2px solid var(--line); border-radius: calc(16px * var(--rad)); background: var(--surface); margin: 10px 0; box-shadow: var(--lift); overflow: hidden; }
 .sop.due { border-color: var(--go); }
 .sop.done { border-color: var(--go-fill); }
 .sop > summary {
@@ -225,7 +271,7 @@ section.gate.just > h2::before { animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0
   display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
   padding: 13px 14px 14px; cursor: pointer; list-style: none;
 }
-.sop > summary:focus-visible { outline-offset: -4px; border-radius: 14px; }
+.sop > summary:focus-visible { outline-offset: -4px; border-radius: calc(14px * var(--rad)); }
 .sop > summary::-webkit-details-marker { display: none; }
 .sop > summary::before { content: "▸"; color: var(--muted); display: inline-block; transition: transform 0.15s; }
 .sop[open] > summary::before { transform: rotate(90deg); }
@@ -238,11 +284,11 @@ section.gate.just > h2::before { animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0
 .sop .m { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; color: var(--muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
 .sop.done .t::before { content: "✓ "; color: var(--go); }
 .sop.done .p { color: var(--go); font-weight: 700; }
-.sop .pts { font: 800 0.85rem/1 var(--display); font-synthesis: none; color: var(--pts); background: var(--pts-soft); border-radius: 999px; padding: 4px 8px 3px; }
+.sop .pts { font: 800 0.85rem/1 var(--display); font-synthesis: none; color: var(--pts); background: var(--pts-soft); border-radius: var(--pill); padding: 4px 8px 3px; }
 .sop.done .pts { background: var(--pts-fill); color: var(--pts-ink); }
 .sop .body { padding: 2px 14px 14px; }
 .sop.flash { animation: flash 0.9s ease-out; }
-.tag { background: var(--raise); color: var(--fg); border-radius: 999px; padding: 2px 9px; font-size: 0.8rem; font-weight: 700; }
+.tag { background: var(--raise); color: var(--fg); border-radius: var(--pill); padding: 2px 9px; font-size: 0.8rem; font-weight: 700; }
 .tag.due { background: var(--go-soft); color: var(--go); }
 
 ol.steps { list-style: none; padding: 0; margin: 8px 0 12px; display: grid; gap: 10px; }
@@ -251,13 +297,13 @@ ol.steps label { flex: 1; min-width: 0; cursor: pointer; padding-top: 1px; }
 ol.steps input:checked + label { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 2px; }
 input[type="checkbox"] {
   -webkit-appearance: none; appearance: none; flex: none; margin: 0;
-  width: 1.5rem; height: 1.5rem; border-radius: 8px; border: 2px solid var(--muted);
+  width: 1.5rem; height: 1.5rem; border-radius: calc(8px * var(--rad)); border: 2px solid var(--muted);
   background: var(--surface) center / 72% no-repeat; cursor: pointer;
   transition: background-color 0.12s, border-color 0.12s;
 }
 input[type="checkbox"]:checked {
   background-color: var(--go-fill); border-color: var(--go-fill);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2304323c' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: var(--tick);
 }
 input[type="checkbox"]:disabled { opacity: 0.45; cursor: not-allowed; }
 input.bump { animation: bump 0.25s ease-out; }
@@ -279,29 +325,40 @@ table.guide td { font-weight: 600; }
 table.skills td:not(:first-child), table.skills thead th:not(:first-child) { text-align: center; width: 3.6rem; }
 table.skills thead th { font-size: 0.8125rem; color: var(--muted); }
 table.skills tr.grp th { padding-top: 18px; font: 800 1.05rem var(--display); font-synthesis: none; color: var(--fg); }
-table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
-.leo { font-size: 0.75rem; font-weight: 700; color: var(--go); background: var(--go-soft); border-radius: 999px; padding: 0 7px; white-space: nowrap; }
+table.skills input { width: 1.3rem; height: 1.3rem; border-radius: calc(7px * var(--rad)); }
+.leo { font-size: 0.75rem; font-weight: 700; color: var(--go); background: var(--go-soft); border-radius: var(--pill); padding: 0 7px; white-space: nowrap; }
 .safety li { margin-bottom: 6px; }
 
-/* Scoreboard: level, the day's tally, and awards. */
-.score { border: 2px solid var(--line); border-radius: 20px; background: var(--surface); padding: 14px; box-shadow: 0 3px 0 var(--lip); }
+/* Scoreboard: a pop-up from the points bar, with level, the day's tally, and awards. */
+.modal { position: fixed; inset: 0; z-index: 45; display: grid; place-items: center; padding: 16px; background: var(--scrim); }
+.sheet {
+  box-sizing: border-box; width: min(26rem, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px);
+  overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px 16px; border-radius: calc(24px * var(--rad));
+  background: var(--surface); border: 2px solid var(--line); box-shadow: var(--lift), 0 14px 30px -14px rgba(0, 0, 0, 0.6);
+}
+.sheet-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
+.sheet-top h2 { margin: 0; }
+.x {
+  flex: none; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border: 2px solid var(--line);
+  border-radius: calc(12px * var(--rad)); background: var(--raise); color: var(--fg); font-size: 1.1rem; cursor: pointer;
+}
 .score .nudge { margin: 0; }
 .player { display: flex; gap: 14px; align-items: center; }
 .player > div { flex: 1; min-width: 0; }
 .lvl.big { width: 4rem; height: 4.4rem; font-size: 2rem; }
 .pname { font: 800 1.45rem/1.1 var(--display); font-synthesis: none; margin: 0; }
 .ptitle { color: var(--award); font-weight: 700; margin: 2px 0 6px; }
-.hcap { display: inline-block; margin-left: 4px; font-size: 0.78rem; font-weight: 700; color: var(--pts); background: var(--pts-soft); border-radius: 999px; padding: 1px 8px; vertical-align: 1px; }
+.hcap { display: inline-block; margin-left: 4px; font-size: 0.78rem; font-weight: 700; color: var(--pts); background: var(--pts-soft); border-radius: var(--pill); padding: 1px 8px; vertical-align: 1px; }
 .psub { font-size: 0.85rem; color: var(--muted); margin: 6px 0 0; }
 .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 14px 0 0; }
-.stats div { background: var(--raise); border-radius: 12px; padding: 8px 12px; }
+.stats div { background: var(--raise); border-radius: calc(12px * var(--rad)); padding: 8px 12px; }
 .stats dt { font-size: 0.8rem; color: var(--muted); }
 .stats dd { margin: 0; font: 800 1.5rem/1.15 var(--display); font-synthesis: none; color: var(--pts); font-variant-numeric: tabular-nums; }
 .stats dd.streak { color: var(--award); }
 .daystate { margin: 12px 0 0; font-weight: 600; }
 .daystate.won { color: var(--go); }
 .awards { list-style: none; padding: 0; margin: 10px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.25rem, 1fr)); gap: 8px; }
-.awards li { border: 2px solid var(--award-soft); background: var(--award-soft); border-radius: 14px; padding: 10px; display: grid; gap: 2px; align-content: start; }
+.awards li { border: 2px solid var(--award-soft); background: var(--award-soft); border-radius: calc(14px * var(--rad)); padding: 10px; display: grid; gap: 2px; align-content: start; }
 .awards .i { font-size: 1.7rem; line-height: 1.15; }
 .awards b { font: 800 1rem/1.15 var(--display); font-synthesis: none; }
 .awards span:last-child { font-size: 0.8rem; color: var(--muted); }
@@ -311,7 +368,7 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 
 /* Award and level-up messages, under the points bar. */
 .toasts { position: fixed; z-index: 40; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 78px); transform: translateX(-50%); width: min(22rem, calc(100% - 32px)); display: grid; gap: 8px; pointer-events: none; }
-.toast { display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 16px; background: var(--surface); border: 2px solid var(--award-fill); box-shadow: 0 4px 0 var(--award-lip), 0 14px 30px -14px rgba(20, 0, 60, 0.55); animation: toast 3.2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
+.toast { display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: calc(16px * var(--rad)); background: var(--surface); border: 2px solid var(--award-fill); box-shadow: 0 4px 0 var(--award-lip), 0 14px 30px -14px rgba(20, 0, 60, 0.55); animation: toast 3.2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
 .toast.up { border-color: var(--pts-fill); box-shadow: 0 4px 0 var(--pts-lip), 0 14px 30px -14px rgba(20, 0, 60, 0.55); }
 .toast .i { font-size: 1.7rem; line-height: 1; }
 .toast small { display: block; color: var(--award); font-weight: 700; font-size: 0.78rem; }
@@ -319,15 +376,15 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 .toast b { display: block; font: 800 1.05rem/1.15 var(--display); font-synthesis: none; }
 
 /* End of the day: the results screen, from Close the day or a clean sweep. Built to be compared. */
-.close-day, .win button { font-family: var(--display); font-weight: 800; font-synthesis: none; border: 0; border-radius: 16px; cursor: pointer; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); }
-.close-day { display: block; width: 100%; margin: 0 0 16px; font-size: 1.3rem; padding: 14px 18px 13px; }
+.close-day, .win button { font-family: var(--display); font-weight: 800; font-synthesis: none; border: 0; border-radius: calc(16px * var(--rad)); cursor: pointer; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); }
+.close-day { flex: none; display: flex; align-items: center; margin: 0 0 3px; padding: 7px 14px 6px; font-size: 1.05rem; line-height: 1; white-space: nowrap; border-radius: var(--pill); box-shadow: 0 3px 0 var(--pts-lip); }
 .close-day:active, .win button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--pts-lip); }
-.win { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(12, 6, 40, 0.62); overflow: hidden; }
+.win { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: var(--scrim); overflow: hidden; }
 .confetti { position: absolute; inset: 0; pointer-events: none; }
 .confetti i { position: absolute; top: -4vh; width: 9px; height: 14px; border-radius: 2px; background: var(--c); animation: fall var(--d) linear var(--w) both; }
 .win-card {
   position: relative; box-sizing: border-box; width: min(23rem, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px);
-  overflow-y: auto; overscroll-behavior: contain; text-align: center; padding: 20px 18px 16px; border-radius: 24px;
+  overflow-y: auto; overscroll-behavior: contain; text-align: center; padding: 20px 18px 16px; border-radius: calc(24px * var(--rad));
   background: var(--surface); border: 3px solid var(--pts-fill); box-shadow: 0 6px 0 var(--pts-lip); animation: land 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
 }
 .win-who { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 8px; text-align: left; }
@@ -339,7 +396,7 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 .win-pct b { display: block; font: 800 3.4rem/1 var(--display); font-synthesis: none; color: var(--go); font-variant-numeric: tabular-nums; }
 .win-card .bar { margin-bottom: 12px; }
 .win-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 10px; }
-.win-stats div { background: var(--raise); border-radius: 12px; padding: 6px 4px; }
+.win-stats div { background: var(--raise); border-radius: calc(12px * var(--rad)); padding: 6px 4px; }
 .win-stats dt { font-size: 0.75rem; color: var(--muted); }
 .win-stats dd { margin: 0; font: 800 1.25rem/1.2 var(--display); font-synthesis: none; font-variant-numeric: tabular-nums; }
 .win-stats dd.p { color: var(--pts); }
@@ -347,14 +404,14 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: 7px; }
 .win-lv { font-weight: 700; color: var(--award); margin: 0 0 12px; }
 .week7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 64px; margin: 0 0 4px; }
 .week7 > span { display: grid; grid-template-rows: 1fr auto; gap: 3px; height: 100%; }
-.week7 i { align-self: end; height: max(4px, calc(var(--v, 0) * 100%)); border-radius: 5px; background: var(--line); }
+.week7 i { align-self: end; height: max(4px, calc(var(--v, 0) * 100%)); border-radius: calc(5px * var(--rad)); background: var(--line); }
 .week7 .has i { background: var(--go-fill); }
 .week7 .full i { background: var(--pts-fill); }
 .week7 b { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
 .week7 .now b { color: var(--fg); font-weight: 800; }
 .win-weekcap { font-size: 0.85rem; color: var(--muted); margin: 0 0 10px; }
 ul.won { list-style: none; padding: 0; margin: 0 0 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10px; font-size: 0.85rem; font-weight: 600; }
+ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 4px 10px; font-size: 0.85rem; font-weight: 600; }
 .win-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
 .win button { font-size: 1.15rem; padding: 12px 20px 11px; }
 .win button.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--line); }
@@ -362,7 +419,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 
 @keyframes bump { 40% { transform: scale(1.22); } }
 @keyframes rise { 0% { opacity: 0; transform: translateY(6px) scale(0.8); } 20% { opacity: 1; transform: translateY(-6px) scale(1.1); } 100% { opacity: 0; transform: translateY(-30px); } }
-@keyframes flash { 0% { box-shadow: 0 3px 0 var(--lip), 0 0 0 0 var(--go-fill); } 30% { box-shadow: 0 3px 0 var(--lip), 0 0 0 6px var(--go-fill); } 100% { box-shadow: 0 3px 0 var(--lip), 0 0 0 16px transparent; } }
+@keyframes flash { 0% { box-shadow: var(--lift), 0 0 0 0 var(--go-fill); } 30% { box-shadow: var(--lift), 0 0 0 6px var(--go-fill); } 100% { box-shadow: var(--lift), 0 0 0 16px transparent; } }
 @keyframes stamp { 0% { transform: scale(0.4) rotate(-20deg); } 100% { transform: none; } }
 @keyframes toast { 0% { opacity: 0; transform: translateY(-14px) scale(0.96); } 8% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
 @keyframes land { 0% { opacity: 0; transform: scale(0.7) translateY(20px); } 100% { opacity: 1; transform: none; } }
@@ -391,6 +448,138 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   92% { opacity: 1; }
   100% { opacity: 0; transform: translate(0, -122vh); }
 }
+/* ============ THEMES ============
+   Picking a name puts on that person's look: the script sets data-person on the root, and a line in the head
+   does it before the first paint, from the name this phone last picked. With no name it's the look above.
+   The colour jobs stay put: --go is progress and ticks, --pts is points, --award is levels and awards. */
+
+/* Dad: a phosphor terminal. Green progress, amber points, cyan awards; scanlines, a slow refresh band, a cursor. */
+:root[data-person="dad"] {
+  --bg: #030b06; --glow: #0b2e18; --glow-2: #06180d;
+  --surface: #06140b; --raise: #0b2214; --fg: #c3f7d3; --muted: #79bf91; --line: #16602f; --lip: #000;
+  --go: #39ff88; --go-fill: #2fe57a; --go-soft: #0c3a1e; --go-ink: #00230d;
+  --pts: #ffb547; --pts-fill: #ffb547; --pts-soft: #2b1f08; --pts-ink: #261600; --pts-lip: #8a5a00;
+  --award: #7fe7ff; --award-fill: #39d0e6; --award-soft: #062a33; --award-lip: #0b6b7c; --award-ink: #001418; --lvl-2: #1592a8;
+  --warn: #ff8a5c; --scrim: rgba(0, 8, 3, 0.8);
+  --display: "VT323", ui-monospace, Menlo, Consolas, monospace;
+  --font: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", "Liberation Mono", monospace;
+  --rad: 0.15; --pill: 3px;
+  --lift: 0 0 0 1px #000, 0 0 18px -8px rgba(57, 255, 136, 0.5);
+  --heading-glow: 0 0 10px rgba(57, 255, 136, 0.55);
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2300230d' stroke-width='3.6' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+:root[data-person="dad"] h1 { color: var(--go); text-shadow: var(--heading-glow); }
+:root[data-person="dad"] h1::before { content: "> "; color: var(--muted); }
+:root[data-person="dad"] h1::after { content: "\2588"; margin-left: 0.06em; animation: blink 1.1s steps(1) infinite; }
+:root[data-person="dad"] .hud-pts b, :root[data-person="dad"] .stats dd { text-shadow: 0 0 8px rgba(255, 181, 71, 0.45); }
+:root[data-person="dad"] .bg i { display: none; }
+:root[data-person="dad"] .bg::after {
+  left: 0; right: 0; top: -25vh; bottom: auto; width: auto; height: 25vh; border-radius: 0;
+  background: linear-gradient(to bottom, transparent, rgba(57, 255, 136, 0.07), transparent);
+  animation: sweep 9s linear infinite;
+}
+:root[data-person="dad"] body::after {
+  content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.2) 2px 4px);
+}
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes sweep { to { transform: translateY(150vh); } }
+
+/* Leo: a world of blocks. Square corners, a pixel face, hard shadows; day or night with the phone's own setting. */
+:root[data-person="leo"] {
+  --bg: #7cc6f2; --glow: #b5e2fb; --glow-2: #dff3ff;
+  --surface: #fdf6e3; --raise: #f1e4c3; --fg: #2a1d12; --muted: #574330; --line: #2a1d12; --lip: #2a1d12;
+  --go: #2f7d22; --go-fill: #5dbb3f; --go-soft: #dcefc9; --go-ink: #0e2a07;
+  --pts: #835500; --pts-fill: #f2b632; --pts-soft: #fbecc0; --pts-ink: #3a2600; --pts-lip: #2a1d12;
+  --award: #b02f28; --award-fill: #d9483b; --award-soft: #f8dcd7; --award-lip: #2a1d12; --lvl-2: #8c2c22;
+  --warn: #9c4100; --scrim: rgba(20, 14, 8, 0.62);
+  --display: "Pixelify Sans", "VT323", system-ui, sans-serif;
+  --rad: 0; --pill: 0;
+  --lift: 4px 4px 0 var(--lip);
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%230e2a07' stroke-width='3.6' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-person="leo"] {
+    --bg: #0c1336; --glow: #1b2a66; --glow-2: #121b48;
+    --surface: #1f2851; --raise: #2a3466; --fg: #f1f3ff; --muted: #b1b7e0; --line: #4a5796; --lip: #02040f;
+    --go: #82e463; --go-soft: #1d3a2c;
+    --pts: #ffd84d; --pts-soft: #3b3420;
+    --award: #ff8579; --award-soft: #4a2132;
+    --warn: #ffb067; --scrim: rgba(2, 4, 16, 0.7);
+    color-scheme: dark;
+  }
+}
+:root[data-person="leo"] h1 { color: #fff; text-shadow: 4px 4px 0 var(--lip); }
+:root[data-person="leo"] .bg { background: linear-gradient(var(--bg), var(--glow) 60%, var(--glow-2)); }
+:root[data-person="leo"] .bg::before, :root[data-person="leo"] .bg::after { display: none; }
+:root[data-person="leo"] .bg i { width: calc(var(--s) * 0.5); height: calc(var(--s) * 0.5); border: 0; border-radius: 0; background: rgba(255, 255, 255, 0.85); }
+:root[data-person="leo"] .bg i:nth-child(3n) { background: #8fd16f; }
+:root[data-person="leo"] .bg i:nth-child(4n) { background: #f2c94c; }
+@media (prefers-color-scheme: dark) {
+  :root[data-person="leo"] .bg i { width: 4px; height: 4px; background: #fff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.6); }
+  :root[data-person="leo"] .bg i:nth-child(3n) { background: #c8f56a; box-shadow: 0 0 10px #c8f56a; }
+}
+:root[data-person="leo"] :is(.cta, .close-day, .win button:not(.ghost)) { box-shadow: 4px 4px 0 var(--lip); }
+:root[data-person="leo"] :is(.who button, .cta, .close-day, .win button:not(.ghost)):active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--lip); }
+:root[data-person="leo"] .close-day { margin: 0 4px 4px 0; }
+:root[data-person="leo"] input[type="checkbox"] { border-color: var(--line); }
+
+/* Aurora: alt-goth. Ink and velvet, neon rose progress, antique gold points, lilac awards, blackletter, falling petals. */
+:root[data-person="aurora"] {
+  --bg: #0c0710; --glow: #3a0c26; --glow-2: #1f0e3a;
+  --surface: #170f1c; --raise: #23172a; --fg: #f6eaf3; --muted: #bea9bd; --line: #3e263c; --lip: #000;
+  --go: #ff6aae; --go-fill: #ff3d95; --go-soft: #3b1029; --go-ink: #2a0016;
+  --pts: #e9c97f; --pts-fill: #d9b05a; --pts-soft: #2d2315; --pts-ink: #1f1500; --pts-lip: #7d5f1f;
+  --award: #c9a6ff; --award-fill: #9356ff; --award-soft: #2a1840; --award-lip: #4c2399; --lvl-2: #a3123a;
+  --warn: #ff9e70; --scrim: rgba(8, 2, 10, 0.78);
+  --display: "Grenze Gotisch", Georgia, serif;
+  --lift: 0 3px 0 #000, 0 0 0 1px rgba(255, 61, 149, 0.1);
+  --heading-glow: 0 0 14px rgba(255, 61, 149, 0.45);
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%232a0016' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+:root[data-person="aurora"] h1 { letter-spacing: 0.02em; text-shadow: 0 0 18px rgba(255, 61, 149, 0.6), 0 3px 0 #a3123a; }
+:root[data-person="aurora"] .bg i {
+  top: -8vh; bottom: auto; width: calc(var(--s) * 0.62); height: calc(var(--s) * 0.42);
+  border: 0; border-radius: 100% 0; background: linear-gradient(135deg, #ff5fa8, #6d0f35);
+  animation-name: petal;
+}
+:root[data-person="aurora"] .bg i:nth-child(3n) { background: linear-gradient(135deg, #c9a6ff, #3a1a73); }
+@keyframes petal {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  8% { opacity: 0.8; }
+  50% { transform: translate(calc(var(--sway) * 3), 58vh) rotate(170deg); }
+  92% { opacity: 0.8; }
+  100% { opacity: 0; transform: translate(0, 118vh) rotate(340deg); }
+}
+
+/* Eshaal: shadow rank. Abyss and violet, electric blue progress, gold points, a cut corner on each card, rising embers. */
+:root[data-person="eshaal"] {
+  --bg: #05040e; --glow: #24105e; --glow-2: #0b1e57;
+  --surface: #0e0c23; --raise: #17143c; --fg: #ece9ff; --muted: #a9a4dc; --line: #2f2978; --lip: #000;
+  --go: #7ab6ff; --go-fill: #4d9bff; --go-soft: #0f2352; --go-ink: #001233;
+  --pts: #ffd46e; --pts-fill: #ffc53d; --pts-soft: #2a2310; --pts-ink: #241800; --pts-lip: #8f6400;
+  --award: #bc98ff; --award-fill: #7c45ff; --award-soft: #211548; --award-lip: #3d1a99; --lvl-2: #2a1080;
+  --warn: #ffad62; --scrim: rgba(2, 1, 10, 0.8);
+  --display: "Oxanium", system-ui, sans-serif;
+  --rad: 0.25; --pill: 4px;
+  --lift: 0 0 0 1px #000, 0 0 22px -10px rgba(124, 69, 255, 0.75);
+  --heading-glow: 0 0 16px rgba(124, 69, 255, 0.6);
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23001233' stroke-width='3.6' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+:root[data-person="eshaal"] h1 { text-transform: uppercase; letter-spacing: 0.06em; text-shadow: 0 0 20px rgba(124, 69, 255, 0.85), 0 0 2px #b892ff; }
+:root[data-person="eshaal"] .sop { position: relative; }
+:root[data-person="eshaal"] .sop::before { content: ""; position: absolute; top: 0; right: 0; width: 16px; height: 16px; background: var(--award-fill); clip-path: polygon(0 0, 100% 0, 100% 100%); }
+:root[data-person="eshaal"] .sop.done::before { background: var(--go-fill); }
+:root[data-person="eshaal"] .bg i {
+  width: max(3px, calc(var(--s) * 0.16)); height: calc(var(--s) * 0.7); border: 0; border-radius: 999px;
+  background: linear-gradient(to top, transparent, #9d6bff 45%, #e6dcff); box-shadow: 0 0 12px 2px rgba(124, 69, 255, 0.55);
+}
+:root[data-person="eshaal"] .bg i:nth-child(odd) { background: linear-gradient(to top, transparent, #4d9bff 45%, #dcecff); box-shadow: 0 0 12px 2px rgba(77, 155, 255, 0.5); }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .bg i { display: none; }
@@ -413,23 +602,28 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 </div>
 <header>
   <h1>Routines</h1>
-  <p class="lede">Pick your name, clear today's cards, and rack up the points.</p>
+  <p class="lede" id="lede">Pick your name, clear today's cards, and rack up the points.</p>
   <div class="who" id="who" role="group" aria-label="Show jobs for"></div>
 </header>
 
-<a class="hud" id="hud" href="#score" hidden>
+<button class="hud" id="hud" type="button" aria-haspopup="dialog" aria-controls="score" hidden>
+  <span class="vh">Scoreboard. </span>
   <span class="lvl"><span class="vh">Level </span><span id="hud-lvl">1</span></span>
   <span class="hud-mid">
     <span class="hud-who"><b id="hud-name"></b><span id="hud-title"></span></span>
     <span class="bar" aria-hidden="true"><i id="hud-bar"></i></span>
     <span class="hud-sub"><span id="hud-cards"></span><span id="hud-streak"></span></span>
   </span>
-  <span class="hud-pts"><b id="hud-pts">0</b><small>points today</small></span>
-</a>
+  <span class="hud-pts"><b id="hud-pts">0</b><small>points today<span aria-hidden="true"> ›</span></small></span>
+</button>
 
+<!-- ============ VIEWS ============
+     This week, Tasks, and Skills, one at a time, switched from the bar along the bottom.
+     The page opens on This week. The scoreboard is a pop-up from the points bar. -->
+<div class="view" id="v-week">
 <section class="week" id="week" aria-labelledby="week-h">
   <div class="week-top"><h2 id="week-h">This week</h2><a href="hub/">Kitchen screen<span aria-hidden="true"> ›</span></a></div>
-  <div id="week-body"><noscript><p>The rota needs JavaScript switched on. The routines below still work as lists.</p></noscript></div>
+  <div id="week-body"><noscript><p>Routines needs JavaScript switched on.</p></noscript></div>
   <details class="plan" id="plan">
     <summary>Day by day</summary>
     <div class="tw">
@@ -440,21 +634,27 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     </div>
   </details>
 </section>
+<button class="cta" id="to-tasks" type="button" hidden>Today's tasks<span aria-hidden="true"> ›</span></button>
+</div>
 
-<nav class="jump" id="tabs" aria-label="Moments in the day">
-  <a href="#g-morning">Morning</a>
-  <a href="#g-reset">Saturday reset</a>
-  <a href="#g-monthly">Monthly</a>
-  <a href="#g-quarterly">Quarterly</a>
-  <a href="#g-office-in">At the office</a>
-  <a href="#g-office-out">Leaving the office</a>
-  <a href="#g-home">Home</a>
-  <a href="#g-dinner">Dinner</a>
-  <a href="#g-meal">After the meal</a>
-  <a href="#g-after">After dinner</a>
-  <a href="#g-bed">Before bed</a>
-  <a href="#g-any">Any time</a>
-</nav>
+<div class="view" id="v-tasks" hidden>
+<div class="jump" id="jump">
+  <nav class="tabs" id="tabs" aria-label="Moments in the day">
+    <a href="#g-morning">Morning</a>
+    <a href="#g-reset">Saturday reset</a>
+    <a href="#g-monthly">Monthly</a>
+    <a href="#g-quarterly">Quarterly</a>
+    <a href="#g-office-in">At the office</a>
+    <a href="#g-office-out">Leaving the office</a>
+    <a href="#g-home">Home</a>
+    <a href="#g-dinner">Dinner</a>
+    <a href="#g-meal">After the meal</a>
+    <a href="#g-after">After dinner</a>
+    <a href="#g-bed">Before bed</a>
+    <a href="#g-any">Any time</a>
+  </nav>
+  <button class="close-day" id="close-day" type="button">Close the day</button>
+</div>
 
 <!-- ============ GATES ============
      The moments in a day, in order, one tab each. Each card sits under the moment it's done at.
@@ -1244,16 +1444,21 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     </div>
   </details>
 </section>
+</div>
 
 <!-- ============ SCOREBOARD ============
+     A pop-up from the points bar.
      Points come from ticks: a card is worth its time in minutes × 10, times your handicap, half shared across
      its steps and half for clearing it. They're kept on each phone under the picked name, and never leave it. -->
-<section id="score" aria-labelledby="score-h">
-  <h2 id="score-h">Scoreboard</h2>
-  <div class="score" id="score-body"><noscript><p>Points need JavaScript switched on.</p></noscript></div>
-</section>
+<div class="modal" id="score" hidden role="dialog" aria-modal="true" aria-labelledby="score-h">
+  <div class="sheet">
+    <div class="sheet-top"><h2 id="score-h">Scoreboard</h2><button type="button" class="x" id="score-x" aria-label="Close the scoreboard">✕</button></div>
+    <div class="score" id="score-body"></div>
+  </div>
+</div>
 
 <!-- ============ SKILLS ============ -->
+<div class="view" id="v-skills" hidden>
 <section id="skills">
   <h2>Skills</h2>
   <p class="intro">What you need to run your own home. Each skill gets three ticks: shown, done with help, and done alone. Anyone who's done a skill alone can teach it.</p>
@@ -1326,6 +1531,13 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     <li>Hob and oven off before you leave the kitchen.</li>
   </ol>
 </section>
+</div>
+
+<nav class="views" id="views" aria-label="Views" hidden>
+  <button type="button" data-view="v-week">This week</button>
+  <button type="button" data-view="v-tasks">Tasks</button>
+  <button type="button" data-view="v-skills">Skills</button>
+</nav>
 
 <!-- When the cleaner starts. Kept here, off the page, until it happens: then apply it, and delete this note.
      The cleaner takes the weekly zone cleans and most of the monthly lists. Daily jobs, dinners, laundry,
@@ -1458,6 +1670,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 
   const ZONES = { kitchen: "Kitchen", bathrooms: "Bathrooms", living: "Living & outside" };
   const PEOPLE = NAMES;
+  const root = document.documentElement;
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
   const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const DAY = 864e5;
@@ -2062,8 +2276,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const stat = (k, v, cls) => "<div><dt>" + k + "</dt><dd" + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</dd></div>";
     const swept = s.all > 0 && s.done === s.all;
     const open = !!scoreBody.querySelector("details.locked[open]");
-    let h = '<button type="button" class="close-day" id="close-day">Close the day</button>';
-    h += '<div class="player"><span class="lvl big"><span class="vh">Level </span>' + l + "</span><div>";
+    let h = '<div class="player"><span class="lvl big"><span class="vh">Level </span>' + l + "</span><div>";
     h += '<p class="pname">' + esc(who) + '</p><p class="ptitle">' + esc(titleOf(l)) + ' <span class="hcap">Handicap ' + hcText(who) + "</span></p>";
     h += '<span class="bar lv" aria-hidden="true"><i style="--v:' + ((g.total - base) / (next - base)).toFixed(3) + '"></i></span>';
     h += '<p class="psub">' + fmt(g.total) + " points. " + fmt(next - g.total) + " more to level " + (l + 1) + ".</p></div></div>";
@@ -2122,7 +2335,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   let winFrom = null;
   const confetti = () => {
     if (!motion) return;
-    const colours = ["#19c6e3", "#ffc22e", "#d81b7f", "#7a2bd8", "#ffffff"];
+    const cs = getComputedStyle(root); // The theme's own colours.
+    const colours = ["--go-fill", "--pts-fill", "--award-fill", "--lvl-2", "--fg"].map((v) => cs.getPropertyValue(v).trim() || "#ffffff");
     let h = "";
     for (let i = 0; i < 42; i++) {
       h += '<i style="left:' + (Math.random() * 100).toFixed(1) + "%;--c:" + colours[i % colours.length] +
@@ -2198,8 +2412,9 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       note.textContent = text;
     }
   });
-  scoreBody.addEventListener("click", (e) => {
-    if (!who || !e.target.closest || !e.target.closest("#close-day")) return;
+  // Close the day sits at the end of the tabs, after the day's last moment.
+  byId("close-day").addEventListener("click", () => {
+    if (!who) return;
     const g = loadGame(who);
     markDay(g);
     saveGame(who, g);
@@ -2207,7 +2422,28 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   });
   byId("win-ok").addEventListener("click", closeWin);
   winEl.addEventListener("click", (e) => { if (e.target === winEl) closeWin(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !winEl.hidden) closeWin(); });
+
+  // The scoreboard: a pop-up from the points bar.
+  const scoreEl = byId("score");
+  let scoreFrom = null;
+  const openScore = () => {
+    if (!who) return;
+    scoreFrom = document.activeElement;
+    scoreEl.hidden = false;
+    byId("score-x").focus({ preventScroll: true });
+  };
+  const closeScore = () => {
+    scoreEl.hidden = true;
+    if (scoreFrom && scoreFrom.focus) scoreFrom.focus({ preventScroll: true });
+  };
+  hud.addEventListener("click", openScore);
+  byId("score-x").addEventListener("click", closeScore);
+  scoreEl.addEventListener("click", (e) => { if (e.target === scoreEl) closeScore(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!winEl.hidden) closeWin();
+    else if (!scoreEl.hidden) closeScore();
+  });
 
   const scoreTick = (card, box) => {
     if (box.checked && motion) replay(box, "bump", 260);
@@ -2258,6 +2494,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   // run-tings/#g-home for a reminder that fires on getting home. That #g-home is then dropped from the
   // address, so the page doesn't keep opening there.
   const tabBar = document.getElementById("tabs");
+  const tabRow = document.getElementById("jump"); // The row that scrolls sideways: the tabs, then Close the day.
   const tabs = Array.from(tabBar.querySelectorAll("a"));
   const panelOf = (a) => document.getElementById(a.getAttribute("aria-controls"));
   let openId = "";
@@ -2270,8 +2507,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       panelOf(a).classList.toggle("off", !on);
       if (!on) return;
       if (focus) a.focus();
-      const x = Math.max(0, a.offsetLeft - (tabBar.clientWidth - a.offsetWidth) / 2);
-      if (tabBar.scrollTo) tabBar.scrollTo({ left: x, behavior: motion ? "smooth" : "auto" }); else tabBar.scrollLeft = x;
+      const x = Math.max(0, a.offsetLeft - (tabRow.clientWidth - a.offsetWidth) / 2);
+      if (tabRow.scrollTo) tabRow.scrollTo({ left: x, behavior: motion ? "smooth" : "auto" }); else tabRow.scrollLeft = x;
     });
   };
   tabBar.setAttribute("role", "tablist");
@@ -2308,25 +2545,52 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     const left = open.find((p) => Array.from(p.querySelectorAll(".sop")).some((c) => !c.hidden && stepBoxes(c).length > 0 && !allTicked(c)));
     openTab((left || open[0]).id);
   };
-  // A link to one of today's moments opens it and brings the tabs into view, whether it loads the page or not.
+  // A link to one of today's moments opens Tasks on it and brings the tabs into view, whether it loads the page or not.
   const followLink = () => {
     const id = location.hash.slice(1);
     const a = tabs.find((t) => t.getAttribute("aria-controls") === id);
     if (!a) return;
-    if (!a.hidden) {
+    if (who && !a.hidden) {
+      showView("v-tasks");
       openTab(id);
-      if (tabBar.scrollIntoView) tabBar.scrollIntoView({ block: "start" });
+      if (tabRow.scrollIntoView) tabRow.scrollIntoView({ block: "start" });
     }
     if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
   };
   window.addEventListener("hashchange", followLink);
 
+  /* ---------- Views: This week, Tasks, and Skills, one at a time ---------- */
+  const views = Array.from(document.querySelectorAll(".view"));
+  const viewBar = document.getElementById("views");
+  const toTasks = document.getElementById("to-tasks");
+  let viewId = "v-week";
+  // Until a name is picked there's only This week, without the bar or the button to the tasks.
+  const showViews = () => {
+    views.forEach((v) => { v.hidden = v.id !== (who ? viewId : "v-week"); });
+    viewBar.hidden = !who;
+    toTasks.hidden = !who;
+    Array.from(viewBar.querySelectorAll("button")).forEach((b) => {
+      if (b.getAttribute("data-view") === viewId) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    });
+  };
+  const showView = (id) => {
+    viewId = id;
+    showViews();
+    try { window.scrollTo({ top: 0, behavior: "instant" }); } catch (e) { window.scrollTo(0, 0); }
+    if (id === "v-tasks" && openId) openTab(openId); // Centres the open tab, now the row can be measured.
+  };
+  viewBar.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("button[data-view]");
+    if (b) showView(b.getAttribute("data-view"));
+  });
+  toTasks.addEventListener("click", () => showView("v-tasks"));
+
   /* ---------- Name picker and filtering ---------- */
   const picker = document.getElementById("who");
-  [["Everyone", ""]].concat(PEOPLE.map((n) => [n, n])).forEach(([label, value]) => {
+  PEOPLE.map((n) => [n, n]).forEach(([label, value]) => {
     const b = document.createElement("button");
     b.type = "button";
-    b.id = "who-" + (value || "everyone").toLowerCase();
+    b.id = "who-" + value.toLowerCase();
     b.value = value;
     b.textContent = label;
     b.addEventListener("click", () => {
@@ -2355,6 +2619,10 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 
   function apply() {
     Array.from(picker.querySelectorAll("button")).forEach((b) => b.setAttribute("aria-pressed", String(b.value === who)));
+    // Each person's theme. A line in the head sets it before the first paint, from the name this phone last picked.
+    if (who) root.setAttribute("data-person", who.toLowerCase()); else root.removeAttribute("data-person");
+    if (themeMeta) themeMeta.setAttribute("content", getComputedStyle(root).getPropertyValue("--bg").trim() || "#f1eeff");
+    document.getElementById("lede").hidden = !!who;
     renderWeek();
     cards.forEach((card) => {
       const w = cardWeek(card);
@@ -2375,6 +2643,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
     renderTabs();
     renderSkills();
+    showViews();
     enterGame();
   }
 
