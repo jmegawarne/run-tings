@@ -292,7 +292,9 @@ addEventListener('click', stayAwake, { once: true });
 // Hub (the receiver CATT uses) and tells it to load this page, which then takes the Hub over as
 // below, and the phone's free again. Only Chrome on Android or a computer can cast a web page,
 // not an iPhone, so the button shows only where Google's cast library says Cast is there.
-const DASHCAST = '84912283', DASHCAST_NS = 'urn:x-cast:es.offd.dashcast';
+// DashCast's namespace as pychromecast, and so CATT, uses it. The first DashCast's es.offd one is
+// gone: on 7 Nov 2026 the Hub listed only this one, and messages on the old one timed out.
+const DASHCAST = '84912283', DASHCAST_NS = 'urn:x-cast:com.madmod.dashcast';
 const send = $('send');
 let wantSend = false, sending = false, sendTimer = 0;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
