@@ -457,7 +457,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
    The colour jobs stay put: --go is progress and ticks, --pts is points, --award is levels and awards. */
 
 /* Dad: a phosphor terminal. Green progress, amber points, cyan awards; scanlines, a slow refresh band, a cursor,
-   and a hex dump scrolling up very faintly behind everything (the script writes it). */
+   and a hex dump scrolling up faintly behind everything (the script writes it). */
 :root[data-person="dad"] {
   --bg: #030b06; --glow: #0b2e18; --glow-2: #06180d;
   --surface: #06140b; --raise: #0b2214; --fg: #c3f7d3; --muted: #79bf91; --line: #16602f; --lip: #000;
@@ -490,7 +490,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 .bg .log { display: none; }
 :root[data-person="dad"] .bg .log {
   display: block; position: absolute; left: 0; top: 0; margin: 0; padding: 0 var(--gl);
-  font: 13px/1.7 var(--font); color: var(--go); opacity: 0.06; white-space: pre;
+  font: 14px/1.7 var(--font); color: var(--go); opacity: 0.16; white-space: pre; text-shadow: 0 0 6px rgba(57, 255, 136, 0.6);
   animation: scroll-log 90s linear infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
