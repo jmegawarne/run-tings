@@ -169,9 +169,11 @@ section, .sop, .jump { scroll-margin-top: 84px; }
 .bar i { display: block; height: 100%; width: calc(var(--v, 0) * 100%); background: var(--go-fill); border-radius: inherit; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .bar.lv i { background: linear-gradient(90deg, var(--award-fill), #7a2bd8); }
 
-/* This week: zone grid, today's line, and your week in short. */
+/* This week: the link to the kitchen screen, zone grid, today's line, and your week in short. */
 .week { border: 2px solid var(--line); border-radius: 20px; background: var(--surface); padding: 6px 14px 12px; margin-top: 16px; box-shadow: 0 3px 0 var(--lip); }
 .week h2 { margin: 10px 0 6px; font-size: 1.35rem; }
+.week-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.week-top a { font-weight: 600; font-size: 0.9rem; white-space: nowrap; padding: 6px 0; }
 .zt { width: 100%; border-collapse: separate; border-spacing: 0 2px; font-size: 0.95rem; }
 .zt th, .zt td { padding: 3px 8px; border: 0; text-align: left; vertical-align: baseline; }
 .zt thead th, .zt .rng { font-size: 0.8rem; font-weight: 600; color: var(--muted); padding-block: 0 2px; }
@@ -426,7 +428,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
 </a>
 
 <section class="week" id="week" aria-labelledby="week-h">
-  <h2 id="week-h">This week</h2>
+  <div class="week-top"><h2 id="week-h">This week</h2><a href="hub/">Kitchen screen<span aria-hidden="true"> ›</span></a></div>
   <div id="week-body"><noscript><p>The rota needs JavaScript switched on. The routines below still work as lists.</p></noscript></div>
   <details class="plan" id="plan">
     <summary>Day by day</summary>
@@ -913,6 +915,17 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     </div>
   </details>
 
+  <details class="sop" id="guitar" data-who="leo" data-period="d" data-we="g-meal" data-time="15 min">
+    <summary>Guitar practice</summary>
+    <div class="body">
+      <p class="when">After your homework. At the weekend, after the main meal.</p>
+      <ol class="steps">
+        <li>Guitar practised for 15 minutes.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> 15 minutes on the guitar today.</p>
+    </div>
+  </details>
+
   <details class="sop" id="laundry-daily" data-who="all" data-period="d" data-we="g-morning" data-time="20 min">
     <summary>Folding and putting away</summary>
     <div class="body">
@@ -1135,6 +1148,19 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     </div>
   </details>
 
+  <details class="sop" id="supplements" data-who="aurora" data-period="w" data-days="0" data-time="15 min">
+    <summary>Dad's supplement box</summary>
+    <div class="body">
+      <p class="when">Sunday night, ready for the week ahead.</p>
+      <ol class="steps">
+        <li>Every morning slot filled: Berocca, Omega-3 fish oil x 1, L-Tyrosine x 1, Allevia x 1, and Vitamin D3 x 1.</li>
+        <li>Every evening slot filled: 4-in-1 Magnesium Glycinate + Turmeric x 1, and L-Glycine x 1.</li>
+        <li>Anything running low? Tell Dad.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> a full week in the box, mornings and evenings.</p>
+    </div>
+  </details>
+
   <details class="sop" id="night-before" data-who="all" data-period="d" data-when="cook-eve" data-time="10 min">
     <summary>Tomorrow's meal</summary>
     <div class="body">
@@ -1343,6 +1369,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   // and is named with them. Their own morning, evening, bedroom, and laundry stay their own.
   const ALONGSIDE = { Eshaal: "Aurora" };
   const EPOCH = "2026-10-19";                 // Monday of rota week 0.
+  const NEW_DAY_AT = 2;                       // The hour the day turns over. Before it, it's still yesterday, so a late night out counts as the day it began.
   // Bin collection: Wednesday, grey and red on alternate weeks.
   const BIN_DAY = 3;
   const GREY_DATE = "2026-10-21";
@@ -1395,6 +1422,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     { card: "office-in", icon: "☕", name: "Brew Crew", desc: "Office open, and Dad's cuppa made." },
     { card: "office-out", icon: "🍴", name: "Outlery Overlord", desc: "Office shut down, Outlery and all." },
     { card: "coming-home", icon: "🏠", name: "Home Run", desc: "In, sorted, and straight to it." },
+    { card: "guitar", icon: "🎸", name: "Fret Not", desc: "Fifteen minutes of guitar, done." },
     { card: "laundry-daily", icon: "🥇", name: "Fold Medal", desc: "Folded and put away. Gold standard." },
     { card: "laundry", icon: "🌀", name: "Spin Doctor", desc: "A whole load, from pockets to put away." },
     { card: "household-wash", icon: "🧺", name: "Towel Power", desc: "Clean towels back where they live." },
@@ -1408,6 +1436,7 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
     { card: "dinner-plan", icon: "📋", name: "Menu Mastermind", desc: "Dinners planned and on the list." },
     { card: "shop", icon: "🛒", name: "Trolley Dash", desc: "Friday's shop, sorted." },
     { card: "night-before", icon: "🧊", name: "Thaw Patrol", desc: "Tomorrow's meal sorted the night before." },
+    { card: "supplements", icon: "💊", name: "Box Clever", desc: "Dad's supplements sorted for the week." },
     { card: "evening", icon: "🌙", name: "Night Shift", desc: "Nothing left downstairs, phone on charge." },
     { card: "shower", icon: "🚿", name: "Squeegee Supreme", desc: "Shower left gleaming." },
     { card: "shirts", icon: "👔", name: "Crease Lightning", desc: "A week of shirts, ironed and hung." },
@@ -1468,7 +1497,9 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
   };
 
   // Dates as UTC midnights built from the local calendar date, so clock changes never shift a day.
-  const now = new Date();
+  // Before NEW_DAY_AT the date is still yesterday's, so now is noon on the day the page counts as today.
+  const clock = new Date();
+  const now = new Date(clock.getFullYear(), clock.getMonth(), clock.getDate() - (clock.getHours() < NEW_DAY_AT ? 1 : 0), 12);
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   const dow = now.getDay();
   const monday = today - mod(dow - 1, 7) * DAY;
@@ -1667,6 +1698,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       if (dow === 5) out.push("Today");
     } else if (id === "shop") {
       if (dow === 5) out.push("Today");
+    } else if (id === "supplements") {
+      if ((card.getAttribute("data-days") || "").split(" ").indexOf(String(dow)) > -1) out.push("Tonight");
     } else if (per === "w" && isSat && card.hasAttribute("data-sat")) {
       out.push("Today");
     } else if (per === "m" && firstSat) {
@@ -1956,7 +1989,8 @@ ul.won li { background: var(--award-soft); border-radius: 999px; padding: 4px 10
       if (per === "q") win("quarterly");
       if (card.id.indexOf("dad-") === 0) win("gaffer");
       const t = new Date();
-      if (card.id === "morning" && ev.live && t.getHours() * 60 + t.getMinutes() < 450) win("early");
+      const mins = t.getHours() * 60 + t.getMinutes(); // Between the day turning over and 7:30, so last night's late tick doesn't count.
+      if (card.id === "morning" && ev.live && mins >= NEW_DAY_AT * 60 && mins < 450) win("early");
     });
     const d = g.days[ymd(today)] || {};
     if (d.clear) {
