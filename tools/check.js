@@ -18,7 +18,7 @@ const path = require("path");
 const { JSDOM } = require("jsdom");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
-const PEOPLE = ["everyone", "aurora", "eshaal", "leo", "dad"];
+const PEOPLE = ["aurora", "eshaal", "leo", "dad"];
 
 const recipesFile = path.join(__dirname, "..", "recipes.json");
 let recipes = null;
@@ -78,19 +78,17 @@ async function report(dateStr) {
     console.log("CARDS OUTSIDE A GATE: " + loose.join(", "));
     process.exitCode = 1;
   }
+  // The Today line and the morning heading are the same for everyone, so they're read before anyone's picked.
+  const today = doc.querySelector("#week-body .today");
+  console.log(today ? today.textContent : "(no today line)");
+  const links = today ? Array.from(today.querySelectorAll("a")).map((a) => a.textContent + " -> " + a.href) : [];
+  if (links.length) console.log("  recipes: " + links.join("; "));
+  console.log("  morning gate: " + doc.getElementById("g-morning-h").textContent);
   for (const p of PEOPLE) {
     doc.getElementById("who-" + p).click();
     const due = Array.from(doc.querySelectorAll(".sop"))
       .filter((c) => !c.hidden && Array.from(c.querySelectorAll(".tag")).some((t) => /^(Today|Tonight|Still to finish)/.test(t.textContent)))
       .map((c) => c.id);
-    if (p === "everyone") {
-      const today = doc.querySelector("#week-body .today");
-      console.log(today ? today.textContent : "(no today line)");
-      const links = today ? Array.from(today.querySelectorAll("a")).map((a) => a.textContent + " -> " + a.href) : [];
-      if (links.length) console.log("  recipes: " + links.join("; "));
-      console.log("  morning gate: " + doc.getElementById("g-morning-h").textContent + (due.length ? "  |  due: " + due.join(", ") : ""));
-      continue;
-    }
     console.log("  " + p.padEnd(7) + gates(doc).join("  |  ") + (due.length ? "\n           due: " + due.join(", ") : ""));
   }
 }

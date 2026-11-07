@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Renders ../index.html at phone width, as everyone and as each person, in light and
-# dark, with every card and the by-day table open, so steps and layout can be checked
-# by eye before a change is pushed. check.js says which cards show; this shows them.
+# Renders ../index.html at phone width, as each person, in light and dark, with every
+# card and the by-day table open, so steps, layout, and each person's theme can be
+# checked by eye before a change is pushed. check.js says which cards show; this shows them.
 #
 # Usage:  python3 tools/phone.py                          (today)
 #         python3 tools/phone.py 2026-10-20 2026-10-25    (specific dates)
@@ -10,11 +10,15 @@
 # Needs Python Playwright with Chromium. The cloud session has both; elsewhere:
 #   pip install playwright && python3 -m playwright install chromium
 # The page is served from a local web server, so it reads recipes.json as it does live.
-# The header, the points bar, the tabs as the page opens them, and each visible section (This week,
-# each moment, its tab opened first, then Scoreboard, Skills, Safety) get their own screenshot,
-# named date-scheme-person-section.png, in a folder outside the repo (printed at the end), so they
-# never get committed. Each line of output names the moment the page opened on for that person.
-# Animations are settled before each shot. Exits non-zero if the page throws, or scrolls sideways.
+# A first visit, before any name is picked, is shot as "nobody": the header and This week.
+# Each person's screens get their own screenshots: the header, the points bar, the bar along
+# the bottom, This week, the tab row as Tasks opens it, each moment with its tab opened first,
+# Skills, Safety, the scoreboard pop-up, and the end-of-day screen from Close the day. They're
+# named date-scheme-person-part.png, in a folder outside the repo (printed at the end), so they
+# never get committed. Each line of output names the moment Tasks opened on for that person.
+# It doesn't tick boxes, so it can't show points or awards being won.
+# Animations are settled before each shot. Exits non-zero if the page throws, scrolls sideways,
+# shows more than This week before a name is picked, or a link to a moment (#g-any) doesn't open it.
 
 import argparse
 import datetime
@@ -28,9 +32,15 @@ import threading
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PEOPLE = ["everyone", "aurora", "eshaal", "leo", "dad"]
+PEOPLE = ["aurora", "eshaal", "leo", "dad"]
 SCHEMES = ["light", "dark"]
 WIDTH, HEIGHT = 390, 844  # a typical phone, in CSS pixels
+# The points bar sticks to the top and the views bar to the bottom, so for every other shot they're
+# moved out of the way, or they'd land on it. Pop-ups are laid out at the top of the page at full
+# height, so a long one is shot whole.
+FLAT = ".hud { position: static !important; } .views { display: none !important; }"
+POPUP = FLAT + (" .modal, .win { position: absolute !important; inset: 0 0 auto 0 !important; min-height: 100vh; place-items: start center !important; }"
+                " .sheet, .win-card { max-height: none !important; }")
 
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
@@ -47,7 +57,7 @@ def listed(value, allowed, what, parser):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Render the House SOPs page at phone width.")
+    parser = argparse.ArgumentParser(description="Render the Routines page at phone width.")
     parser.add_argument("dates", nargs="*", help="dates as YYYY-MM-DD (default: today)")
     parser.add_argument("--who", default=",".join(PEOPLE), help="comma-separated (default: all)")
     parser.add_argument("--scheme", default=",".join(SCHEMES), help="light, dark, or both (default: both)")
@@ -84,28 +94,70 @@ def main():
                     page.on("pageerror", lambda e: errors.append(str(e)))
                     page.clock.set_fixed_time(moment)
                     page.goto(url, wait_until="networkidle")  # lets the recipes fetch finish
+                    # A first visit, before a name is picked: the default look and only This week, as "nobody".
+                    first = []
+                    for name, sel in [("header", "body > header"), ("week", "#v-week")]:
+                        part = page.locator(sel)
+                        if part.count() and part.is_visible():
+                            part.screenshot(path=os.path.join(args.out, "%s-%s-nobody-%s.png" % (d, scheme, name)), animations="disabled", style=FLAT)
+                            first.append(name)
+                    extra = page.evaluate("['#hud', '#views', '#to-tasks', '#v-tasks', '#v-skills'].filter((s) => { const e = document.querySelector(s); return e && !e.hidden; })")
+                    problems = (["shows " + " ".join(extra) + " with no name"] if extra else []) + (["script error: " + "; ".join(errors)] if errors else [])
+                    failed = failed or bool(problems)
+                    print("%s  %-5s  %-8s  %-4s  %s" % (d, scheme, "nobody", ", ".join(problems) or "ok", " ".join(first)))
+                    errors.clear()
                     for person in who:
                         page.click("#who-" + person)
                         page.evaluate("document.querySelectorAll('details').forEach((el) => { el.open = true; })")
                         page.wait_for_timeout(100)
-                        opens = page.evaluate("(document.querySelector('#tabs [aria-selected=\"true\"]') || { id: '' }).id.replace('tab-g-', '')")
-                        sideways = page.evaluate("document.documentElement.scrollWidth > window.innerWidth")
                         shown = []
-                        parts = [("header", page.locator("body > header"), None), ("hud", page.locator("#hud"), None), ("tabs", page.locator("#tabs"), None)]
-                        for s in page.locator("body > section[id]").all():
-                            sid = s.get_attribute("id")
-                            parts.append((sid.replace("g-", "", 1), s, page.locator("#tab-" + sid)))
-                        for name, part, tab in parts:
+                        sideways = []
+
+                        def shoot(name, part, style=FLAT):
+                            if part.count() and part.is_visible():
+                                part.screenshot(path=os.path.join(args.out, "%s-%s-%s-%s.png" % (d, scheme, person, name)),
+                                                animations="disabled", style=style)
+                                shown.append(name)
+
+                        def view(vid):
+                            page.click('#views [data-view="%s"]' % vid)
+                            page.wait_for_timeout(50)
+                            if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"):
+                                sideways.append(vid.replace("v-", "", 1))
+
+                        shoot("header", page.locator("body > header"))
+                        shoot("hud", page.locator("#hud"), "")
+                        shoot("views", page.locator("#views"), "")
+                        view("v-week")
+                        shoot("week", page.locator("#v-week"))
+                        view("v-tasks")
+                        opens = page.evaluate("(document.querySelector('#tabs [aria-selected=\"true\"]') || { id: '' }).id.replace('tab-g-', '')")
+                        shoot("tabs", page.locator("#jump"))
+                        for s in page.locator("#v-tasks > section.gate").all():
                             # A moment's cards only show while its tab is open.
-                            if tab is not None and tab.count() and tab.is_visible():
+                            sid = s.get_attribute("id")
+                            tab = page.locator("#tab-" + sid)
+                            if tab.count() and tab.is_visible():
                                 tab.click()
                                 page.wait_for_timeout(50)
-                            if part.count() and part.is_visible():
-                                # The points bar sticks to the top of the screen, so it's unstuck for the other shots or it lands on them.
-                                part.screenshot(path=os.path.join(args.out, "%s-%s-%s-%s.png" % (d, scheme, person, name)), animations="disabled",
-                                                style="" if name == "hud" else ".hud { position: static !important; }")
-                                shown.append(name)
-                        problems = (["scrolls sideways"] if sideways else []) + (["script error: " + "; ".join(errors)] if errors else [])
+                            shoot(sid.replace("g-", "", 1), s)
+                        view("v-skills")
+                        shoot("skills", page.locator("#skills"))
+                        shoot("safety", page.locator("#safety"))
+                        page.click("#hud")
+                        shoot("score", page.locator("#score .sheet"), POPUP)
+                        page.keyboard.press("Escape")
+                        view("v-tasks")
+                        page.click("#close-day")
+                        shoot("end", page.locator("#win .win-card"), POPUP)
+                        page.keyboard.press("Escape")
+                        view("v-week")
+                        # A link to a moment, as a reminder sends, opens Tasks on it. Any time shows every day.
+                        page.evaluate("location.hash = '#g-any'")
+                        page.wait_for_timeout(100)
+                        linked = page.evaluate("!document.getElementById('v-tasks').hidden && document.getElementById('tab-g-any').getAttribute('aria-selected') === 'true' && !location.hash")
+                        view("v-week")
+                        problems = (["scrolls sideways in " + ", ".join(sideways)] if sideways else []) + ([] if linked else ["a link to #g-any doesn't open it"]) + (["script error: " + "; ".join(errors)] if errors else [])
                         failed = failed or bool(problems)
                         print("%s  %-5s  %-8s  %-4s  opens %-10s %s" % (d, scheme, person, ", ".join(problems) or "ok", opens or "-", " ".join(shown)))
                         errors.clear()
