@@ -16,7 +16,8 @@
 # Skills, Safety, the scoreboard pop-up, and the end-of-day screen from Close the day. They're
 # named date-scheme-person-part.png, in a folder outside the repo (printed at the end), so they
 # never get committed. Each line of output names the moment Tasks opened on for that person.
-# It doesn't tick boxes, so it can't show points or awards being won.
+# It doesn't tick boxes unless asked: with --tick, it ticks every step of the first card Tasks opens
+# on, before the shots, so a card done, progress, and points show too.
 # Animations are settled before each shot. Exits non-zero if the page throws, scrolls sideways,
 # shows more than This week before a name is picked, or a link to a moment (#g-any) doesn't open it.
 
@@ -38,7 +39,7 @@ WIDTH, HEIGHT = 390, 844  # a typical phone, in CSS pixels
 # The points bar sticks to the top and the views bar to the bottom, so for every other shot they're
 # moved out of the way, or they'd land on it. Pop-ups are laid out at the top of the page at full
 # height, so a long one is shot whole.
-FLAT = ".hud { position: static !important; } .views { display: none !important; }"
+FLAT = ".hud { position: static !important; } .views, .toasts { display: none !important; }"
 POPUP = FLAT + (" .modal, .win { position: absolute !important; inset: 0 0 auto 0 !important; min-height: 100vh; place-items: start center !important; }"
                 " .sheet, .win-card { max-height: none !important; }")
 
@@ -62,6 +63,7 @@ def main():
     parser.add_argument("--who", default=",".join(PEOPLE), help="comma-separated (default: all)")
     parser.add_argument("--scheme", default=",".join(SCHEMES), help="light, dark, or both (default: both)")
     parser.add_argument("--out", default=os.path.join(tempfile.gettempdir(), "run-tings-phone"), help="folder for the screenshots")
+    parser.add_argument("--tick", action="store_true", help="tick every step of the first card Tasks opens on")
     args = parser.parse_args()
 
     who = listed(args.who, PEOPLE, "--who", parser)
@@ -125,6 +127,14 @@ def main():
                             if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"):
                                 sideways.append(vid.replace("v-", "", 1))
 
+                        if args.tick:
+                            view("v-tasks")
+                            page.evaluate("""() => {
+                                const sec = document.querySelector('#v-tasks > section.gate:not(.off):not([hidden])');
+                                const card = sec && sec.querySelector('.sop:not([hidden])');
+                                if (card) card.querySelectorAll('ol.steps > li:not([hidden]) input').forEach((b) => { if (!b.checked) b.click(); });
+                            }""")
+                            page.wait_for_timeout(1000)
                         shoot("header", page.locator("body > header"))
                         shoot("hud", page.locator("#hud"), "")
                         shoot("views", page.locator("#views"), "")
