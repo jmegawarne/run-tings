@@ -495,6 +495,9 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 }
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes sweep { to { transform: translateY(150vh); } }
+.bg .log .l { font-weight: 300; }
+.bg .log .m { font-weight: 600; }
+.bg .log .h { font-weight: 800; }
 @keyframes scroll-log { to { transform: translateY(-50%); } }
 
 /* Leo: a world of blocks. Everything square, a pixel face, panels and buttons built as blocks with solid sides,
@@ -2744,19 +2747,33 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     enterGame();
   }
 
-  // The hex dump behind Dad's theme: made-up bytes, the same every time, written twice so it scrolls round seamlessly.
+  // The hex dump behind Dad's theme: made-up bytes from a seeded generator, so the same every time, each byte in a
+  // weight of its own, with famous magic numbers hidden in it in the heaviest weight. Written twice so it scrolls round
+  // seamlessly. Only about the first 12 bytes of a row fit on a phone, so the magic numbers sit there.
   (() => {
     const log = document.createElement("pre");
     log.className = "log";
     log.setAttribute("aria-hidden", "true");
     let seed = 20261107;
-    const byte = () => { seed = (seed * 16807) % 2147483647; return (seed & 255).toString(16).padStart(2, "0"); };
+    const rand = () => (seed = (seed * 16807) % 2147483647);
+    const WEIGHTS = ["l", "l", "", "", "", "m", "m", "h"]; // Light, regular, semibold, heavy.
+    // Row, first byte, bytes: an ELF header to start, then the classics.
+    const MAGIC = [
+      [0, 0, "7f454c4602010100"], [3, 4, "cafebabe"], [6, 0, "deadbeef"], [9, 8, "feedface"],
+      [13, 2, "baadf00d"], [16, 4, "8badf00d"], [20, 0, "badc0ffee0ddf00d"], [24, 4, "deadc0de"],
+      [27, 8, "c0ffee"], [31, 1, "fee1dead"], [35, 5, "cafebabe"], [38, 8, "c00010ff"],
+      [41, 0, "deadbeef"], [44, 3, "1badb002"]
+    ];
+    const cell = ([b, w]) => (w ? '<span class="' + w + '">' + b + "</span>" : b);
     const rows = [];
     for (let i = 0; i < 48; i++) {
-      const b = Array.from({ length: 16 }, byte);
-      rows.push((i * 16).toString(16).padStart(6, "0") + "  " + b.slice(0, 8).join(" ") + "  " + b.slice(8).join(" "));
+      const bytes = Array.from({ length: 16 }, () => [(rand() & 255).toString(16).padStart(2, "0"), WEIGHTS[rand() % WEIGHTS.length]]);
+      MAGIC.filter((m) => m[0] === i).forEach(([, at, hex]) => {
+        hex.match(/../g).forEach((b, k) => { if (at + k < 16) bytes[at + k] = [b, "h"]; });
+      });
+      rows.push((i * 16).toString(16).padStart(6, "0") + "  " + bytes.slice(0, 8).map(cell).join(" ") + "  " + bytes.slice(8).map(cell).join(" "));
     }
-    log.textContent = rows.concat(rows).join("\n");
+    log.innerHTML = rows.concat(rows).join("\n");
     document.querySelector(".bg").appendChild(log);
   })();
 
