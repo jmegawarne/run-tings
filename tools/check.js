@@ -4,6 +4,9 @@
 //
 // Usage:  cd tools && npm install && npm run check            (today and the next 13 days)
 //         cd tools && npm run check -- 2026-12-29 2027-01-01  (specific dates)
+//         cd tools && npm run check -- 2026-11-09T01:30       (a time too: the day turns over at 02:00, not midnight)
+//
+// A date on its own is checked at noon, UK time.
 //
 // The page fetches ../recipes.json; this script hands it the file from disk instead,
 // and prints the recipe links on each date's Today line.
@@ -29,7 +32,11 @@ if (fs.existsSync(recipesFile)) {
 }
 
 function load(dateStr) {
-  const fixed = new Date(dateStr + "T12:00:00").getTime();
+  const fixed = new Date(dateStr.indexOf("T") > -1 ? dateStr : dateStr + "T12:00:00").getTime();
+  if (isNaN(fixed)) {
+    console.log("Not a date, or a date and time: " + dateStr);
+    process.exit(1);
+  }
   const errors = [];
   const dom = new JSDOM(html, {
     runScripts: "dangerously",
