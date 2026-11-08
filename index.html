@@ -617,6 +617,17 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   50% { transform: translate(2px, -1px); box-shadow: -3px 0 0 #b6ff3b, 3px 0 0 #b24dff; }
   75%, 100% { transform: none; box-shadow: var(--lift); }
 }
+/* A beating pixel heart rides the end of each progress bar. */
+:root[data-person="aurora"] .bar { overflow: visible; }
+:root[data-person="aurora"] .bar i { position: relative; }
+:root[data-person="aurora"] .bar i::before, :root[data-person="aurora"] .bar i::after {
+  content: ""; position: absolute; top: 50%; right: 0; transform: translate(50%, -50%);
+  clip-path: polygon(14.29% 0, 42.86% 0, 42.86% 16.67%, 57.14% 16.67%, 57.14% 0, 85.71% 0, 85.71% 16.67%, 100% 16.67%, 100% 50%, 85.71% 50%, 85.71% 66.67%, 71.43% 66.67%, 71.43% 83.33%, 57.14% 83.33%, 57.14% 100%, 42.86% 100%, 42.86% 83.33%, 28.57% 83.33%, 28.57% 66.67%, 14.29% 66.67%, 14.29% 50%, 0 50%, 0 16.67%, 14.29% 16.67%);
+  animation: heartbeat 1.2s steps(1) infinite;
+}
+:root[data-person="aurora"] .bar i::before { width: 19px; height: 16px; background: #000; }
+:root[data-person="aurora"] .bar i::after { width: 14px; height: 12px; background: #ff2e97; }
+@keyframes heartbeat { 50% { transform: translate(50%, -50%) scale(1.25); } }
 /* Falling pixel hearts and sparkles, in steps. */
 :root[data-person="aurora"] .bg i {
   top: -8vh; bottom: auto; width: calc(var(--s) * 0.7); height: calc(var(--s) * 0.6); border: 0; border-radius: 0; background: #ff2e97;
