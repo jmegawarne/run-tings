@@ -24,6 +24,7 @@
   #radio[data-state="on"], #stations .on { color: var(--accent); }
   #picker { position: fixed; inset: 0; }
   #stations { position: absolute; bottom: 88px; display: flex; flex-direction: column; padding: 6px 0;
+    max-height: calc(100% - 96px); overflow-y: auto;   /* a short screen, like a phone on its side, squeezes the list up, then scrolls it */
     border-radius: 10px; background: #2c2c2c; box-shadow: 0 6px 30px #000; }
   #stations button { height: 72px; text-align: left; }
   #stations button::before { content: '✓'; display: inline-block; width: 36px; visibility: hidden; }
@@ -67,6 +68,7 @@
       <button data-streams="https://media-ssl.musicradio.com/SmoothChill https://media-ssl.musicradio.com/SmoothChillMP3">Smooth Chill</button>
       <button data-streams="https://media-ssl.musicradio.com/RadioX00s https://media-ssl.musicradio.com/RadioX00sMP3">Radio X 00s</button>
       <button data-streams="https://media-ssl.musicradio.com/CapitalXTRAReloaded https://media-ssl.musicradio.com/CapitalXTRAReloadedMP3">Capital XTRA Reloaded</button>
+      <button data-streams="https://stream.rcs.revma.com/gnys6kxst8tvv">Fix Radio</button>
       <button id="stop" hidden>Stop radio</button>
     </div>
   </div>
