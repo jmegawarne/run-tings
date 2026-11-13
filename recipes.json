@@ -1,23 +1,4 @@
 {
-  "2026-11-02": [
-    { "dish": "Cajun salmon with crushed potatoes and green beans", "deck": "1MyCHBPNSSif0qM4ujx0QYaB6PjdJPVzWfFObXq99Bys", "doc": "1tOKzU6Rzqr5i3f00DEpd1_e2qPB7JwRd9bJ7EKsnFQY" }
-  ],
-  "2026-11-03": [
-    { "dish": "Keema with peas", "deck": "1MZvGLN_d4K3TyquE0BX9gpQVNhcDZnzXxOkfLJmxMl0", "doc": "1_saAdt2kHG4nrkr_0lECx2wMh0awhJa6hPSMMf--fQI" }
-  ],
-  "2026-11-04": [
-    { "dish": "Prawn egg fried rice", "deck": "1XnyPS5RI_Aq95bo96C1m3wMKGjBbXR1OGO3l1qD5HfU", "doc": "1TpeQJYU-VK4dDP8bW15n-FOVv3ulP6lrTEQ_Joo1wiM" }
-  ],
-  "2026-11-05": [
-    { "dish": "Smoky bean chilli with jacket potatoes", "deck": "1BFjsqrIw9MchGDd2QAxyus1_KXpl1YyNZrCYZeOycdI", "doc": "1C3rU0F8mvhsVuwYWP0YjlHd119fUpfgJWtfKWp9jFqE" }
-  ],
-  "2026-11-07": [
-    { "dish": "Slow-cooker BBQ pulled chicken buns", "deck": "1IhT67p9i2XbITiFmyd70B3hQKUdVejoJ_zBz5ewUXRg", "doc": "15kz6FCu2f-yNLnQpz-S-1E_KCMNr8vplP1_xVPwRpq4" }
-  ],
-  "2026-11-08": [
-    { "dish": "Lamb biryani with mint raita and kachumber", "deck": "1QGX63e2_RA66FgehE2-fmy68k69wGotOKlUgxMghQUQ", "doc": "1Vhw9sIKBeNZSHBWHdSJP21aTU7tXpBpd9UfDCdaLdvU" },
-    { "dish": "Saffron and cardamom bread and butter pudding", "deck": "168SilXyHLw5xcFn7ggLsuSaxqDFIWdHznRQVHgpDUCk", "doc": "1hHTlHv1m6CINN8oaeGE8MwJCq345SxdCOC0v3G39R5Q" }
-  ],
   "2026-11-09": [
     { "dish": "Keema pav", "deck": "1BNRzB_46t4OG-cxZ7tzdvGKy61QtXdKngdqQbbDPvRU", "doc": "1PSSCiGMsk2QGp40wP-fLSSBpYjwnIQHIdMJVjAp82jc", "before": { "morning": "Keema and fish pie out of the freezer and into the fridge, and the sour cream if it's frozen.", "night": "Keema, fish pie, and sour cream in the fridge, not the freezer." } }
   ],
@@ -36,5 +17,24 @@
   "2026-11-15": [
     { "dish": "Sausages with pommes aligot", "deck": "13lCHZ0MY9kP5n7wv1gDKO6RRKzxWviENN_EMoNDgRrw", "doc": "1i1nvXahT28m33P6N7mLtu0LwE3A7kRfaBP4TFT_DOas", "before": { "morning": "Sausages out of the freezer and into the fridge.", "night": "Sausages in the fridge, not the freezer." } },
     { "dish": "French apple tart", "deck": "1t65ouiJ-Bm8u99FtNY5HLYwjA3E0eEl9w3wMfyHU7qE", "doc": "1TkUPwBSjy-U0ueOTFUTKuRIY9uO2_svEylm6xsJ3OPk" }
+  ],
+  "2026-11-16": [
+    { "dish": "Harissa cod with carrots, chickpeas, and lemon couscous", "deck": "15SRckPN773zznaF4PSOy1dSWcvDOiDT77Tfh3j7LPJE", "doc": "1JvwRPIZZxjsEj5RHtcRyfCRY_0BN1sfxeuWk8c5g8W0", "before": { "night": "Chicken thighs, breaded cod, tuna steaks, sweetcorn, and edamame in the freezer. Sea bass in the freezer too if its date is before Tuesday. Leo's Food Tech bag weighed out, with its cold things in the fridge." } }
+  ],
+  "2026-11-17": [
+    { "dish": "Ginger and spring onion sea bass with sesame noodles", "deck": "1IeoDl9GiRgAhEnIS3Jl_41G0ZPmVxXm7lgNUqpdXy-4", "doc": "1B1HDKZMcfR72kwk6Y2svx-QVyDfuHC5n0thzlh3r90A", "before": { "night": "Wednesday's lunches boxed and in the fridge. Sea bass in the fridge, not the freezer." } }
+  ],
+  "2026-11-18": [
+    { "dish": "Fish katsu sandos", "deck": "1jUGce3I1BuvP-gcX0e5ra7-MueHw9yJ94ZkjBEWGTwA", "doc": "1jA2_o0X9E5GLEqW6UprQ1RtIXsrZiNOyPQ_tQN19W54", "before": { "morning": "Butter out of the fridge by 16:00 and the brioche in the breadmaker by 17:00, for tomorrow's sandos.", "night": "Brioche out of the breadmaker and cooling on the wire rack." } }
+  ],
+  "2026-11-19": [
+    { "dish": "Sri Lankan fish curry with rice and green beans", "deck": "1wdubakb5RJvYUljy7VWlzkDv0uXW6pfd643NVC8Xdpo", "doc": "1JFDph0J4afT2gJaUgcFXSDzxY1h9YxBrW3MBGzznOxk", "before": { "night": "Tuna steaks out of the freezer and into the fridge. 80 g of sweetcorn in a bowl in the fridge, for tomorrow's lunches." } }
+  ],
+  "2026-11-21": [
+    { "dish": "Slow-cooker chicken tinga tacos", "deck": "1tYeTb30TmgaHOkLX1VhDDfDf6rSVzwHoXj9QPyvoTCA", "doc": "1PqVqzz6zkNLtL4IMVHdps2VBn1AG7zONaDJEMXemmKE", "before": { "morning": "Chicken thighs out of the freezer and into the fridge.", "night": "Chicken in the fridge, not the freezer, ready for Leo at 12:30. Queso fresco, crema, and tomatillos in the fridge." } }
+  ],
+  "2026-11-22": [
+    { "dish": "Tamales with chicken tinga, and with rajas and queso fresco", "deck": "1S-6alzJCoPerqRN38hZ-F4G8hJc79jTKK4RnL04zR8M", "doc": "1DrCcVr2qtFu2OFRhGPwzrsqNfA6UpZ4VIAOAPiIo8Q8", "before": { "morning": "Little gems, radishes, coriander, a white onion, and double cream bought.", "night": "Half the tinga boxed and in the fridge." } },
+    { "dish": "Tres leches cake", "deck": "1fNvWk23QpSqCRSmLOPw3BQTCqtim87wyke_WaxKMEr4", "doc": "1gIAAy9zFSCpXM2sOP-cqyAn3u2AymAbNrrvpwTICKlc", "before": { "night": "Aurora's tres leches baked, soaked, and in the fridge overnight." } }
   ]
 }
