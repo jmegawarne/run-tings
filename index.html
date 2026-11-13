@@ -378,6 +378,21 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: calc(7px * va
 .toast.up small { color: var(--pts); }
 .toast b { display: block; font: 800 1.05rem/1.15 var(--display); font-synthesis: none; }
 
+/* A bonus card's send-off: the screen blushes, hearts pour up it, and a card lands in the middle. It sits under the
+   award messages and never takes a tap. */
+.love { position: fixed; inset: 0; z-index: 38; display: grid; place-items: center; padding: 16px; overflow: hidden; pointer-events: none; }
+.love::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(255, 46, 120, 0.55), rgba(255, 46, 120, 0.16) 60%, transparent 90%); animation: blush 3.4s ease-out both; }
+.love > i { position: absolute; left: var(--l); bottom: -14vh; font-style: normal; font-size: var(--s); line-height: 1; animation: heart-up var(--d) cubic-bezier(0.3, 0.6, 0.5, 1) var(--w) both; }
+.love-card {
+  position: relative; box-sizing: border-box; width: min(19rem, 100%); text-align: center; padding: 16px 20px 18px; border-radius: calc(24px * var(--rad));
+  background: var(--surface); border: 3px solid var(--award-fill); box-shadow: 0 6px 0 var(--award-lip), 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+  animation: love-card 3.4s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.love-card .i { display: block; font-size: 4.6rem; line-height: 1.15; animation: squeeze 0.6s ease-in-out 0.4s 3; }
+.love-card b { display: block; font: 800 1.9rem/1.1 var(--display); font-synthesis: none; color: var(--award); }
+.love-card strong { display: block; margin: 4px 0 2px; font: 800 3.4rem/1 var(--display); font-synthesis: none; color: var(--pts); font-variant-numeric: tabular-nums; }
+.love-card small { display: block; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
+
 /* End of the day: the results screen, from Close the day or a clean sweep. Built to be compared. */
 .close-day, .win button { font-family: var(--display); font-weight: 800; font-synthesis: none; border: 0; border-radius: calc(16px * var(--rad)); cursor: pointer; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); }
 .close-day { flex: none; display: flex; align-items: center; margin: 0 0 3px; padding: 7px 14px 6px; font-size: 1.05rem; line-height: 1; white-space: nowrap; border-radius: var(--pill); box-shadow: 0 3px 0 var(--pts-lip); }
@@ -427,6 +442,10 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 @keyframes toast { 0% { opacity: 0; transform: translateY(-14px) scale(0.96); } 8% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
 @keyframes land { 0% { opacity: 0; transform: scale(0.7) translateY(20px); } 100% { opacity: 1; transform: none; } }
 @keyframes fall { to { transform: translate(var(--x), 110vh) rotate(var(--r)); } }
+@keyframes blush { 0% { opacity: 0; } 10% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes heart-up { 0% { opacity: 0; transform: scale(0.5); } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), -130vh) rotate(var(--r)) scale(1.15); } }
+@keyframes love-card { 0% { opacity: 0; transform: scale(0.3) rotate(-8deg); } 10% { opacity: 1; transform: scale(1.08) rotate(2deg); } 16% { transform: none; } 88% { opacity: 1; transform: none; } 100% { opacity: 0; transform: scale(0.9) translateY(-20px); } }
+@keyframes squeeze { 50% { transform: scale(1.25, 0.82); } }
 
 /* Background: two glows drifting slowly, and soap bubbles rising behind the cards. */
 .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
@@ -771,8 +790,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
      The moments in a day, in order, one tab each. Each card sits under the moment it's done at.
      With a name picked, only today's cards show (see dueToday in the script).
      data-we moves a card to another gate at the weekend; data-when shows a card
-     only on your laundry day, the evening before collection, collection day, or the
-     evening before you cook. A step with data-who="cook:next" shows to tomorrow's cooks. -->
+     only on your laundry day, the evening before collection, collection day, the
+     evening before you cook, or a day with a cooked meal. A step with data-who="cook:next" shows to tomorrow's cooks. -->
 <section class="gate" id="g-morning" aria-labelledby="g-morning-h">
   <h2 id="g-morning-h" data-weekday="Before you leave the house" data-weekend="When you get up">Morning</h2>
 
@@ -1384,6 +1403,17 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 <section class="gate" id="g-after" aria-labelledby="g-after-h">
   <h2 id="g-after-h">After dinner</h2>
 
+  <details class="sop" id="meal-score" data-who="all" data-period="d" data-when="cooked" data-we="g-meal" data-time="2 min">
+    <summary>Score the meal</summary>
+    <div class="body">
+      <p class="when">Once you've eaten, on any day we cooked. <span id="score-dish"></span></p>
+      <ol class="steps">
+        <li>Today's meal scored.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> your score's in.</p>
+    </div>
+  </details>
+
   <details class="sop" id="bath-daily" data-who="zone:bathrooms" data-rota="today" data-period="d" data-time="10 min">
     <summary>Bathrooms check</summary>
     <div class="body">
@@ -1443,19 +1473,29 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
-  <details class="sop" id="shop" data-who="aurora eshaal dad leo" data-period="w" data-days="5" data-time="1 hour">
+  <details class="sop" id="shop" data-who="aurora eshaal dad leo" data-period="w" data-days="5" data-time="45 min">
     <summary>Weekly shop</summary>
     <div class="body">
-      <p class="when">Friday. Aurora, Eshaal, and Dad.</p>
+      <p class="when">Friday: the order. Aurora, Eshaal, and Dad. It arrives on Sunday night.</p>
       <ol class="steps">
         <li data-who="aurora eshaal dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
         <li data-who="aurora eshaal dad">Next week's dinner ingredients added.</li>
-        <li>Leo, with Aurora: tomorrow's slow-cooker ingredients added.</li>
+        <li>Leo, with Aurora: next Saturday's slow-cooker ingredients added.</li>
         <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
         <li data-who="aurora eshaal dad">Dad: order approved and paid.</li>
-        <li data-who="aurora eshaal dad">Shopping put away, fridge and freezer things first and new behind old.</li>
       </ol>
-      <p class="dw"><b>Done when:</b> staples, next week's dinners, tomorrow's slow-cooker dinner, and any food tech ingredients covered, and everything put away.</p>
+      <p class="dw"><b>Done when:</b> staples, next week's dinners, next Saturday's slow-cooker dinner, and any food tech ingredients on the order, and the order paid for.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="shop-away" data-who="aurora eshaal dad" data-period="w" data-days="0" data-time="20 min">
+    <summary>Shopping away</summary>
+    <div class="body">
+      <p class="when">Sunday night, when Friday's shop arrives.</p>
+      <ol class="steps">
+        <li>Shopping put away, fridge and freezer things first and new behind old.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> everything put away, and nothing cold left out.</p>
     </div>
   </details>
 
@@ -1501,6 +1541,17 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       </ol>
       <p class="note" data-who="leo">Leo: the latest Dad's Days as a bedtime read, if you want one.</p>
       <p class="dw"><b>Done when:</b> nothing of yours left downstairs, no dishes upstairs, and you've showered.</p>
+    </div>
+  </details>
+
+  <!-- A bonus card: see BONUS in the script. It pays extra and sets off the hearts, and the day never waits on it. -->
+  <details class="sop" id="cuddle" data-who="aurora leo" data-period="d" data-time="1 min">
+    <summary>Dad's cuddle</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Dad given a big cuddle and a kiss goodnight.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> the old man's been properly squeezed.</p>
     </div>
   </details>
 
@@ -1656,6 +1707,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
      before they arrive. -->
 
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="love" id="love" hidden aria-hidden="true"></div>
 <div class="win" id="win" hidden role="dialog" aria-modal="true" aria-labelledby="win-h">
   <div class="confetti" id="confetti" aria-hidden="true"></div>
   <div class="win-card">
@@ -1708,7 +1760,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     { cooks: ["Leo"], label: "Leo's slow-cooker dinner", short: "Leo's slow cooker" }
   ];
   const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
-  const ALSO = ["", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
+  const ALSO = ["Shopping arrives", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
   // The week's recipes live in recipes.json beside this page, not here, so the menu never needs an edit to this file.
   /* ---------- End of settings ---------- */
 
@@ -1718,6 +1770,9 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   // Handicaps, from age and ability: every point a person wins is multiplied by theirs, so nobody is out-scored
   // for being younger or newer to a job. Dad's call; they come down as people grow up and get better.
   const HANDICAP = { Aurora: 1.2, Eshaal: 1.2, Leo: 1.6, Dad: 1 };
+  // Bonus cards, by card id. One pays its pts here, not its time, and ticking it sets off the big send-off with these words.
+  // A bonus is extra: it's never needed for a cleared moment, a clean sweep, or a streak.
+  const BONUS = { cuddle: { pts: 300, icon: "🤗", title: "Dad's cuddle!", line: "Best bit of Dad's day." } };
   const LEVEL_AT = (l) => 500 * (l - 1) * l; // Total points to reach level l: 1,000 for level 2, 3,000 for 3, 6,000 for 4.
   const TITLES = ["Sock Rookie", "Crumb Cadet", "Dish Apprentice", "Hoover Hopeful", "Squeegee Squire", "Laundry Ranger",
     "Grime Fighter", "Dust Ninja", "Mop Mage", "Tidy Knight", "Spotless Sorcerer", "Order Overlord", "Kitchen Commander",
@@ -1750,6 +1805,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     { card: "laundry", icon: "🌀", name: "Spin Doctor", desc: "A whole load, from pockets to put away." },
     { card: "household-wash", icon: "🧺", name: "Towel Power", desc: "Clean towels back where they live." },
     { card: "dinner", icon: "🍝", name: "Plate Expectations", desc: "Dinner on the table at 7pm, kitchen clear." },
+    { card: "meal-score", icon: "⭐", name: "Tough Crowd", desc: "Meal scored. Be kind to the chef." },
     { card: "weekend-cleanup", icon: "🧽", name: "Sink or Swim", desc: "Kitchen back to clear after the big meal." },
     { card: "floors-daily", icon: "🍞", name: "Crumb Crusher", desc: "Not a crumb left standing." },
     { card: "bath-daily", icon: "🧻", name: "Loo-tenant", desc: "Both bathrooms checked and stocked." },
@@ -1758,9 +1814,11 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     { card: "bins-in", icon: "↩️", name: "Kerb Your Enthusiasm", desc: "Bin back in. No bin left behind." },
     { card: "dinner-plan", icon: "📋", name: "Menu Mastermind", desc: "Dinners planned and on the list." },
     { card: "shop", icon: "🛒", name: "Trolley Dash", desc: "Friday's shop, sorted." },
+    { card: "shop-away", icon: "🥫", name: "Shelf Respect", desc: "Shopping away, new behind old." },
     { card: "night-before", icon: "🧊", name: "Thaw Patrol", desc: "Tomorrow's meal sorted the night before." },
     { card: "supplements", icon: "💊", name: "Box Clever", desc: "Dad's supplements sorted for the week." },
     { card: "evening", icon: "🌙", name: "Night Shift", desc: "Nothing left downstairs, phone on charge." },
+    { card: "cuddle", icon: "🤗", name: "Embrace Yourself", desc: "Dad cuddled and kissed goodnight. He's chuffed." },
     { card: "shower", icon: "🚿", name: "Squeegee Supreme", desc: "Shower left gleaming." },
     { card: "shirts", icon: "👔", name: "Crease Lightning", desc: "A week of shirts, ironed and hung." },
     { card: "dusting-weekly", icon: "🐰", name: "Dust Bunny Hunter", desc: "No dust bunny survived." },
@@ -1814,6 +1872,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       .filter((r) => r && r.dish && (DRIVE_ID.test(r.deck || "") || DRIVE_ID.test(r.doc || "")))
       .map((r) => '<a href="https://docs.google.com/' + (DRIVE_ID.test(r.deck || "") ? "presentation/d/" + r.deck : "document/d/" + r.doc) + '/edit">' + esc(r.dish) + "</a>");
   };
+  const dishesOn = (t) => { const list = recipes[ymd(t)]; return (Array.isArray(list) ? list : []).filter((r) => r && r.dish).map((r) => r.dish); };
   const aheadOf = (t, when) => {
     const list = recipes[ymd(t)];
     return (Array.isArray(list) ? list : [])
@@ -1942,7 +2001,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     const m = /(\d+(?:\.\d+)?)\s*(min|hour)/.exec(card.getAttribute("data-time") || "");
     return m ? +m[1] * (m[2] === "hour" ? 60 : 1) : 10;
   };
-  const cardPts = (card) => minutesOf(card) * PTS_PER_MIN;
+  const isBonus = (card) => Object.prototype.hasOwnProperty.call(BONUS, card.id);
+  const cardPts = (card) => (isBonus(card) ? BONUS[card.id].pts : minutesOf(card) * PTS_PER_MIN);
   const hc = (p) => HANDICAP[p] || 1;
   const hcText = (p) => "×" + hc(p).toFixed(1);
   // What a card pays the picked person: its points times their handicap.
@@ -2023,6 +2083,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       if (dow === 5) out.push("Today");
     } else if (id === "shop") {
       if (dow === 5) out.push("Today");
+    } else if (id === "shop-away") {
+      if (dow === 0) out.push("Tonight");
     } else if (id === "supplements") {
       if ((card.getAttribute("data-days") || "").split(" ").indexOf(String(dow)) > -1) out.push("Tonight");
     } else if (per === "w" && isSat && card.hasAttribute("data-sat")) {
@@ -2035,6 +2097,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       out.push("Still to finish");
     }
     if (q && +q === quarter) out.push("This quarter");
+    if (isBonus(card)) out.push("Bonus");
     if (id === "bath-weekly" && firstSat) out.push("Dad does this today");
     else if (zones.length && !person) out.push(and(crewOf(zones.map((z) => ownerOf(z.slice(5), cardWeek(card), cardKind(card))))));
     return out;
@@ -2065,6 +2128,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       out.push(["Friday", "plan dinners" + (mates.length ? " with " + and(mates) : "") + ", then the shop with Dad"]);
     }
     if (p === "Dad") out.push(["Friday", "the shop with " + and(shoppers)]);
+    if (shoppers.indexOf(p) > -1 || p === "Dad") out.push(["Sunday night", "the shopping arrives, and gets put away"]);
     if (p === "Leo") out.push(["Friday", "slow-cooker and food tech shopping, with Aurora"]);
     const ld = LAUNDRY.indexOf(p);
     if (ld > -1) out.push(["Laundry", DAYS[ld]]);
@@ -2108,7 +2172,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     if (quarterSat) bits.push("Saturday reset from 9:00, then the quarterly session, about 2½ hours more with everyone.");
     else if (firstSat) bits.push("Saturday reset from 9:00, then the monthly lists. Dad does the weekly bathroom clean.");
     else if (isSat) bits.push("Saturday reset from 9:00, done by midday.");
-    if (dow === 5) bits.push("The meal plan goes on the fridge, and " + and(crew("Aurora").concat(["Dad"])) + " do the shop.");
+    if (dow === 5) bits.push("The meal plan goes on the fridge, and " + and(crew("Aurora").concat(["Dad"])) + " do the shop. It arrives on Sunday night.");
+    if (dow === 0) bits.push("The shopping arrives tonight: " + and(crew("Aurora").concat(["Dad"])) + " put it away.");
     const c = collectedOn(today);
     if (c) bits.push("Bin day: the " + c + " comes back in (" + and(crew(ownerOf("living", week, "weekday"))) + ").");
     const b = binsEve(today);
@@ -2143,6 +2208,9 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     });
     const links = cooksOn(t).length ? recipeLinks(t) : [];
     document.getElementById("eve-dish").innerHTML = links.length ? "Tomorrow: " + and(links) + "." : "";
+    // Today's dishes on the card for scoring them, as plain names.
+    const dishes = cooksOn(today).length ? dishesOn(today) : [];
+    document.getElementById("score-dish").textContent = dishes.length ? "Today: " + and(dishes) + "." : "";
   };
 
   /* ---------- Skills ---------- */
@@ -2249,8 +2317,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     return n;
   };
 
-  // The day's cards: everything showing with steps to tick, apart from week-long lists like Dad's.
-  const dayCards = () => cards.filter((c) => !c.hidden && stepBoxes(c).length > 0 &&
+  // The day's cards: everything showing with steps to tick, apart from bonus cards and week-long lists like Dad's.
+  const dayCards = () => cards.filter((c) => !c.hidden && stepBoxes(c).length > 0 && !isBonus(c) &&
     !(c.getAttribute("data-period") === "w" && !c.hasAttribute("data-days") && !c.hasAttribute("data-when")));
   const sweep = () => { const dc = dayCards(); return { all: dc.length, done: dc.filter(allTicked).length }; };
   // The share of the day's points on offer that you've won, so a light day and a heavy day both top out at 100.
@@ -2427,9 +2495,30 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 950);
   };
   const replay = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
+  // A bonus card's send-off: hearts up the whole screen, its words and points on a card in the middle, and a buzz
+  // where the phone can. With less motion asked for, it's the card alone, held still.
+  const loveEl = document.getElementById("love");
+  const HEARTS = ["❤️", "💖", "💛", "🧡", "💜", "💙", "💚", "💖", "❤️", "😘"];
+  let loveTimer = 0;
+  const sendOff = (b, pts) => {
+    let h = "";
+    if (motion) {
+      for (let i = 0; i < 54; i++) {
+        h += '<i style="--l:' + (Math.random() * 96 - 2).toFixed(1) + "%;--s:" + (1.3 + Math.random() * 2.4).toFixed(2) +
+          "rem;--d:" + (1.7 + Math.random() * 1.3).toFixed(2) + "s;--w:" + (Math.random() * 1.3).toFixed(2) +
+          "s;--x:" + Math.round(Math.random() * 120 - 60) + "px;--r:" + Math.round(Math.random() * 80 - 40) + 'deg">' + HEARTS[i % HEARTS.length] + "</i>";
+      }
+    }
+    h += '<div class="love-card"><span class="i">' + esc(b.icon) + "</span><b>" + esc(b.title) + "</b>" + (pts ? "<strong>+" + fmt(pts) + "</strong>" : "") + "<small>" + esc(b.line) + "</small></div>";
+    loveEl.innerHTML = h;
+    loveEl.hidden = false;
+    clearTimeout(loveTimer);
+    loveTimer = setTimeout(() => { loveEl.hidden = true; loveEl.innerHTML = ""; }, motion ? 4400 : 3000);
+    try { if (motion && navigator.vibrate) navigator.vibrate([40, 60, 40, 60, 160]); } catch (e) { /* no buzz */ }
+  };
   const gateStates = (live) => {
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => {
-      const cs = Array.from(sec.querySelectorAll(".sop")).filter((c) => !c.hidden && stepBoxes(c).length > 0);
+      const cs = Array.from(sec.querySelectorAll(".sop")).filter((c) => !c.hidden && stepBoxes(c).length > 0 && !isBonus(c));
       const was = sec.classList.contains("cleared");
       const now = cs.length > 0 && cs.every(allTicked);
       sec.classList.toggle("cleared", now);
@@ -2576,10 +2665,15 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     const fresh = checkAwards(g, ev);
     saveGame(who, g);
     renderGame(g);
-    if (step) pop(box.parentNode, "+" + fmt(step));
-    if (bonus) {
-      if (motion) replay(card, "flash", 950);
-      pop(card.querySelector("summary"), "Cleared +" + fmt(bonus), "big");
+    if (isBonus(card)) {
+      // A bonus card says it all at once, and every time it's ticked.
+      if (box.checked && allTicked(card)) { if (motion) replay(card, "flash", 950); sendOff(BONUS[card.id], step + bonus); }
+    } else {
+      if (step) pop(box.parentNode, "+" + fmt(step));
+      if (bonus) {
+        if (motion) replay(card, "flash", 950);
+        pop(card.querySelector("summary"), "Cleared +" + fmt(bonus), "big");
+      }
     }
     const l = levelOf(g.total);
     if (l > was) toast("⭐", "Level up", "Level " + l + ": " + titleOf(l), "up");
@@ -2653,7 +2747,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     });
     const open = tabs.filter((a) => !a.hidden).map(panelOf);
     if (!open.length) return;
-    const left = open.find((p) => Array.from(p.querySelectorAll(".sop")).some((c) => !c.hidden && stepBoxes(c).length > 0 && !allTicked(c)));
+    const left = open.find((p) => Array.from(p.querySelectorAll(".sop")).some((c) => !c.hidden && stepBoxes(c).length > 0 && !isBonus(c) && !allTicked(c)));
     openTab((left || open[0]).id);
   };
   // A link to one of today's moments opens Tasks on it and brings the tabs into view, whether it loads the page or not.
@@ -2724,6 +2818,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     if (on === "bins-eve") return !!binsEve(today);
     if (on === "bins-day") return !!collectedOn(today);
     if (on === "cook-eve") return cooksOn(today + DAY).indexOf(who) > -1;
+    if (on === "cooked") return MEALS[dow].cooks.length > 0;
     if (p === "m" || p === "q") return listDue(card);
     return true;
   };
