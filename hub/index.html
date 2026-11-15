@@ -22,7 +22,11 @@
   #radio { flex: none; }
   #radio[data-state="connecting"], #radio[data-state="unavailable"] { color: var(--dim); }
   #radio[data-state="on"], #stations .on { color: var(--accent); }
-  #picker { position: fixed; inset: 0; }
+  /* What the station's playing, tucked in after its name. It starts from no width and grows into whatever
+     room the rest of the bar leaves, up to its own length, so it's the first thing cut and squeezes nothing. */
+  #playing { align-self: center; flex: 1 1 0; min-width: 0; max-width: max-content; margin: 0 12px 0 -14px;
+    color: var(--dim); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #picker { position: fixed; inset: 0; z-index: 4; }   /* above the ?debug list, which sits where the stations open */
   #stations { position: absolute; bottom: 88px; display: flex; flex-direction: column; padding: 6px 0;
     max-height: calc(100% - 96px); overflow-y: auto;   /* a short screen, like a phone on its side, squeezes the list up, then scrolls it */
     border-radius: 10px; background: #2c2c2c; box-shadow: 0 6px 30px #000; }
@@ -41,12 +45,13 @@
     background: var(--accent); color: #fff; font: inherit; font-size: 20px; font-weight: 700; box-shadow: 0 4px 18px #000; }
   #send:disabled { opacity: 0.85; }
   #log { position: fixed; left: 8px; right: 8px; bottom: 90px; z-index: 3; max-height: 40vh; overflow: auto; margin: 0;
-    padding: 8px; background: #000d; color: #fff; font: 12px/1.35 monospace; white-space: pre-wrap; }
+    padding: 8px; background: #000d; color: #fff; font: 12px/1.35 monospace; white-space: pre-wrap;
+    pointer-events: none; }   /* taps go through it to the slide */
   .can-send #days { padding-top: 84px; scroll-padding-top: 76px; }
-  @media (max-width: 600px) {   /* a phone: the bar's buttons on one line, without the slide count */
+  @media (max-width: 600px) {   /* a phone: the bar's buttons on one line, without the slide count or what's playing */
     #bar { height: 64px; }
     #bar button { font-size: 18px; padding: 0 14px; white-space: nowrap; }
-    #where { display: none; }
+    #where, #playing { display: none; }
     #stations { bottom: 72px; }
   }
   [hidden] { display: none !important; }
@@ -59,15 +64,18 @@
     <button id="back" aria-label="Previous slide">&lsaquo; Back</button>
     <button id="list" aria-label="Choose a day">Days</button>
     <button id="radio" data-state="off">♪ Radio</button>
+    <span id="playing" hidden></span>
     <span id="where"></span>
     <button id="next" aria-label="Next slide">Next &rsaquo;</button>
   </div>
   <div id="picker" hidden>
     <div id="stations">
-      <!-- Each station's streams, tried in turn until one plays: AAC first, as that's what plays on the Hub. -->
-      <button data-streams="https://media-ssl.musicradio.com/SmoothChill https://media-ssl.musicradio.com/SmoothChillMP3">Smooth Chill</button>
-      <button data-streams="https://media-ssl.musicradio.com/RadioX00s https://media-ssl.musicradio.com/RadioX00sMP3">Radio X 00s</button>
-      <button data-streams="https://media-ssl.musicradio.com/CapitalXTRAReloaded https://media-ssl.musicradio.com/CapitalXTRAReloadedMP3">Capital XTRA Reloaded</button>
+      <!-- Each station's streams, tried in turn until one plays: AAC first, as that's what plays on the Hub.
+           data-titles marks a station whose stream gives its titles to this page (15 Nov 2026: Global's do;
+           Fix Radio's refuses the header that asks for them, and no other source for them turned up). -->
+      <button data-titles data-streams="https://media-ssl.musicradio.com/SmoothChill https://media-ssl.musicradio.com/SmoothChillMP3">Smooth Chill</button>
+      <button data-titles data-streams="https://media-ssl.musicradio.com/RadioX00s https://media-ssl.musicradio.com/RadioX00sMP3">Radio X 00s</button>
+      <button data-titles data-streams="https://media-ssl.musicradio.com/CapitalXTRAReloaded https://media-ssl.musicradio.com/CapitalXTRAReloadedMP3">Capital XTRA Reloaded</button>
       <button data-streams="https://stream.rcs.revma.com/gnys6kxst8tvv">Fix Radio</button>
       <button id="stop" hidden>Stop radio</button>
     </div>
@@ -234,6 +242,75 @@ function showRadio(state) {
                         unavailable: name + ' unavailable' }[state];
   for (const s of stations) s.classList.toggle('on', s === station && radioBusy());
   $('stop').hidden = !radioBusy();
+  showTitles();
+}
+
+// What's playing, after the station's name. A station's stream carries its titles (ICY metadata) to
+// anyone who asks with an Icy-MetaData header: every icy-metaint bytes of sound comes one byte giving
+// a length in 16s, then that much text, like StreamTitle='Artist - Title';StreamUrl='...';. The
+// <audio> element can't ask, so while a station is on, a second connection reads as far as the first
+// of those, about 8 KB, and hangs up; then again every 20 seconds. Nothing here touches the <audio>
+// element, and a read that fails only leaves the bar without a title.
+const playing = $('playing'), narrow = matchMedia('(max-width: 600px)');
+const TITLE_EVERY = 20000, TITLE_WAIT = 8000, TITLE_TRIES = 3;
+let titleRead = null, titleTimer = 0;   // the read under way, if any, and the wait for the next one
+function showTitle(text) {
+  playing.textContent = text;
+  playing.hidden = !text;
+}
+function showTitles() {   // on every change in the radio: drop the title, and read afresh if a station's on
+  clearTimeout(titleTimer);
+  if (titleRead) titleRead.abort();
+  titleRead = null;
+  showTitle('');
+  if (radioState === 'on' && 'titles' in station.dataset) readTitle(station, 0);
+}
+function titleIn(bytes) {   // the title in a block of metadata, or '' if it has none
+  let text;
+  try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
+  catch (e) { text = new TextDecoder('windows-1252').decode(bytes); }   // older encoders send Latin-1
+  // A title can hold apostrophes, so it ends at the '; before the next field, or before the padding
+  const m = /StreamTitle='([\s\S]*?)';(?:\w+=|\0*$)/.exec(text);
+  return m ? m[1].trim() : '';
+}
+async function readTitle(s, fails) {
+  const next = (f) => { titleTimer = setTimeout(() => readTitle(s, f), TITLE_EVERY); };
+  if (narrow.matches) return next(fails);   // a phone's bar doesn't show it, so don't fetch it
+  const read = titleRead = new AbortController(), began = performance.now();
+  const wait = setTimeout(() => read.abort(), TITLE_WAIT);
+  let title = '', got = 0, failed = null;
+  try {
+    const res = await fetch(stream.currentSrc || s.dataset.streams.split(' ')[0],
+      { headers: { 'Icy-MetaData': '1' }, cache: 'no-store', signal: read.signal });
+    const every = Number(res.headers.get('icy-metaint'));
+    if (!res.ok || !every) throw new Error('HTTP ' + res.status + ', icy-metaint ' + res.headers.get('icy-metaint'));
+    const body = res.body.getReader();
+    let bytes = new Uint8Array(0), end = every + 1;
+    while (bytes.length < end) {
+      const { done, value } = await body.read();
+      if (done) throw new Error('the stream ended after ' + bytes.length + ' bytes');
+      const more = new Uint8Array(bytes.length + value.length);
+      more.set(bytes);
+      more.set(value, bytes.length);
+      bytes = more;
+      if (bytes.length > every) end = every + 1 + bytes[every] * 16;
+    }
+    got = bytes.length;
+    title = titleIn(bytes.subarray(every + 1, end));
+  } catch (e) {
+    failed = read.signal.aborted ? 'nothing in ' + TITLE_WAIT / 1000 + ' s' : String(e && e.message || e);
+  } finally {
+    clearTimeout(wait);
+  }
+  if (titleRead !== read) return;   // the radio changed while this was reading, so it's not wanted
+  read.abort();   // hang up: one title is all this connection is for
+  fails = failed ? fails + 1 : 0;
+  showTitle(title);
+  const took = ', ' + Math.round(performance.now() - began) + ' ms';
+  if (!failed) note('now playing, ' + s.textContent + ': ' + (title ? '“' + title + '”' : 'no title') + ', ' + got + ' bytes' + took);
+  else note('now playing, ' + s.textContent + ': no read (' + failed + ')' + took +
+    (fails < TITLE_TRIES ? '' : '; ' + fails + ' in a row, so no more tries until a station is picked'));
+  if (fails < TITLE_TRIES) next(fails);
 }
 function tune(s) {
   clearTimeout(radioTimer);
@@ -306,14 +383,19 @@ function showSend(text, ms) {
   send.disabled = /…$/.test(text || '');      // no second tap while one is under way
   if (text && ms) sendTimer = setTimeout(() => showSend(''), ms);
 }
-function note(text) {   // with ?debug in the link, the phone lists what each step of a send did
+// With ?debug in the link, the page lists what each step of a send did, and each read of what's playing.
+function note(text) {
   if (!params.has('debug')) return;
   const log = $('log') || document.body.appendChild(Object.assign(document.createElement('pre'), { id: 'log' }));
   log.textContent += (performance.now() / 1000).toFixed(1) + 's  ' + text + '\n';
+  log.scrollTop = log.scrollHeight;   // the newest line stays in view
 }
-function hubLink() {   // this page as the Hub should open it: today, unless the link names a day or dish
+// This page as the Hub should open it: today, unless the link names a day or dish. ?debug goes too,
+// so a page sent from a phone with it shows its own list on the Hub.
+function hubLink() {
   const u = new URL('.', location.href);
   for (const k of ['date', 'deck']) if (params.get(k)) u.searchParams.set(k, params.get(k));
+  if (params.has('debug')) u.searchParams.set('debug', '');
   return u.href;
 }
 function namespaces(session) {   // what the app on the Hub has said it listens on
