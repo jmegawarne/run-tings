@@ -22,10 +22,17 @@
   #radio { flex: none; }
   #radio[data-state="connecting"], #radio[data-state="unavailable"] { color: var(--dim); }
   #radio[data-state="on"], #stations .on { color: var(--accent); }
-  /* What the station's playing, tucked in after its name. It starts from no width and grows into whatever
-     room the rest of the bar leaves, up to its own length, so it's the first thing cut and squeezes nothing. */
-  #playing { align-self: center; flex: 1 1 0; min-width: 0; max-width: max-content; margin: 0 12px 0 -14px;
-    color: var(--dim); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* What the station's playing, tucked in after its name: a fixed length, and a title too long for it scrolls
+     round (or is cut with an ellipsis, for anyone who's asked their device for less motion). */
+  #playing { align-self: center; flex: none; width: 240px; margin: 0 12px 0 -14px; color: var(--dim);
+    font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #playing.scroll { text-overflow: clip; }
+  #playing.scroll span { display: inline-block; }
+  #playing.scroll span::after { content: attr(data-text); padding-left: 48px; }   /* the title again, coming round */
+  /* Where the bar has room for it, the buttons keep their width and only the slide count and dish give way.
+     On anything narrower it's left out, and the bar is as it was. */
+  @media (min-width: 1000px) { #bar button { flex: none; } }
+  @media (max-width: 999px) { #playing { display: none; } }
   #picker { position: fixed; inset: 0; z-index: 4; }   /* above the ?debug list, which sits where the stations open */
   #stations { position: absolute; bottom: 88px; display: flex; flex-direction: column; padding: 6px 0;
     max-height: calc(100% - 96px); overflow-y: auto;   /* a short screen, like a phone on its side, squeezes the list up, then scrolls it */
@@ -48,10 +55,10 @@
     padding: 8px; background: #000d; color: #fff; font: 12px/1.35 monospace; white-space: pre-wrap;
     pointer-events: none; }   /* taps go through it to the slide */
   .can-send #days { padding-top: 84px; scroll-padding-top: 76px; }
-  @media (max-width: 600px) {   /* a phone: the bar's buttons on one line, without the slide count or what's playing */
+  @media (max-width: 600px) {   /* a phone: the bar's buttons on one line, without the slide count */
     #bar { height: 64px; }
     #bar button { font-size: 18px; padding: 0 14px; white-space: nowrap; }
-    #where, #playing { display: none; }
+    #where { display: none; }
     #stations { bottom: 72px; }
   }
   [hidden] { display: none !important; }
@@ -64,7 +71,7 @@
     <button id="back" aria-label="Previous slide">&lsaquo; Back</button>
     <button id="list" aria-label="Choose a day">Days</button>
     <button id="radio" data-state="off">♪ Radio</button>
-    <span id="playing" hidden></span>
+    <span id="playing" hidden><span></span></span>
     <span id="where"></span>
     <button id="next" aria-label="Next slide">Next &rsaquo;</button>
   </div>
@@ -251,12 +258,27 @@ function showRadio(state) {
 // <audio> element can't ask, so while a station is on, a second connection reads as far as the first
 // of those, about 8 KB, and hangs up; then again every 20 seconds. Nothing here touches the <audio>
 // element, and a read that fails only leaves the bar without a title.
-const playing = $('playing'), narrow = matchMedia('(max-width: 600px)');
+const playing = $('playing'), titleText = playing.firstElementChild;
+const narrow = matchMedia('(max-width: 999px)'), still = matchMedia('(prefers-reduced-motion: reduce)');
 const TITLE_EVERY = 20000, TITLE_WAIT = 8000, TITLE_TRIES = 3;
+const TITLE_GAP = 48, TITLE_SPEED = 40, TITLE_HOLD = 2000;   // px between the title and its repeat; px a second; ms held at the start
 let titleRead = null, titleTimer = 0;   // the read under way, if any, and the wait for the next one
+let titleScroll = null;                 // the scrolling of a title too long for its box
 function showTitle(text) {
-  playing.textContent = text;
+  if (text === titleText.textContent && playing.hidden === !text) return;   // the same title: leave its scrolling be
+  if (titleScroll) titleScroll.cancel();
+  titleScroll = null;
+  playing.classList.remove('scroll');
+  titleText.textContent = text;
   playing.hidden = !text;
+  const width = titleText.getBoundingClientRect().width;   // nothing, where the bar leaves the title out
+  if (width <= playing.clientWidth || still.matches) return;
+  // Too long: it holds a moment, then runs left until its repeat, a gap behind it, sits where it began; and again.
+  const far = width + TITLE_GAP, ms = far / TITLE_SPEED * 1000;
+  titleText.dataset.text = text;   // the repeat, drawn by the style sheet
+  playing.classList.add('scroll');
+  titleScroll = titleText.animate([{ transform: 'none' }, { transform: 'none', offset: TITLE_HOLD / (TITLE_HOLD + ms) },
+    { transform: 'translateX(-' + far + 'px)' }], { duration: TITLE_HOLD + ms, iterations: Infinity });
 }
 function showTitles() {   // on every change in the radio: drop the title, and read afresh if a station's on
   clearTimeout(titleTimer);
@@ -275,7 +297,7 @@ function titleIn(bytes) {   // the title in a block of metadata, or '' if it has
 }
 async function readTitle(s, fails) {
   const next = (f) => { titleTimer = setTimeout(() => readTitle(s, f), TITLE_EVERY); };
-  if (narrow.matches) return next(fails);   // a phone's bar doesn't show it, so don't fetch it
+  if (narrow.matches) return next(fails);   // a bar this short doesn't show it, so don't fetch it
   const read = titleRead = new AbortController(), began = performance.now();
   const wait = setTimeout(() => read.abort(), TITLE_WAIT);
   let title = '', got = 0, failed = null;
