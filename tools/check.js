@@ -8,10 +8,10 @@
 //
 // A date on its own is checked at noon, UK time.
 //
-// The page fetches ../recipes.json; this script hands it the file from disk instead,
-// and prints the recipe links on each date's Today line.
+// The page fetches ../recipes.json and ../lunches.json; this script hands it the files from disk
+// instead, and prints the recipe links on each date's Today line, which also carries the lunch.
 // Exits non-zero if the page's script throws on any date, a card sits outside a gate,
-// or recipes.json isn't valid JSON.
+// or recipes.json or lunches.json isn't valid JSON.
 
 const fs = require("fs");
 const path = require("path");
@@ -20,13 +20,15 @@ const { JSDOM } = require("jsdom");
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const PEOPLE = ["aurora", "eshaal", "leo", "dad"];
 
-const recipesFile = path.join(__dirname, "..", "recipes.json");
-let recipes = null;
-if (fs.existsSync(recipesFile)) {
+// The files the page fetches, by name. One that's missing is served as a failed fetch, as it would be live.
+const served = {};
+for (const name of ["recipes.json", "lunches.json"]) {
+  const file = path.join(__dirname, "..", name);
+  if (!fs.existsSync(file)) continue;
   try {
-    recipes = JSON.parse(fs.readFileSync(recipesFile, "utf8"));
+    served[name] = JSON.parse(fs.readFileSync(file, "utf8"));
   } catch (e) {
-    console.log("recipes.json is not valid JSON: " + e.message);
+    console.log(name + " is not valid JSON: " + e.message);
     process.exit(1);
   }
 }
@@ -48,9 +50,12 @@ function load(dateStr) {
         static now() { return fixed; }
       }
       w.Date = Fixed;
-      w.fetch = () => Promise.resolve(recipes
-        ? { ok: true, json: () => Promise.resolve(recipes) }
-        : { ok: false, json: () => Promise.resolve(null) });
+      w.fetch = (url) => {
+        const data = served[String(url).split("?")[0].split("/").pop()];
+        return Promise.resolve(data
+          ? { ok: true, json: () => Promise.resolve(data) }
+          : { ok: false, json: () => Promise.resolve(null) });
+      };
       w.addEventListener("error", (e) => errors.push(e.message));
     },
   });
@@ -66,7 +71,7 @@ function gates(doc) {
 
 async function report(dateStr) {
   const { doc, errors } = load(dateStr);
-  await new Promise((r) => setTimeout(r, 0)); // let the page's recipes fetch settle
+  await new Promise((r) => setTimeout(r, 0)); // let the page's recipes and lunches fetches settle
   console.log("\n=== " + dateStr + " ===");
   if (errors.length) {
     console.log("SCRIPT ERRORS: " + errors.join("; "));
