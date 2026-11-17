@@ -2,7 +2,6 @@ Copyright (c) 2011 Juan Montoreano (juan@remolacha.biz), with Reserved Font Name
 Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
 Copyright 2021 The Pixelify Sans Project Authors (https://github.com/eifetx/Pixelify-Sans)
 Copyright 2020 The Rubik Filtered Project Authors (https://github.com/NaN-xyz/Rubik-Filtered)
-Google Inc. (IM Fell English)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

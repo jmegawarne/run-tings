@@ -26,10 +26,6 @@
   unicode-range: U+0000-002F, U+003A-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212;
 }
 @font-face { font-family: "Rubik Glitch"; src: url("fonts/rubik-glitch-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { /* No digits: its 0 is a lower-case o, so numbers come from the next face in Eshaal's list. */
-  font-family: "IM Fell English"; src: url("fonts/im-fell-english-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap;
-  unicode-range: U+0000-002F, U+003A-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212;
-}
 :root {
   --bg: #f1eeff;
   --glow: #dcd2ff;
@@ -666,51 +662,6 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   100% { opacity: 0; transform: translate(0, 118vh); }
 }
 
-/* Eshaal: dark academia. Walnut, amber lamplight, and bottle green; old-print headings over a book face; cards ruled
-   in gilt; Roman numerals for the moments; a wax seal for the level; and dust drifting in the light. */
-:root[data-person="eshaal"] {
-  --bg: #14110d; --glow: #3b2a14; --glow-2: #142019;
-  --surface: #1c1a15; --raise: #26231b; --fg: #ebe0c9; --muted: #b3a688; --line: #5b4a2c; --lip: #000;
-  --go: #a9c49a; --go-fill: #7d9f6e; --go-soft: #1f2a1e; --go-ink: #0e1a0c;
-  --pts: #d9b56f; --pts-fill: #c9a24e; --pts-soft: #2a2215; --pts-ink: #1e1505; --pts-lip: #7d6125;
-  --award: #e58c86; --award-fill: #8e2230; --award-soft: #33161b; --award-lip: #4f0f18; --award-ink: #f5e6d3; --lvl-2: #5c1420;
-  --warn: #e0a060; --scrim: rgba(10, 8, 5, 0.8);
-  --display: "IM Fell English", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif;
-  --font: "Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", "Noto Serif", Georgia, serif;
-  --rad: 0.3; --pill: 4px;
-  --lift: inset 0 0 0 3px var(--surface), inset 0 0 0 4px rgba(201, 162, 78, 0.38), 0 3px 0 #000;
-  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%230e1a0c' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  color-scheme: dark;
-}
-:root[data-person="eshaal"] h1 { letter-spacing: 0.01em; text-shadow: 0 2px 0 #000; }
-:root[data-person="eshaal"] h1::after { content: " \2766"; color: var(--pts); font-size: 0.55em; vertical-align: 0.15em; }
-/* Roman numerals for the moments of the day. */
-:root[data-person="eshaal"] :is(section.gate > h2, .jump a)[data-n]::before { width: auto; min-width: 2.1rem; padding: 0 0.35em; box-sizing: border-box; }
-:root[data-person="eshaal"] .jump a[data-n]::before { min-width: 1.45rem; }
-:root[data-person="eshaal"] [data-n="1"]::before { content: "I"; }
-:root[data-person="eshaal"] [data-n="2"]::before { content: "II"; }
-:root[data-person="eshaal"] [data-n="3"]::before { content: "III"; }
-:root[data-person="eshaal"] [data-n="4"]::before { content: "IV"; }
-:root[data-person="eshaal"] [data-n="5"]::before { content: "V"; }
-:root[data-person="eshaal"] [data-n="6"]::before { content: "VI"; }
-:root[data-person="eshaal"] [data-n="7"]::before { content: "VII"; }
-:root[data-person="eshaal"] [data-n="8"]::before { content: "VIII"; }
-:root[data-person="eshaal"] [data-n="9"]::before { content: "IX"; }
-:root[data-person="eshaal"] [data-n="10"]::before { content: "X"; }
-:root[data-person="eshaal"] [data-n="11"]::before { content: "XI"; }
-:root[data-person="eshaal"] [data-n="12"]::before { content: "XII"; }
-/* A wax seal for the level. */
-:root[data-person="eshaal"] .lvl {
-  clip-path: none; border-radius: 50%; height: auto; aspect-ratio: 1; color: var(--award-ink);
-  background: radial-gradient(circle at 35% 30%, #b8323f, #8e2230 55%, #5c1420);
-  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.22), inset 0 0 0 5px rgba(255, 255, 255, 0.06);
-}
-/* Dust in the lamplight. */
-:root[data-person="eshaal"] .bg i {
-  width: max(2px, calc(var(--s) * 0.16)); height: max(2px, calc(var(--s) * 0.16)); border: 0;
-  background: rgba(255, 222, 170, 0.75); box-shadow: 0 0 8px 2px rgba(255, 196, 120, 0.3); animation-duration: calc(var(--d) * 1.8);
-}
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .bg i { display: none; }
@@ -801,6 +752,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     <div class="body">
       <ol class="steps">
         <li>Bed made.</li>
+        <li data-who="dad">Showered.</li>
         <li>Pyjamas folded or hung up.</li>
         <li>Yesterday's clothes in your wash basket or put away.</li>
         <li>Window open while you get ready, shut before you go.</li>
@@ -809,7 +761,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
         <li data-who="aurora" data-days="1 2 3 4 5">Bag packed with everything you need for the office.</li>
         <li data-who="aurora" data-days="1 2 3 4 5">Any lunch ingredients packed.</li>
         <li data-who="dad" data-days="1 2 3 4 5">Supplements packed for the office.</li>
-        <li data-who="aurora eshaal leo" data-days="1 2 3 4 5">Phone, wallet, and keys on you.</li>
+        <li data-who="aurora leo" data-days="1 2 3 4 5">Phone, wallet, and keys on you.</li>
         <li data-who="cook:next"><span class="tag">Tomorrow's meal</span> <span data-ahead="morning">Anything frozen? Out of the freezer and into the fridge.</span></li>
       </ol>
       <p class="dw"><b>Done when:</b> bed made, floor clear, window shut, and no dishes in your room.</p>
@@ -829,20 +781,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 
 <section class="gate" id="g-reset" aria-labelledby="g-reset-h">
   <h2 id="g-reset-h">Saturday reset</h2>
-  <p class="intro">Saturday from 9:00, everyone together, done by midday. Dad works alongside. Do the cards in order: Leo's shirts go in first, he dusts while the others do their bedrooms, and his slow cooker is on by 11:00. His floors come last.</p>
-
-  <details class="sop" id="shirts" data-who="leo" data-period="w" data-sat data-days="6" data-time="35 min hands-on">
-    <summary>Your shirts</summary>
-    <div class="body">
-      <p class="when">First wash of the day. Ironed after lunch, once they're dry.</p>
-      <ol class="steps">
-        <li>Shirts washed: Synthetics, 40°C, Easy Iron on.</li>
-        <li>Shirts dried.</li>
-        <li>Shirts ironed and hung up.</li>
-      </ol>
-      <p class="dw"><b>Done when:</b> a week of shirts ironed and hung up.</p>
-    </div>
-  </details>
+  <p class="intro">Saturday from 9:00, everyone together, done by midday. Dad works alongside. Do the cards in order: Leo dusts while the others do their bedrooms, and his slow cooker is on by 11:00. His floors come last.</p>
 
   <details class="sop" id="dusting-weekly" data-who="leo" data-period="w" data-sat data-days="6" data-time="40 min">
     <summary>Dusting</summary>
@@ -877,7 +816,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   <details class="sop" id="room-weekly" data-who="all" data-period="w" data-sat data-days="6" data-time="40 min">
     <summary>Your bedroom</summary>
     <div class="body">
-      <p class="when">Beds stripped first. The bedding goes in after the shirts.</p>
+      <p class="when">Beds stripped first.</p>
       <p class="note" data-who="leo">Leo: strip your bed first, then do the rest once the slow cooker's on.</p>
       <ol class="steps">
         <li>Bed stripped and bedding in the wash (Bedding programme).</li>
@@ -888,7 +827,6 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
         <li>Clean clothes put away.</li>
         <li>Bed made with clean bedding.</li>
       </ol>
-      <p class="note" data-who="aurora eshaal">Aurora and Eshaal: each of you does your own bunk and your own things. For the floor and shared surfaces, one hoovers and one dusts, and you swap each week.</p>
       <p class="dw"><b>Done when:</b> clean bedding on, floor hoovered, surfaces dusted, and bin empty.</p>
     </div>
   </details>
@@ -1108,7 +1046,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
         <li>Pillows and mattress protector washed.</li>
         <li>Clothes that don't fit, or weren't worn this season, bagged for charity.</li>
         <li>Drawers and wardrobe wiped inside.</li>
-        <li data-who="aurora eshaal">Bunk bed bolts, ladder, and guard rail checked. Anything loose? Tell Dad, and nobody sleeps on top until it's fixed.</li>
+        <li data-who="aurora">Bunk bed bolts, ladder, and guard rail checked. Anything loose? Tell Dad, and nobody sleeps on top until it's fixed.</li>
       </ol>
       <p class="dw"><b>Done when:</b> mattress turned, pillows washed, and the bunk checked.</p>
     </div>
@@ -1129,7 +1067,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     <div class="body">
       <ol class="steps">
         <li>Session run, with a zone job of your own.</li>
-        <li>Trip switch (RCD) tested and reset, with one of the girls watching.</li>
+        <li>Trip switch (RCD) tested and reset, with Aurora watching.</li>
         <li>Fire plan walked through with everyone.</li>
         <li>First aid kit and medicines checked and restocked.</li>
         <li>Zones, dinners, routines, skills, and budget reviewed with everyone.</li>
@@ -1228,18 +1166,18 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   <h2 id="g-home-h">When you get home</h2>
   <p class="intro">Weekdays, as soon as you're in.</p>
 
-  <details class="sop" id="coming-home" data-who="aurora eshaal leo" data-period="d" data-days="1 2 3 4 5" data-time="15 min">
+  <details class="sop" id="coming-home" data-who="aurora leo" data-period="d" data-days="1 2 3 4 5" data-time="15 min">
     <summary>Coming home</summary>
     <div class="body">
       <ol class="steps">
         <li>Shoes and coat in their place in the living room, and slippers on.</li>
         <li>Hands washed.</li>
-        <li data-who="aurora eshaal">Lunch box and water bottle in the dishwasher.</li>
+        <li data-who="aurora">Lunch box and water bottle in the dishwasher.</li>
         <li>Bag upstairs.</li>
         <li data-who="leo">Out of uniform: shirt in your wash basket, and the rest hung up.</li>
         <li data-who="leo">PE day? PE kit in your wash basket.</li>
-        <li data-who="aurora eshaal">Windows open, if the weather's right.</li>
-        <li data-who="aurora eshaal" data-days="1 2 3 4">Dinner started, then a short break.</li>
+        <li data-who="aurora">Windows open, if the weather's right.</li>
+        <li data-who="aurora" data-days="1 2 3 4">Dinner started, then a short break.</li>
         <li data-who="leo">Homework: real progress made before anything else.</li>
       </ol>
       <p class="dw"><b>Done when:</b> coat, shoes, bag, and uniform away, slippers on, and dinner or homework under way.</p>
@@ -1257,7 +1195,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
-  <details class="sop" id="laundry-daily" data-who="all" data-period="d" data-we="g-morning" data-time="20 min">
+  <details class="sop" id="laundry-daily" data-who="aurora leo" data-period="d" data-we="g-morning" data-time="20 min">
     <summary>Folding and putting away</summary>
     <div class="body">
       <p class="when">Anything of yours that's dry.</p>
@@ -1269,7 +1207,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
-  <details class="sop" id="laundry" data-who="all" data-period="w" data-when="laundry" data-we="g-morning" data-time="30 min hands-on">
+  <details class="sop" id="laundry" data-who="aurora leo" data-period="w" data-when="laundry" data-we="g-morning" data-time="30 min hands-on">
     <summary>Your laundry</summary>
     <div class="body">
       <p class="when">Your laundry day.</p>
@@ -1303,6 +1241,33 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
+  <details class="sop" id="dad-laundry" data-who="zone:bathrooms" data-rota="weekday" data-period="w" data-days="4 5" data-time="30 min hands-on">
+    <summary>Dad's laundry</summary>
+    <div class="body">
+      <p class="when">Thursday when you get home. Folded and away on Friday, before the household wash.</p>
+      <ol class="steps">
+        <li>Dad's wash basket emptied, and pockets checked.</li>
+        <li>Washed on the right programmes.</li>
+        <li>Out of the machine within 30 minutes of finishing.</li>
+        <li>Dried on the airer, not on radiators.</li>
+        <li>Folded or hung up, and put away in Dad's room.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> Dad's basket empty, airer clear, and his clothes put away.</p>
+    </div>
+  </details>
+
+  <details class="sop" id="shirts-wash" data-who="leo" data-period="w" data-days="5" data-time="10 min hands-on">
+    <summary>School shirts in the wash</summary>
+    <div class="body">
+      <p class="when">Friday, as soon as you're in, before the household wash.</p>
+      <ol class="steps">
+        <li>School shirts washed: Synthetics, 40°C, Easy Iron on.</li>
+        <li>Shirts out of the machine and hung up to dry.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> a week of school shirts washed and drying.</p>
+    </div>
+  </details>
+
   <details class="sop" id="household-wash" data-who="zone:bathrooms" data-rota="weekday" data-period="w" data-days="5 6" data-we="g-morning" data-time="20 min">
     <summary>Household wash</summary>
     <div class="body">
@@ -1332,13 +1297,12 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 <section class="gate" id="g-dinner" aria-labelledby="g-dinner-h">
   <h2 id="g-dinner-h">Dinner</h2>
 
-  <details class="sop" id="dinner" data-who="aurora eshaal" data-period="d" data-days="1 2 3 4" data-time="2 hours">
+  <details class="sop" id="dinner" data-who="aurora" data-period="d" data-days="1 2 3 4" data-time="2 hours">
     <summary>Weekday dinner</summary>
     <div class="body">
-      <p class="when">Monday to Thursday, together. Dinner at 7pm.</p>
+      <p class="when">Monday to Thursday. Dinner at 7pm.</p>
       <p class="sub">Before you start</p>
       <ol class="steps">
-        <li>Tonight's meal and who does what agreed.</li>
         <li>Dishwasher empty, sink empty, and worktops clear.</li>
         <li>Mise en place: every ingredient prepped, and every pan and tool out, before the heat goes on.</li>
       </ol>
@@ -1461,35 +1425,35 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
-  <details class="sop" id="dinner-plan" data-who="aurora eshaal" data-period="w" data-days="5" data-time="30 min">
+  <details class="sop" id="dinner-plan" data-who="aurora" data-period="w" data-days="5" data-time="30 min">
     <summary>Next week's dinners</summary>
     <div class="body">
       <p class="when">Friday, before the shop.</p>
       <ol class="steps">
         <li>Four dinners agreed.</li>
         <li>Their ingredients on the shopping list.</li>
-        <li data-who="aurora eshaal">Meal plan written up on the fridge.</li>
+        <li data-who="aurora">Meal plan written up on the fridge.</li>
       </ol>
       <p class="dw"><b>Done when:</b> next week's dinners agreed, on the shopping list, and on the fridge.</p>
     </div>
   </details>
 
-  <details class="sop" id="shop" data-who="aurora eshaal dad leo" data-period="w" data-days="5" data-time="45 min">
+  <details class="sop" id="shop" data-who="aurora dad leo" data-period="w" data-days="5" data-time="45 min">
     <summary>Weekly shop</summary>
     <div class="body">
-      <p class="when">Friday: the order. Aurora, Eshaal, and Dad. It arrives on Sunday night.</p>
+      <p class="when">Friday: the order. Aurora and Dad. It arrives on Sunday night.</p>
       <ol class="steps">
-        <li data-who="aurora eshaal dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
-        <li data-who="aurora eshaal dad">Next week's dinner ingredients added.</li>
+        <li data-who="aurora dad">Aurora: the Staples List checked against the cupboards, fridge, freezer, and bathrooms.</li>
+        <li data-who="aurora dad">Next week's dinner ingredients added.</li>
         <li>Leo, with Aurora: next Saturday's slow-cooker ingredients added.</li>
         <li>Leo, with Aurora: any food tech ingredients for next week added.</li>
-        <li data-who="aurora eshaal dad">Dad: order approved and paid.</li>
+        <li data-who="aurora dad">Dad: order approved and paid.</li>
       </ol>
       <p class="dw"><b>Done when:</b> staples, next week's dinners, next Saturday's slow-cooker dinner, and any food tech ingredients on the order, and the order paid for.</p>
     </div>
   </details>
 
-  <details class="sop" id="shop-away" data-who="aurora eshaal dad" data-period="w" data-days="0" data-time="20 min">
+  <details class="sop" id="shop-away" data-who="aurora dad" data-period="w" data-days="0" data-time="20 min">
     <summary>Shopping away</summary>
     <div class="body">
       <p class="when">Sunday night, when Friday's shop arrives.</p>
@@ -1538,10 +1502,10 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
         <li>Bag, clothes, and charger upstairs.</li>
         <li>Cups and plates in the dishwasher.</li>
         <li>Phone charging on a hard surface, not on the bed.</li>
-        <li>Showered. A quick one counts.</li>
+        <li data-who="aurora leo">Showered. A quick one counts.</li>
       </ol>
       <p class="note" data-who="leo">Leo: the latest Dad's Days as a bedtime read, if you want one.</p>
-      <p class="dw"><b>Done when:</b> nothing of yours left downstairs, no dishes upstairs, and you've showered.</p>
+      <p class="dw"><b>Done when:</b> <span data-who="aurora leo">you've showered, </span>nothing of yours left downstairs, and no dishes upstairs.</p>
     </div>
   </details>
 
@@ -1592,13 +1556,25 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
+  <details class="sop" id="shirts" data-who="leo" data-period="w" data-days="6 0" data-time="40 min">
+    <summary>Your school shirts</summary>
+    <div class="body">
+      <p class="when">The weekend, once they're dry. Ready by Sunday night.</p>
+      <ol class="steps">
+        <li>Shirts starched and ironed.</li>
+        <li>Shirts hung up, ready for school.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> a week of school shirts starched, ironed, and hung up by Sunday night.</p>
+    </div>
+  </details>
+
   <details class="sop" id="dad-weekly" data-who="dad" data-period="w" data-sat data-time="3 hours">
     <summary>Dad</summary>
     <div class="body">
       <ol class="steps">
-        <li>Saturday reset: your own room. Thursday is your laundry day.</li>
+        <li>Saturday reset: your own room.</li>
         <li>Stage 1 only: a walk round with each zone owner after the reset, checking against "Done when".</li>
-        <li>One skills session: one skill, one learner, 30 minutes. Eshaal first.</li>
+        <li>One skills session: one skill, one learner, 30 minutes.</li>
         <li>Friday's shop with Aurora: order approved and paid.</li>
         <li>Sunday lunch.</li>
         <li>Bins washed, if they need it.</li>
@@ -1625,7 +1601,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 <section id="skills">
   <h2>Skills</h2>
   <p class="intro">What you need to run your own home. Each skill gets three ticks: shown, done with help, and done alone. Anyone who's done a skill alone can teach it.</p>
-  <p><b>Pace.</b> Aurora: all of them by your 18th birthday. Eshaal: two a week, starting with Food and Money. Leo: the ones marked Leo, for now.</p>
+  <p><b>Pace.</b> Aurora: all of them by your 18th birthday. Leo: the ones marked Leo, for now.</p>
   <p id="skills-sum" class="note"></p>
   <div class="tw">
     <table class="skills" id="skills-table">
@@ -1735,7 +1711,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   "use strict";
 
   /* ---------- Settings. Change these, then republish. ---------- */
-  const NAMES = ["Aurora", "Eshaal", "Leo", "Dad"]; // The name buttons, in order.
+  const NAMES = ["Aurora", "Leo", "Dad"]; // The name buttons, in order.
   // Zones rotate weekly. Each rota needs one zone set per person in it.
   const ROTA = ["Aurora", "Leo"];                    // Weekend zones: weekend daily jobs, Saturday cleans, and the monthly and quarterly lists.
   const SETS = [["kitchen"], ["bathrooms", "living"]];
@@ -1743,7 +1719,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const WEEKDAY_SETS = [["kitchen", "bathrooms", "living"]];
   // Someone alongside another person does that person's household jobs with them, zones and cooking included,
   // and is named with them. Their own morning, evening, bedroom, and laundry stay their own.
-  const ALONGSIDE = { Eshaal: "Aurora" };
+  const ALONGSIDE = {};
   const EPOCH = "2026-10-19";                 // Monday of rota week 0.
   const NEW_DAY_AT = 2;                       // The hour the day turns over. Before it, it's still yesterday, so a late night out counts as the day it began.
   // Bin collection: Wednesday, grey and red on alternate weeks.
@@ -1760,8 +1736,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     { cooks: [], label: "Eating out", short: "Eating out" },
     { cooks: ["Leo"], label: "Leo's slow-cooker dinner", short: "Leo's slow cooker" }
   ];
-  const LAUNDRY = ["Leo", "", "Aurora", "Eshaal", "Dad", "Household", "Bedding"]; // Sunday first.
-  const ALSO = ["Shopping arrives", "", "", "", "", "Meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
+  const LAUNDRY = ["Leo", "", "Aurora", "", "Dad's", "Household", "Bedding"]; // Sunday first. Dad's and Household go to the weekday bathrooms.
+  const ALSO = ["Shopping arrives, Leo's shirts ironed", "", "", "", "", "Leo's shirts in, meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
   // The week's recipes live in recipes.json beside this page, not here, so the menu never needs an edit to this file.
   /* ---------- End of settings ---------- */
 
@@ -1770,7 +1746,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const PTS_PER_MIN = 10;
   // Handicaps, from age and ability: every point a person wins is multiplied by theirs, so nobody is out-scored
   // for being younger or newer to a job. Dad's call; they come down as people grow up and get better.
-  const HANDICAP = { Aurora: 1.2, Eshaal: 1.2, Leo: 1.6, Dad: 1 };
+  const HANDICAP = { Aurora: 1.2, Leo: 1.6, Dad: 1 };
   // Bonus cards, by card id. One pays its pts here, not its time, and ticking it sets off the big send-off with these words.
   // A bonus is extra: it's never needed for a cleared moment, a clean sweep, or a streak.
   const BONUS = { cuddle: { pts: 300, icon: "🤗", title: "Dad's cuddle!", line: "Best bit of Dad's day." } };
@@ -1821,7 +1797,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     { card: "evening", icon: "🌙", name: "Night Shift", desc: "Nothing left downstairs, phone on charge." },
     { card: "cuddle", icon: "🤗", name: "Embrace Yourself", desc: "Dad cuddled and kissed goodnight. He's chuffed." },
     { card: "shower", icon: "🚿", name: "Squeegee Supreme", desc: "Shower left gleaming." },
-    { card: "shirts", icon: "👔", name: "Crease Lightning", desc: "A week of shirts, ironed and hung." },
+    { card: "shirts", icon: "👔", name: "Crease Lightning", desc: "A week of school shirts, starched, ironed, and hung." },
     { card: "dusting-weekly", icon: "🐰", name: "Dust Bunny Hunter", desc: "No dust bunny survived." },
     { card: "slow-cooker", icon: "🍲", name: "Low and Slow", desc: "Slow cooker on, lid on, worktops clear." },
     { card: "room-weekly", icon: "🛏️", name: "Bedroom Boss", desc: "Fresh bedding, clear floor." },
@@ -1944,12 +1920,14 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const laundrySentence = (d) => {
     const l = LAUNDRY[d];
     if (l === "Household") return "Household wash: " + and(crew(ownerOf("bathrooms", week, "weekday"))) + ".";
+    if (l === "Dad's") return "Dad's laundry: " + and(crew(ownerOf("bathrooms", week, "weekday"))) + ".";
     if (l === "Bedding") return "Bedding wash, everyone.";
     return l ? "Laundry: " + l + "." : "No laundry today.";
   };
   const laundryShort = (d) => {
     const l = LAUNDRY[d];
     if (l === "Household") return "Household (" + crew(ownerOf("bathrooms", week, "weekday")).join(" & ") + ")";
+    if (l === "Dad's") return "Dad's (" + crew(ownerOf("bathrooms", week, "weekday")).join(" & ") + ")";
     if (l === "Bedding") return "Bedding, everyone";
     return l || "Free";
   };
@@ -2066,7 +2044,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     const zones = (card.getAttribute("data-who") || "").match(/zone:\w+/g) || [];
     const out = [];
     const l = LAUNDRY[dow];
-    const ownLaundry = l && l !== "Household" && l !== "Bedding";
+    const ownLaundry = l && l !== "Household" && l !== "Bedding" && l !== "Dad's";
     const weekday = dow >= 1 && dow <= 5;
     if (id === "dinner") {
       if (weekday && MEALS[dow].cooks.length) out.push(person ? "Tonight" : "Tonight: " + MEALS[dow].label);
@@ -2077,6 +2055,12 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       else if (ownLaundry && l === person) out.push("Today");
     } else if (id === "household-wash") {
       if (l === "Household") out.push("Today");
+    } else if (id === "dad-laundry") {
+      if (l === "Dad's") out.push("Today");
+    } else if (id === "shirts-wash") {
+      if (dow === 5) out.push("Today");
+    } else if (id === "shirts") {
+      if (dow === 0) out.push("Tonight");
     } else if (id === "bins") {
       const b = binsEve(today);
       if (b) out.push("Tonight: " + b);
@@ -2117,7 +2101,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     const wd = zonesOf(p, week, "weekday");
     const we = zonesOf(p, week, "weekend");
     const d3 = (d) => DAYS[d].slice(0, 3);
-    if (p === "Leo") out.push(["Evenings", "free on weekdays"], ["Weekend", "floors, dusting, and your shirts"]);
+    if (p === "Leo") out.push(["Evenings", "free Monday to Thursday"], ["Weekend", "floors, dusting, and ironing your shirts"]);
     const cookDays = [];
     for (let i = 1; i <= 7; i++) { const d = i % 7; if (crewOf(MEALS[d].cooks).indexOf(p) > -1) cookDays.push(d); }
     if (cookDays.length) {
@@ -2136,10 +2120,10 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     }
     if (p === "Dad") out.push(["Friday", "the shop with " + and(shoppers)]);
     if (shoppers.indexOf(p) > -1 || p === "Dad") out.push(["Sunday night", "the shopping arrives, and gets put away"]);
-    if (p === "Leo") out.push(["Friday", "slow-cooker and food tech shopping, with Aurora"]);
+    if (p === "Leo") out.push(["Friday", "school shirts in the wash"], ["Friday", "slow-cooker and food tech shopping, with Aurora"]);
     const ld = LAUNDRY.indexOf(p);
     if (ld > -1) out.push(["Laundry", DAYS[ld]]);
-    if (wd.indexOf("bathrooms") > -1) out.push(["Friday", "household wash"]);
+    if (wd.indexOf("bathrooms") > -1) out.push(["Thursday", "Dad's laundry"], ["Friday", "household wash"]);
     if (wd.indexOf("living") > -1) out.push(["Bins", "out the night before, back in on the day"]);
     const holds = crew(ownerOf("kitchen", week, "weekend"));
     const hoovers = crew(ownerOf("living", week, "weekend"));

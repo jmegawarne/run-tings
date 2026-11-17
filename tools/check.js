@@ -18,7 +18,7 @@ const path = require("path");
 const { JSDOM } = require("jsdom");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
-const PEOPLE = ["aurora", "eshaal", "leo", "dad"];
+const PEOPLE = ["aurora", "leo", "dad"];
 
 // The files the page fetches, by name. One that's missing is served as a failed fetch, as it would be live.
 const served = {};

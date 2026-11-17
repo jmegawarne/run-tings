@@ -33,7 +33,7 @@ import threading
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PEOPLE = ["aurora", "eshaal", "leo", "dad"]
+PEOPLE = ["aurora", "leo", "dad"]
 SCHEMES = ["light", "dark"]
 WIDTH, HEIGHT = 390, 844  # a typical phone, in CSS pixels
 # The points bar sticks to the top and the views bar to the bottom, so for every other shot they're
