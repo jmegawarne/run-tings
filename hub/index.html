@@ -97,7 +97,8 @@
 // Nest Hub's own screen once the page has been sent there, so no phone has to stay connected.
 // It gets there from its own Send to Hub button, in Chrome on an Android phone or a computer,
 // or with CATT (catt cast_site and this page's address).
-// Reads ../recipes.json for what's on which day and decks.json for each deck's slide count.
+// Reads ../recipes.json for what's on which day and decks.json for each deck's slide count, and
+// ../lunches.json for any lunch made at home with a deck, which goes before that day's dishes.
 // Query options: ?date=YYYY-MM-DD shows that day; ?deck=<deck id> opens one deck.
 
 const $ = (id) => document.getElementById(id);
@@ -177,7 +178,7 @@ function showDays(note) {
     box.appendChild(head);
     recipes[date].forEach((r, i) => {
       const b = document.createElement('button');
-      b.textContent = r.dish;
+      b.textContent = r.lunch ? 'Lunch: ' + r.dish : r.dish;
       b.onclick = () => openDeck(recipes[date], i, 1);
       box.appendChild(b);
     });
@@ -188,12 +189,23 @@ function showDays(note) {
   if (t) t.scrollIntoView();
 }
 
+// A lunch made at home is { "dish", "doc", "deck" } in lunches.json, and a bought one a plain name.
+// Each with a deck goes first in its day's list, marked as a lunch, since lunch comes before dinner.
+const LUNCH_UNTIL = 14;
+function addLunches(lunches) {
+  for (const [date, l] of Object.entries(lunches || {})) {
+    if (!l || typeof l !== 'object' || !l.deck || !l.dish) continue;
+    recipes[date] = [{ dish: l.dish, deck: l.deck, doc: l.doc, lunch: true }].concat(recipes[date] || []);
+  }
+}
+
 async function start() {
   try {
     const [r, d] = await Promise.all([fetch('../recipes.json', { cache: 'no-store' }),
                                       fetch('decks.json', { cache: 'no-store' })]);
     recipes = await r.json();
     decks = await d.json();
+    addLunches(await fetch('../lunches.json', { cache: 'no-store' }).then((l) => l.json()).catch(() => ({})));
   } catch (e) {
     $('days').hidden = false;
     $('days').textContent = 'Couldn’t load the recipes. Check the Wi-Fi, then send this page again.';
@@ -206,11 +218,14 @@ async function start() {
       if (i >= 0) return openDeck(list, i, 1);
     }
   }
-  const list = recipes[today] || [];
+  const all = recipes[today] || [];
   const s = saved();
-  const resume = s && list.findIndex((r) => r.deck === s.deck);
-  if (s && resume >= 0) openDeck(list, resume, s.slide);
-  else if (list.length === 1) openDeck(list, 0, 1);
+  const resume = s && all.findIndex((r) => r.deck === s.deck);
+  if (s && resume >= 0) return openDeck(all, resume, s.slide);
+  // Before LUNCH_UNTIL the day's lunch deck, if it has one, opens by itself; after it, only the dishes count.
+  if (all.length && all[0].lunch && new Date().getHours() < LUNCH_UNTIL) return openDeck(all, 0, 1);
+  const list = all.filter((r) => !r.lunch);
+  if (list.length === 1) openDeck(list, 0, 1);
   else showDays(list.length ? '' : 'Nothing planned for today.');
 }
 
