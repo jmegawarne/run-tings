@@ -213,6 +213,7 @@ ul.you b { margin-right: 4px; }
 .plan tr.now { background: var(--go-soft); }
 .plan td a { display: block; margin-top: 4px; }
 .plan td .lunch { display: block; margin-top: 4px; color: var(--muted); }
+.plan td .lunch a { display: inline; margin-top: 0; }
 .cta {
   display: flex; justify-content: center; align-items: baseline; width: 100%; margin: 16px 0 0; padding: 15px 18px 14px;
   border: 0; border-radius: calc(18px * var(--rad)); background: var(--go-fill); color: var(--go-ink); box-shadow: 0 4px 0 var(--go);
@@ -771,7 +772,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
         <li>Breakfast things, and any cups or plates from your room, in the dishwasher.</li>
         <li data-who="leo" data-days="1 2 3 4 5">PE day? PE kit packed.</li>
         <li data-who="aurora" data-days="1 2 3 4 5">Bag packed with everything you need for the office.</li>
-        <li data-who="aurora" data-days="1 2 3 4 5">Any lunch ingredients packed.</li>
+        <li data-who="aurora" data-days="1 2 3 4 5">Any lunch ingredients packed. <span id="lunch-dish"></span></li>
         <li data-who="dad" data-days="1 2 3 4 5">Supplements packed for the office.</li>
         <li data-who="aurora leo" data-days="1 2 3 4 5">Phone, wallet, and keys on you.</li>
         <li data-who="cook:next"><span class="tag">Tomorrow's meal</span> <span data-ahead="morning">Anything frozen? Out of the freezer and into the fridge.</span></li>
@@ -1859,11 +1860,11 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   // general reminder on their morning card and their Tomorrow's meal card.
   let recipes = {};
   const DRIVE_ID = /^[\w-]{20,}$/;
+  const hasRecipe = (r) => DRIVE_ID.test(r.deck || "") || DRIVE_ID.test(r.doc || "");
+  const recipeLink = (r, name) => '<a href="https://docs.google.com/' + (DRIVE_ID.test(r.deck || "") ? "presentation/d/" + r.deck : "document/d/" + r.doc) + '/edit">' + esc(name) + "</a>";
   const recipeLinks = (t) => {
     const list = recipes[ymd(t)];
-    return (Array.isArray(list) ? list : [])
-      .filter((r) => r && r.dish && (DRIVE_ID.test(r.deck || "") || DRIVE_ID.test(r.doc || "")))
-      .map((r) => '<a href="https://docs.google.com/' + (DRIVE_ID.test(r.deck || "") ? "presentation/d/" + r.deck : "document/d/" + r.doc) + '/edit">' + esc(r.dish) + "</a>");
+    return (Array.isArray(list) ? list : []).filter((r) => r && r.dish && hasRecipe(r)).map((r) => recipeLink(r, r.dish));
   };
   const dishesOn = (t) => { const list = recipes[ymd(t)]; return (Array.isArray(list) ? list : []).filter((r) => r && r.dish).map((r) => r.dish); };
   const aheadOf = (t, when) => {
@@ -1873,11 +1874,17 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       .filter(Boolean);
   };
 
-  // Lunches from lunches.json, beside recipes.json: { "YYYY-MM-DD": "Smoked salmon and cream cheese wraps" }, the
-  // lunch's name only, no method. A day whose lunch is its main meal, like Sunday's, is in recipes.json, not here.
+  // Lunches from lunches.json, beside recipes.json: { "YYYY-MM-DD": "Taco Tuesday" }, the lunch's name only, or
+  // { "YYYY-MM-DD": { "dish": "...", "deck": "<Drive ID>", "doc": "<Drive ID>" } } for a lunch with a recipe, linked
+  // like a recipe above. A day whose lunch is its main meal, like Sunday's, is in recipes.json, not here.
   // They're a file of their own because the kitchen screen reads every entry in recipes.json as a dish to cook.
   let lunches = {};
-  const lunchOn = (t) => { const l = lunches[ymd(t)]; return typeof l === "string" ? l.trim().replace(/\.$/, "") : ""; };
+  const lunchOn = (t) => {
+    const l = lunches[ymd(t)];
+    const r = typeof l === "string" ? { dish: l } : l && typeof l.dish === "string" ? l : null;
+    const dish = r ? r.dish.trim().replace(/\.$/, "") : "";
+    return { dish: dish, link: dish && hasRecipe(r) ? recipeLink(r, dish) : "" };
+  };
 
   // Dates as UTC midnights built from the local calendar date, so clock changes never shift a day.
   // Before NEW_DAY_AT the date is still yesterday's, so now is noon on the day the page counts as today.
@@ -2186,7 +2193,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     if (c) bits.push("Bin day: the " + c + " comes back in (" + and(crew(ownerOf("living", week, "weekday"))) + ").");
     const b = binsEve(today);
     if (b) bits.push("Bins out tonight: the " + b + " (" + and(crew(ownerOf("living", week, "weekday"))) + ").");
-    h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + (lunch ? esc("Lunch: " + lunch + ".") + " " : "") + mealHtml + " " + esc(bits.join(" ")) + "</p>";
+    h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + (lunch.dish ? "Lunch: " + (lunch.link || esc(lunch.dish)) + ". " : "") + mealHtml + " " + esc(bits.join(" ")) + "</p>";
     const chips = who ? youChips(who) : [];
     if (chips.length) h += '<ul class="you" aria-label="Your week">' + chips.map(([k, v]) => "<li><b>" + esc(k) + "</b> " + esc(v) + "</li>").join("") + "</ul>";
     document.getElementById("week-body").innerHTML = h;
@@ -2202,7 +2209,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       if (b) also.push("Bins out (" + b.replace(" bin", "") + ")");
       const links = MEALS[d].cooks.length ? recipeLinks(t) : [];
       const lunch = lunchOn(t);
-      rows += "<tr" + (t === today ? ' class="now"' : "") + '><th scope="row">' + DAYS[d].slice(0, 3) + "</th><td>" + esc(MEALS[d].short) + links.join("") + (lunch ? '<span class="lunch">' + esc("Lunch: " + lunch) + "</span>" : "") + "</td><td>" + esc(laundryShort(d)) + "</td><td>" + esc(also.filter(Boolean).join(", ")) + "</td></tr>";
+      rows += "<tr" + (t === today ? ' class="now"' : "") + '><th scope="row">' + DAYS[d].slice(0, 3) + "</th><td>" + esc(MEALS[d].short) + links.join("") + (lunch.dish ? '<span class="lunch">Lunch: ' + (lunch.link || esc(lunch.dish)) + "</span>" : "") + "</td><td>" + esc(laundryShort(d)) + "</td><td>" + esc(also.filter(Boolean).join(", ")) + "</td></tr>";
     }
     document.getElementById("plan-body").innerHTML = rows;
   };
@@ -2220,6 +2227,12 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     // Today's dishes on the card for scoring them, as plain names.
     const dishes = cooksOn(today).length ? dishesOn(today) : [];
     document.getElementById("score-dish").textContent = dishes.length ? "Today: " + and(dishes) + "." : "";
+  };
+
+  // Today's lunch on the morning card, where it's made, when it has a recipe to link to.
+  const renderLunch = () => {
+    const link = lunchOn(today).link;
+    document.getElementById("lunch-dish").innerHTML = link ? "Today: " + link + "." : "";
   };
 
   /* ---------- Skills ---------- */
@@ -2977,6 +2990,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 
   renderPlan();
   renderAhead();
+  renderLunch();
   apply();
   followLink();
 
@@ -2989,7 +3003,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     fetch("lunches.json", { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
-      .then((data) => { if (data && typeof data === "object") { lunches = data; renderPlan(); renderWeek(); } });
+      .then((data) => { if (data && typeof data === "object") { lunches = data; renderPlan(); renderWeek(); renderLunch(); } });
   }
 })();
 </script>
