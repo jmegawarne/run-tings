@@ -11,6 +11,10 @@
 // It finds columns by their headings, so the sheet's layout can change as long as these stay:
 // Date, Meal, Dish, Note, and a column for each name in COLUMN.
 //
+// The line below limits the script to this one spreadsheet. Without it, Google asks for every spreadsheet
+// you own. Keep it.
+/** @OnlyCurrentDoc */
+//
 // GET  ?date=YYYY-MM-DD&who=Leo
 //      -> { ok: true, rows: [{ meal, dish, score }] }, score being that person's own, or 0.
 // POST { date, who, scores: [{ dish, score, note }] }, sent as plain text
