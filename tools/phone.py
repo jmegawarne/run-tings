@@ -18,6 +18,8 @@
 # never get committed. Each line of output names the moment Tasks opened on for that person.
 # It doesn't tick boxes unless asked: with --tick, it ticks every step of the first card Tasks opens
 # on, before the shots, so a card done, progress, and points show too.
+# The ratings web app that Score the meal talks to, when RATINGS_URL is set, is stubbed: it answers with the
+# day's dishes from recipes.json, nobody's scores yet, and a yes to every send, so a run never touches the sheet.
 # Animations are settled before each shot. Exits non-zero if the page throws, scrolls sideways,
 # shows more than This week before a name is picked, or a link to a moment (#g-any) doesn't open it.
 
@@ -25,10 +27,12 @@ import argparse
 import datetime
 import functools
 import http.server
+import json
 import os
 import sys
 import tempfile
 import threading
+import urllib.parse
 
 from playwright.sync_api import sync_playwright
 
@@ -55,6 +59,21 @@ def listed(value, allowed, what, parser):
     if unknown or not items:
         parser.error("%s must be from: %s" % (what, ", ".join(allowed)))
     return items
+
+
+# Stands in for the ratings web app (apps-script/ratings.gs) on script.google.com.
+def stub_ratings(route, request):
+    if request.method == "POST":
+        body = {"ok": True, "saved": 1}
+    else:
+        date = (urllib.parse.parse_qs(urllib.parse.urlparse(request.url).query).get("date") or [""])[0]
+        try:
+            with open(os.path.join(ROOT, "recipes.json")) as f:
+                dishes = [r.get("dish", "") for r in json.load(f).get(date, []) if isinstance(r, dict)]
+        except (OSError, ValueError):
+            dishes = []
+        body = {"ok": True, "rows": [{"meal": "Dessert" if i else "Dinner", "dish": dish, "score": 0} for i, dish in enumerate(dishes) if dish]}
+    route.fulfill(status=200, content_type="application/json", headers={"Access-Control-Allow-Origin": "*"}, body=json.dumps(body))
 
 
 def main():
@@ -91,6 +110,7 @@ def main():
                     context = browser.new_context(
                         viewport={"width": WIDTH, "height": HEIGHT}, device_scale_factor=2,
                         is_mobile=True, has_touch=True, color_scheme=scheme, timezone_id="Europe/London")
+                    context.route("https://script.google.com/**", stub_ratings)
                     page = context.new_page()
                     errors = []
                     page.on("pageerror", lambda e: errors.append(str(e)))
@@ -112,6 +132,7 @@ def main():
                         page.click("#who-" + person)
                         page.evaluate("document.querySelectorAll('details').forEach((el) => { el.open = true; })")
                         page.wait_for_timeout(100)
+                        page.wait_for_function("() => { const r = document.getElementById('rate'); return !r || r.hidden || !/Getting/.test(r.textContent); }", timeout=5000)
                         shown = []
                         sideways = []
 

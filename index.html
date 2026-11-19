@@ -127,7 +127,7 @@ body {
   padding-right: var(--gr);
   padding-block: 8px calc(96px + env(safe-area-inset-bottom, 0px));
 }
-h1, h2, h3, .who button, .lvl, .hud-pts b, .win button {
+h1, h2, h3, .who button, .five button, .lvl, .hud-pts b, .win button {
   font-family: var(--display);
   font-weight: 800;
   font-synthesis: none;
@@ -149,14 +149,14 @@ section, .sop, .jump { scroll-margin-top: 84px; }
 
 /* Name picker: chunky buttons that press down. */
 .who { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 6px; }
-.who button {
+:is(.who, .five) button {
   font-size: 1.05rem; line-height: 1; padding: 11px 16px 10px; border-radius: calc(14px * var(--rad)); cursor: pointer;
   border: 2px solid var(--line); background: var(--surface); color: var(--fg);
   box-shadow: var(--lift); touch-action: manipulation;
   transition: transform 0.08s, box-shadow 0.08s;
 }
-.who button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lip); }
-.who button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: var(--award-ink); box-shadow: 0 3px 0 var(--award-lip); }
+:is(.who, .five) button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lip); }
+:is(.who, .five) button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: var(--award-ink); box-shadow: 0 3px 0 var(--award-lip); }
 
 /* Points bar: sticks to the top once a name is picked. Tapping it opens the scoreboard. */
 .hud {
@@ -311,6 +311,20 @@ input.bump { animation: bump 0.25s ease-out; }
 .warn { color: var(--warn); font-size: 0.9375rem; }
 .dw { border-top: 2px dashed var(--line); padding-top: 10px; margin: 12px 0 0; }
 .dw b { color: var(--go); }
+
+/* Scoring the meal: 1 to 5 for each dish, sent straight to the scores sheet. */
+.rate .dish { margin: 12px 0 16px; }
+.rate .dish > p:first-child { margin-bottom: 8px; }
+.five { display: flex; gap: 8px; }
+.five button { flex: 1; min-width: 0; padding: 11px 0 10px; font-size: 1.15rem; }
+.rate .mean { min-height: 1.3em; margin: 6px 0 0; font-size: 0.875rem; color: var(--muted); }
+.rate input[type="text"] {
+  width: 100%; box-sizing: border-box; margin: 8px 0 0; padding: 10px 12px; font: 1rem var(--font); color: var(--fg);
+  background: var(--surface); border: 2px solid var(--line); border-radius: calc(12px * var(--rad));
+}
+.rate .cta { margin-top: 4px; }
+.rate .cta:disabled { opacity: 0.6; cursor: progress; }
+.rate .send + .note { margin: 12px 0 0; }
 
 /* Points as they're won: a number that floats up from the tick, and a ring round a cleared card. */
 .pop { position: absolute; left: -2px; top: -6px; z-index: 2; pointer-events: none; white-space: nowrap; font: 800 1rem/1 var(--display); font-synthesis: none; color: var(--pts); text-shadow: 0 2px 0 var(--surface); animation: rise 0.9s ease-out forwards; }
@@ -565,10 +579,10 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   :root[data-person="leo"] .bg i { filter: brightness(0.6); }
 }
 /* Buttons are blocks too, with sides in their own colour, and they press down into them. */
-:root[data-person="leo"] .who button[aria-pressed="true"] { box-shadow: 4px 4px 0 var(--lip); }
+:root[data-person="leo"] :is(.who, .five) button[aria-pressed="true"] { box-shadow: 4px 4px 0 var(--lip); }
 :root[data-person="leo"] .cta { box-shadow: 1px 1px 0 #3d8a2a, 2px 2px 0 #3d8a2a, 3px 3px 0 #3d8a2a, 4px 4px 0 #3d8a2a, 5px 5px 0 var(--lip); }
 :root[data-person="leo"] :is(.close-day, .win button:not(.ghost)) { box-shadow: 1px 1px 0 #c98f1c, 2px 2px 0 #c98f1c, 3px 3px 0 #c98f1c, 4px 4px 0 #c98f1c, 5px 5px 0 var(--lip); }
-:root[data-person="leo"] :is(.who button, .cta, .close-day, .win button:not(.ghost)):active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--lip); }
+:root[data-person="leo"] :is(.who button, .five button, .cta, .close-day, .win button:not(.ghost)):active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--lip); }
 :root[data-person="leo"] .close-day { margin: 0 5px 5px 0; }
 :root[data-person="leo"] input[type="checkbox"] { border-color: var(--line); }
 :root[data-person="leo"] input[type="checkbox"]:checked { box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.2), inset 3px 3px 0 rgba(255, 255, 255, 0.35); }
@@ -622,7 +636,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 :root[data-person="aurora"] :is(.bar i, .sop > summary::after) { background: var(--rainbow); }
 :root[data-person="aurora"] .sop.done { border-color: transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rainbow) border-box; }
 :root[data-person="aurora"] :is(section.gate.cleared > h2[data-n], .jump a.cleared[data-n])::before { background: var(--rainbow); color: #1f0029; box-shadow: none; }
-:root[data-person="aurora"] .who button[aria-pressed="true"] { background: var(--rainbow); border-color: transparent; color: #1f0029; }
+:root[data-person="aurora"] :is(.who, .five) button[aria-pressed="true"] { background: var(--rainbow); border-color: transparent; color: #1f0029; }
 :root[data-person="aurora"] .cta { background: var(--rainbow); color: #1f0029; box-shadow: 0 4px 0 #5c1a7a; }
 :root[data-person="aurora"] .cta:active { box-shadow: 0 2px 0 #5c1a7a; }
 :root[data-person="aurora"] input[type="checkbox"]:checked { border-color: transparent; background-image: var(--tick), linear-gradient(135deg, #ff2e97, #ffe600 50%, #2ec8ff); background-size: 72%, 100%; }
@@ -1372,6 +1386,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     <summary>Score the meal</summary>
     <div class="body">
       <p class="when">Once you've eaten, on any day we cooked. <span id="score-dish"></span></p>
+      <div class="rate" id="rate" hidden></div>
       <ol class="steps">
         <li>Today's meal scored.</li>
       </ol>
@@ -1739,6 +1754,9 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const LAUNDRY = ["Leo", "", "Aurora", "", "Dad's", "Household", "Bedding"]; // Sunday first. Dad's and Household go to the weekday bathrooms.
   const ALSO = ["Shopping arrives, Leo's shirts ironed", "", "", "", "", "Leo's shirts in, meal plan, shop", "Saturday reset, 9:00"];    // Sunday first; bins are added below.
   // The week's recipes live in recipes.json beside this page, not here, so the menu never needs an edit to this file.
+  // Meal scores go straight into the Ratings sheet through this web app, the one in apps-script/ratings.gs.
+  // Empty, and Score the meal is a plain tick.
+  const RATINGS_URL = "";
   /* ---------- End of settings ---------- */
 
   /* ---------- Points and awards ---------- */
@@ -2875,6 +2893,95 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     log.innerHTML = rows.concat(rows).join("\n");
     document.querySelector(".bg").appendChild(log);
   })();
+
+  /* ---------- Scoring the meal, straight into the scores sheet ---------- */
+  // Opening Score the meal fetches today's dishes from RATINGS_URL, with the picked person's own scores, and the
+  // send button writes theirs back and ticks the card. If the sheet can't be reached, the dishes come from
+  // recipes.json, and a send waits on this phone and goes the next time the page loads.
+  const MEANS = ["", "Don't make it again", "Wouldn't choose it", "Fine", "Happy to have it again", "Make it again soon"]; // As the sheet's How to score tab.
+  const RATE_WAIT = "hsop-rateq";
+  const rateCard = byId("meal-score");
+  const rateBox = byId("rate");
+  let rateRows = [];
+  const rateWaiting = () => { try { const q = JSON.parse(get(RATE_WAIT) || "[]"); return Array.isArray(q) ? q : []; } catch (e) { return []; } };
+  const rateHold = (body) => set(RATE_WAIT, JSON.stringify(rateWaiting().concat([body]).slice(-20)));
+  const rateGet = (date, name) => fetch(RATINGS_URL + "?date=" + date + "&who=" + encodeURIComponent(name), { cache: "no-store" }).then((r) => r.json());
+  const ratePost = (body) => fetch(RATINGS_URL, { method: "POST", body: JSON.stringify(body) }).then((r) => r.json());
+
+  const rateDraw = (msg) => {
+    rateBox.hidden = !rateRows.length;
+    byId("score-dish").hidden = !!rateRows.length;
+    if (!rateRows.length) { rateBox.innerHTML = ""; return; }
+    let h = "";
+    rateRows.forEach((r, i) => {
+      h += '<div class="dish" data-i="' + i + '"><p>' + (r.meal ? '<span class="tag">' + esc(r.meal) + "</span> " : "") + "<b>" + esc(r.dish) + "</b></p>";
+      h += '<div class="five" role="group" aria-label="' + esc("Score for " + r.dish) + '">';
+      for (let s = 1; s <= 5; s++) h += '<button type="button" value="' + s + '" aria-pressed="' + (r.score === s) + '" aria-label="' + s + ", " + esc(MEANS[s]) + '">' + s + "</button>";
+      h += '</div><p class="mean">' + (r.score ? esc(MEANS[r.score]) : "") + "</p>";
+      h += '<input type="text" maxlength="140" enterkeyhint="done" placeholder="What would make it better? (optional)" aria-label="' + esc("What would make " + r.dish + " better") + '"></div>';
+    });
+    h += '<button type="button" class="cta send">Send my scores</button><p class="note" role="status">' + esc(msg || "") + "</p>";
+    rateBox.innerHTML = h;
+  };
+
+  const rateLoad = () => {
+    if (!who || !rateCard.open) return;
+    const name = who;
+    const fromRecipes = () => dishesOn(today).map((d) => ({ meal: "", dish: d, score: 0 }));
+    rateRows = [];
+    rateBox.hidden = false;
+    rateBox.innerHTML = '<p class="note" role="status">Getting today\'s meal…</p>';
+    rateGet(ymd(today), name).then((res) => {
+      if (name !== who) return;
+      rateRows = res && res.ok && Array.isArray(res.rows)
+        ? res.rows.filter((r) => r && r.dish).slice(0, 6).map((r) => ({ meal: String(r.meal || ""), dish: String(r.dish), score: Math.max(0, Math.min(5, Math.round(+r.score) || 0)) }))
+        : fromRecipes();
+      rateDraw();
+    }, () => { if (name === who) { rateRows = fromRecipes(); rateDraw(); } });
+  };
+
+  const rateSend = () => {
+    const notes = Array.from(rateBox.querySelectorAll(".dish input"));
+    const scores = rateRows.map((r, i) => ({ dish: r.dish, score: r.score || 0, note: notes[i] ? notes[i].value.trim() : "" })).filter((s) => s.score || s.note);
+    const status = rateBox.querySelector(".send + .note");
+    if (!scores.length) { status.textContent = "Pick a score first."; return; }
+    const body = { date: ymd(today), who: who, scores: scores };
+    const send = rateBox.querySelector(".send");
+    send.disabled = true;
+    status.textContent = "Sending…";
+    const done = (msg) => {
+      rateDraw(msg);
+      const box = byId("c-meal-score-0");
+      if (box && !box.checked) { box.checked = true; box.dispatchEvent(new Event("change")); }
+    };
+    ratePost(body).then((res) => {
+      if (res && res.ok) done("Scores in. Thanks!");
+      else { send.disabled = false; status.textContent = "That didn't go in: " + ((res && res.error) || "no answer from the sheet.") + " Tell Dad."; }
+    }, () => { rateHold(body); done("Saved on this phone. It'll go in next time the page can reach the sheet."); });
+  };
+
+  rateBox.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("button");
+    if (!b) return;
+    if (b.classList.contains("send")) { rateSend(); return; }
+    const d = b.closest(".dish");
+    if (!d) return;
+    const r = rateRows[+d.getAttribute("data-i")];
+    r.score = +b.value;
+    Array.from(d.querySelectorAll(".five button")).forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    d.querySelector(".mean").textContent = MEANS[r.score];
+  });
+
+  if (RATINGS_URL && window.fetch && rateCard && rateBox) {
+    rateCard.addEventListener("toggle", rateLoad);
+    picker.addEventListener("click", rateLoad); // A new name: their own scores.
+    // Anything waiting from a send that couldn't get through. One the sheet turns down, like a closed day, is dropped.
+    const waiting = rateWaiting();
+    if (waiting.length) {
+      del(RATE_WAIT);
+      waiting.forEach((body) => ratePost(body).catch(() => rateHold(body)));
+    }
+  }
 
   renderPlan();
   renderAhead();
