@@ -127,7 +127,7 @@ body {
   padding-right: var(--gr);
   padding-block: 8px calc(96px + env(safe-area-inset-bottom, 0px));
 }
-h1, h2, h3, .who button, .five button, .lvl, .hud-pts b, .win button {
+h1, h2, h3, .who button, .lvl, .hud-pts b, .win button {
   font-family: var(--display);
   font-weight: 800;
   font-synthesis: none;
@@ -149,14 +149,14 @@ section, .sop, .jump { scroll-margin-top: 84px; }
 
 /* Name picker: chunky buttons that press down. */
 .who { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 6px; }
-:is(.who, .five) button {
+.who button {
   font-size: 1.05rem; line-height: 1; padding: 11px 16px 10px; border-radius: calc(14px * var(--rad)); cursor: pointer;
   border: 2px solid var(--line); background: var(--surface); color: var(--fg);
   box-shadow: var(--lift); touch-action: manipulation;
   transition: transform 0.08s, box-shadow 0.08s;
 }
-:is(.who, .five) button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lip); }
-:is(.who, .five) button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: var(--award-ink); box-shadow: 0 3px 0 var(--award-lip); }
+.who button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lip); }
+.who button[aria-pressed="true"] { background: var(--award-fill); border-color: var(--award-fill); color: var(--award-ink); box-shadow: 0 3px 0 var(--award-lip); }
 
 /* Points bar: sticks to the top once a name is picked. Tapping it opens the scoreboard. */
 .hud {
@@ -312,16 +312,14 @@ input.bump { animation: bump 0.25s ease-out; }
 .dw { border-top: 2px dashed var(--line); padding-top: 10px; margin: 12px 0 0; }
 .dw b { color: var(--go); }
 
-/* Scoring the meal: 1 to 5 for each dish, sent straight to the scores sheet. */
+/* Scoring the meal: a drop-down of what each score means, for each dish, sent straight to the scores sheet. */
 .rate .dish { margin: 12px 0 16px; }
 .rate .dish > p:first-child { margin-bottom: 8px; }
-.five { display: flex; gap: 8px; }
-.five button { flex: 1; min-width: 0; padding: 11px 0 10px; font-size: 1.15rem; }
-.rate .mean { min-height: 1.3em; margin: 6px 0 0; font-size: 0.875rem; color: var(--muted); }
-.rate input[type="text"] {
+.rate :is(select, input[type="text"]) {
   width: 100%; box-sizing: border-box; margin: 8px 0 0; padding: 10px 12px; font: 1rem var(--font); color: var(--fg);
   background: var(--surface); border: 2px solid var(--line); border-radius: calc(12px * var(--rad));
 }
+.rate select { margin-top: 0; font-weight: 700; cursor: pointer; }
 .rate .cta { margin-top: 4px; }
 .rate .cta:disabled { opacity: 0.6; cursor: progress; }
 .rate .send + .note { margin: 12px 0 0; }
@@ -579,10 +577,10 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   :root[data-person="leo"] .bg i { filter: brightness(0.6); }
 }
 /* Buttons are blocks too, with sides in their own colour, and they press down into them. */
-:root[data-person="leo"] :is(.who, .five) button[aria-pressed="true"] { box-shadow: 4px 4px 0 var(--lip); }
+:root[data-person="leo"] .who button[aria-pressed="true"] { box-shadow: 4px 4px 0 var(--lip); }
 :root[data-person="leo"] .cta { box-shadow: 1px 1px 0 #3d8a2a, 2px 2px 0 #3d8a2a, 3px 3px 0 #3d8a2a, 4px 4px 0 #3d8a2a, 5px 5px 0 var(--lip); }
 :root[data-person="leo"] :is(.close-day, .win button:not(.ghost)) { box-shadow: 1px 1px 0 #c98f1c, 2px 2px 0 #c98f1c, 3px 3px 0 #c98f1c, 4px 4px 0 #c98f1c, 5px 5px 0 var(--lip); }
-:root[data-person="leo"] :is(.who button, .five button, .cta, .close-day, .win button:not(.ghost)):active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--lip); }
+:root[data-person="leo"] :is(.who button, .cta, .close-day, .win button:not(.ghost)):active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--lip); }
 :root[data-person="leo"] .close-day { margin: 0 5px 5px 0; }
 :root[data-person="leo"] input[type="checkbox"] { border-color: var(--line); }
 :root[data-person="leo"] input[type="checkbox"]:checked { box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.2), inset 3px 3px 0 rgba(255, 255, 255, 0.35); }
@@ -636,7 +634,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
 :root[data-person="aurora"] :is(.bar i, .sop > summary::after) { background: var(--rainbow); }
 :root[data-person="aurora"] .sop.done { border-color: transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rainbow) border-box; }
 :root[data-person="aurora"] :is(section.gate.cleared > h2[data-n], .jump a.cleared[data-n])::before { background: var(--rainbow); color: #1f0029; box-shadow: none; }
-:root[data-person="aurora"] :is(.who, .five) button[aria-pressed="true"] { background: var(--rainbow); border-color: transparent; color: #1f0029; }
+:root[data-person="aurora"] .who button[aria-pressed="true"] { background: var(--rainbow); border-color: transparent; color: #1f0029; }
 :root[data-person="aurora"] .cta { background: var(--rainbow); color: #1f0029; box-shadow: 0 4px 0 #5c1a7a; }
 :root[data-person="aurora"] .cta:active { box-shadow: 0 2px 0 #5c1a7a; }
 :root[data-person="aurora"] input[type="checkbox"]:checked { border-color: transparent; background-image: var(--tick), linear-gradient(135deg, #ff2e97, #ffe600 50%, #2ec8ff); background-size: 72%, 100%; }
@@ -2915,9 +2913,9 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     let h = "";
     rateRows.forEach((r, i) => {
       h += '<div class="dish" data-i="' + i + '"><p>' + (r.meal ? '<span class="tag">' + esc(r.meal) + "</span> " : "") + "<b>" + esc(r.dish) + "</b></p>";
-      h += '<div class="five" role="group" aria-label="' + esc("Score for " + r.dish) + '">';
-      for (let s = 1; s <= 5; s++) h += '<button type="button" value="' + s + '" aria-pressed="' + (r.score === s) + '" aria-label="' + s + ", " + esc(MEANS[s]) + '">' + s + "</button>";
-      h += '</div><p class="mean">' + (r.score ? esc(MEANS[r.score]) : "") + "</p>";
+      h += '<select aria-label="' + esc("Score for " + r.dish) + '"><option value="0">How was it?</option>';
+      for (let s = 5; s >= 1; s--) h += '<option value="' + s + '"' + (r.score === s ? " selected" : "") + ">" + esc(MEANS[s]) + "</option>";
+      h += "</select>";
       h += '<input type="text" maxlength="140" enterkeyhint="done" placeholder="What would make it better? (optional)" aria-label="' + esc("What would make " + r.dish + " better") + '"></div>';
     });
     h += '<button type="button" class="cta send">Send my scores</button><p class="note" role="status">' + esc(msg || "") + "</p>";
@@ -2941,10 +2939,12 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   };
 
   const rateSend = () => {
+    const picks = Array.from(rateBox.querySelectorAll(".dish select"));
+    rateRows.forEach((r, i) => { r.score = picks[i] ? +picks[i].value || 0 : r.score; });
     const notes = Array.from(rateBox.querySelectorAll(".dish input"));
     const scores = rateRows.map((r, i) => ({ dish: r.dish, score: r.score || 0, note: notes[i] ? notes[i].value.trim() : "" })).filter((s) => s.score || s.note);
     const status = rateBox.querySelector(".send + .note");
-    if (!scores.length) { status.textContent = "Pick a score first."; return; }
+    if (!scores.length) { status.textContent = "Say how it was first."; return; }
     const body = { date: ymd(today), who: who, scores: scores };
     const send = rateBox.querySelector(".send");
     send.disabled = true;
@@ -2961,15 +2961,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   };
 
   rateBox.addEventListener("click", (e) => {
-    const b = e.target.closest && e.target.closest("button");
-    if (!b) return;
-    if (b.classList.contains("send")) { rateSend(); return; }
-    const d = b.closest(".dish");
-    if (!d) return;
-    const r = rateRows[+d.getAttribute("data-i")];
-    r.score = +b.value;
-    Array.from(d.querySelectorAll(".five button")).forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-    d.querySelector(".mean").textContent = MEANS[r.score];
+    if (e.target.closest && e.target.closest(".send")) rateSend();
   });
 
   if (RATINGS_URL && window.fetch && rateCard && rateBox) {
