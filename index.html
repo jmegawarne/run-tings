@@ -325,6 +325,48 @@ input.bump { animation: bump 0.25s ease-out; }
 .rate .cta:disabled { opacity: 0.6; cursor: progress; }
 .rate .send + .note { margin: 12px 0 0; }
 
+/* Tidying a mess: today's claims on the card, the claim pop-up's chips and photos, and Dad's list to approve.
+   The chips are name buttons too, so each person's theme dresses them. */
+ul.claims { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+ul.claims li { background: var(--raise); border-radius: calc(10px * var(--rad)); padding: 6px 10px; font-size: 0.9rem; }
+ul.claims b { margin-right: 4px; }
+.tidy .cta { margin-top: 12px; }
+.tidy .note { margin: 10px 0 0; }
+.tq { margin: 16px 0 0; font-weight: 700; }
+.chips { margin: 8px 0 2px; }
+.chips button { font-size: 0.95rem; padding: 10px 12px 9px; }
+.chips button:disabled { opacity: 0.45; cursor: not-allowed; }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
+.shot {
+  position: relative; display: grid; place-items: center; min-height: 6.5rem; overflow: hidden; cursor: pointer;
+  border: 2px dashed var(--line); border-radius: calc(12px * var(--rad)); background: var(--raise); font-weight: 700;
+}
+.shot:focus-within { outline: 3px solid var(--go); outline-offset: 2px; }
+.shot.got { border-style: solid; border-color: var(--go-fill); }
+.shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.shot span { position: relative; background: var(--surface); color: var(--fg); border-radius: var(--pill); padding: 2px 10px; }
+.tidy-total { display: flex; gap: 12px; align-items: center; margin: 16px 0 0; }
+.tidy-total p { margin: 0; font-size: 0.875rem; color: var(--muted); }
+#tidy-sheet .cta:disabled { opacity: 0.6; cursor: progress; }
+#tidy-sheet [role="status"] { margin: 10px 0 0; }
+.approve .note { margin: 0 0 4px; }
+.ap { margin: 10px 0 0; padding: 10px 12px; border: 2px solid var(--line); border-radius: calc(12px * var(--rad)); background: var(--raise); }
+.ap-row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin: 0; }
+.ap-row .pts { flex: none; font: 800 0.85rem/1 var(--display); font-synthesis: none; color: var(--pts); background: var(--pts-soft); border-radius: var(--pill); padding: 4px 8px 3px; }
+.ap-meta { margin: 2px 0 0; font-size: 0.85rem; color: var(--muted); }
+.ap-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 0; }
+.ap-acts button, .ap-done button {
+  min-height: 44px; padding: 0 14px; border: 2px solid var(--line); border-radius: calc(12px * var(--rad));
+  background: var(--surface); color: var(--fg); font: 700 0.9rem var(--font); cursor: pointer; touch-action: manipulation;
+}
+.ap-acts button.yes { background: var(--go-fill); border-color: var(--go-fill); color: var(--go-ink); }
+.ap-acts button:disabled { opacity: 0.5; cursor: progress; }
+.ap-calls { border-top: 2px dashed var(--line); padding-top: 10px; }
+.ap-calls > span { flex-basis: 100%; color: var(--warn); font-weight: 700; font-size: 0.85rem; }
+.ap-done { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 10px 0 0; padding: 6px 6px 6px 10px; border-radius: calc(10px * var(--rad)); background: var(--go-soft); color: var(--go); font-size: 0.9rem; }
+.ap-done button { min-height: 36px; padding: 0 10px; font-size: 0.8rem; }
+.ap [role="status"]:not(:empty) { margin: 8px 0 0; color: var(--warn); font-size: 0.85rem; }
+
 /* Points as they're won: a number that floats up from the tick, and a ring round a cleared card. */
 .pop { position: absolute; left: -2px; top: -6px; z-index: 2; pointer-events: none; white-space: nowrap; font: 800 1rem/1 var(--display); font-synthesis: none; color: var(--pts); text-shadow: 0 2px 0 var(--surface); animation: rise 0.9s ease-out forwards; }
 .pop.big { left: auto; right: 14px; top: 30%; font-size: 1.15rem; }
@@ -707,7 +749,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   <span class="hud-mid">
     <span class="hud-who"><b id="hud-name"></b><span id="hud-title"></span></span>
     <span class="bar" aria-hidden="true"><i id="hud-bar"></i></span>
-    <span class="hud-sub"><span id="hud-cards"></span><span id="hud-streak"></span></span>
+    <span class="hud-sub"><span id="hud-cards"></span><span id="hud-streak"></span><span id="hud-wait"></span></span>
   </span>
   <span class="hud-pts"><b id="hud-pts">0</b><small>points today<span aria-hidden="true"> ›</span></small></span>
 </button>
@@ -716,6 +758,12 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
      This week, Tasks, and Skills, one at a time, switched from the bar along the bottom.
      The page opens on This week. The scoreboard is a pop-up from the points bar. -->
 <div class="view" id="v-week">
+<!-- Tidy claims waiting for Dad: only with Dad picked, and only when there's something to decide or decided today. -->
+<section class="week approve" id="approve" hidden aria-labelledby="approve-h">
+  <div class="week-top"><h2 id="approve-h">To approve</h2><span class="note" id="approve-n"></span></div>
+  <p class="note">The photos are in <span class="chat-name">Loving Chat 3.0</span>.</p>
+  <div id="approve-list"></div>
+</section>
 <section class="week" id="week" aria-labelledby="week-h">
   <div class="week-top"><h2 id="week-h">This week</h2><a href="hub/">Kitchen screen<span aria-hidden="true"> ›</span></a></div>
   <div id="week-body"><noscript><p>Routines needs JavaScript switched on.</p></noscript></div>
@@ -1554,6 +1602,17 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   <h2 id="g-any-h">Any time</h2>
   <p class="intro">Whenever it comes up.</p>
 
+  <!-- No ticks: a claim sends the before and after to the family chat and waits for Dad's yes on This week.
+       Its time sets what a room pays, times the handicap, and TIDY_TOGETHER when someone helped. -->
+  <details class="sop" id="tidy" data-who="aurora leo" data-period="d" data-time="5 min">
+    <summary>See a mess, tidy a mess</summary>
+    <div class="body">
+      <p class="when">Any shared room, whoever made the mess.</p>
+      <div class="tidy" id="tidy-box"></div>
+      <p class="dw"><b>Done when:</b> the room's back to normal, and your before and after are in <span class="chat-name">Loving Chat 3.0</span>.</p>
+    </div>
+  </details>
+
   <details class="sop" id="shower" data-who="all" data-period="d" data-time="5 min">
     <summary>After every shower</summary>
     <div class="body">
@@ -1607,6 +1666,14 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   <div class="sheet">
     <div class="sheet-top"><h2 id="score-h">Scoreboard</h2><button type="button" class="x" id="score-x" aria-label="Close the scoreboard">✕</button></div>
     <div class="score" id="score-body"></div>
+  </div>
+</div>
+
+<!-- Claiming a tidy: a pop-up from the card. See "Tidying a mess" in the script. -->
+<div class="modal" id="tidy-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="tidy-h">
+  <div class="sheet">
+    <div class="sheet-top"><h2 id="tidy-h">Claim a tidy</h2><button type="button" class="x" id="tidy-x" aria-label="Close">✕</button></div>
+    <div id="tidy-body"></div>
   </div>
 </div>
 
@@ -1756,6 +1823,10 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   // Meal scores go straight into the Ratings sheet through this web app, the one in apps-script/ratings.gs.
   // Empty, and Score the meal is a plain tick.
   const RATINGS_URL = "https://script.google.com/macros/s/AKfycbwKwd1LMkvCETiNMQFaAueAFYibhKwn2q6zcv5MiJh8bnCQUoCSpWLwMV3jaSkLORmg/exec";
+  // See a mess, tidy a mess: the rooms a claim can be for, and the chat the photos go to. Claims go through the
+  // same web app, to its Tidies tab, and wait for Dad on This week. Empty RATINGS_URL, and there's no tidy card.
+  const TIDY_ROOMS = ["Kitchen", "Living room", "Bathroom", "Toilet", "Stairs and landing", "Porch", "Front garden"];
+  const TIDY_CHAT = "Loving Chat 3.0";
   /* ---------- End of settings ---------- */
 
   /* ---------- Points and awards ---------- */
@@ -1767,6 +1838,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   // Bonus cards, by card id. One pays its pts here, not its time, and ticking it sets off the big send-off with these words.
   // A bonus is extra: it's never needed for a cleared moment, a clean sweep, or a streak.
   const BONUS = { cuddle: { pts: 300, icon: "🤗", title: "Dad's cuddle!", line: "Best bit of Dad's day." } };
+  // A tidy claim pays its card's time, times your handicap, times this when someone helped. Each of you claims your own.
+  const TIDY_TOGETHER = 1.5;
   const LEVEL_AT = (l) => 500 * (l - 1) * l; // Total points to reach level l: 1,000 for level 2, 3,000 for 3, 6,000 for 4.
   const TITLES = ["Sock Rookie", "Crumb Cadet", "Dish Apprentice", "Hoover Hopeful", "Squeegee Squire", "Laundry Ranger",
     "Grime Fighter", "Dust Ninja", "Mop Mage", "Tidy Knight", "Spotless Sorcerer", "Order Overlord", "Kitchen Commander",
@@ -2101,6 +2174,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       if (dow === 0) out.push("Tonight");
     } else if (id === "supplements") {
       if ((card.getAttribute("data-days") || "").split(" ").indexOf(String(dow)) > -1) out.push("Tonight");
+    } else if (id === "tidy") {
+      out.push("Per room");
     } else if (per === "w" && isSat && card.hasAttribute("data-sat")) {
       out.push("Today");
     } else if (per === "m" && firstSat) {
@@ -2195,6 +2270,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     if (b) bits.push("Bins out tonight: the " + b + " (" + and(crew(ownerOf("living", week, "weekday"))) + ").");
     h += '<p class="today"><b>' + esc("Today, " + DAYS[dow] + " " + now.getDate() + " " + MONTHS[now.getMonth()] + ".") + "</b> " + (lunch.dish ? "Lunch: " + (lunch.link || esc(lunch.dish)) + ". " : "") + mealHtml + " " + esc(bits.join(" ")) + "</p>";
     const chips = who ? youChips(who) : [];
+    const badge = who ? badgeOf(who) : null;
+    if (badge) chips.unshift([BADGES[badge.kind].icon + " " + BADGES[badge.kind].name, "till " + longDay(badge.until)]);
     if (chips.length) h += '<ul class="you" aria-label="Your week">' + chips.map(([k, v]) => "<li><b>" + esc(k) + "</b> " + esc(v) + "</li>").join("") + "</ul>";
     document.getElementById("week-body").innerHTML = h;
   };
@@ -2291,7 +2368,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       const t = ymd(today);
       Object.keys(g.got).forEach((k) => {
         const a = g.got[k];
-        if (a[1] !== t) return;
+        if (a[1] !== t || k.indexOf("hsop|t|") === 0) return; // A tidy pays what its claim said, handicap and all.
         const v = Math.round((a[0] * hc(p)) / g.hc);
         g.total += v - a[0];
         if (g.days[t]) g.days[t].pts += v - a[0];
@@ -2299,12 +2376,14 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       });
       g.hc = hc(p);
     }
-    // Records of which ticks scored go when their ticks do. The points stay.
+    // Records of which ticks scored go when their ticks do, and tidies' long after the sheet stops sending them.
+    // The points stay.
+    const cut = ymd(today - KEEP_DAYS * DAY);
     Object.keys(g.got).forEach((k) => {
       const per = k.split("|")[1] || "";
       if ("dwmq".indexOf(per.charAt(0)) > -1 && per !== PERIOD[per.charAt(0)]) delete g.got[k];
+      else if (per === "t" && g.got[k][1] < cut) delete g.got[k];
     });
-    const cut = ymd(today - KEEP_DAYS * DAY);
     Object.keys(g.days).forEach((d) => { if (d < cut) { g.old = Math.max(g.old, +g.days[d].pts || 0); delete g.days[d]; } });
     return g;
   };
@@ -2461,7 +2540,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     const pts = (g.days[ymd(today)] || {}).pts || 0;
     const st = streakOf(g);
     document.getElementById("hud-lvl").textContent = l;
-    document.getElementById("hud-name").textContent = who;
+    document.getElementById("hud-name").textContent = who + badgeMark(who);
+    document.getElementById("hud-wait").textContent = tidyWaiting();
     document.getElementById("hud-title").textContent = titleOf(l);
     document.getElementById("hud-bar").style.setProperty("--v", s.all ? (s.done / s.all).toFixed(3) : "0");
     document.getElementById("hud-cards").textContent = s.done + " of " + s.all + " cards";
@@ -2873,6 +2953,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     renderSkills();
     showViews();
     enterGame();
+    renderTidy();
   }
 
   // The hex dump behind Dad's theme: made-up bytes from a seeded generator, so the same every time, each byte in a
@@ -2986,6 +3067,349 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       del(RATE_WAIT);
       waiting.forEach((body) => ratePost(body).catch(() => rateHold(body)));
     }
+  }
+
+  /* ---------- Tidying a mess ---------- */
+  // Claiming a tidy shares the before and after to the family chat with the phone's own share sheet, then sends the
+  // claim to the Tidies tab through RATINGS_URL, where it waits for Dad. Dad decides on This week: approve, not this
+  // one, or, when someone called it, owned, Cobra, or wolf. Points are still kept on each phone: each one asks the
+  // sheet what's been decided about its person's claims and calls, and pays out once a decision, under keys starting
+  // hsop|t|. A changed decision changes what it paid. Cobra puts a snake on the claimer's name for a week, and a wolf
+  // goes on a caller who got it wrong; the sheet says whose, so every phone shows them on the name buttons.
+  const APPROVER = "Dad";
+  const TIDY_WAIT = "hsop-tidyq";
+  const BADGES = { cobra: { icon: "🐍", name: "Cobra" }, wolf: { icon: "🐺", name: "Wolf" } };
+  const tidyCard = byId("tidy");
+  const tidyBox = byId("tidy-box");
+  const tidySheet = byId("tidy-sheet");
+  const tidyBody = byId("tidy-body");
+  const approveEl = byId("approve");
+  const tidyOn = !!(RATINGS_URL && window.fetch);
+  if (!tidyOn && tidyCard) tidyCard.remove();
+  Array.from(document.querySelectorAll(".chat-name")).forEach((el) => { el.textContent = TIDY_CHAT; });
+
+  let tidy = { for: "", claims: [], badges: [], gapHours: 3 };
+  const tidyFor = (p) => (tidy.for === p ? tidy.claims : []);
+  // The page's own day for a moment, so a claim at 1am counts on the day before, as ticks do.
+  const dayAt = (iso) => { const d = new Date(iso); const n = new Date(d.getFullYear(), d.getMonth(), d.getDate() - (d.getHours() < NEW_DAY_AT ? 1 : 0)); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
+  const clockAt = (iso) => { const d = new Date(iso); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+  const longDay = (iso) => { const d = new Date(iso); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
+  const badgeOf = (p) => tidy.badges.find((b) => b && b.who === p && BADGES[b.kind] && Date.parse(b.until) > Date.now()) || null;
+  const badgeMark = (p) => { const b = badgeOf(p); return b ? " " + BADGES[b.kind].icon : ""; };
+  const tidyWaiting = () => {
+    if (!who || tidy.for !== who) return "";
+    if (who === APPROVER) { const n = tidy.claims.filter((c) => !c.decision).length; return n ? n + " to approve" : ""; }
+    const pts = tidy.claims.filter((c) => c.who === who && !c.decision).reduce((s, c) => s + (+c.pts || 0), 0);
+    return pts ? "+" + fmt(pts) + " waiting" : "";
+  };
+  const tidyGet = (name) => fetch(RATINGS_URL + "?tidy=1&who=" + encodeURIComponent(name), { cache: "no-store" }).then((r) => r.json());
+  const tidyPost = (body) => fetch(RATINGS_URL, { method: "POST", body: JSON.stringify(body) }).then((r) => r.json());
+  const tidyQueue = () => { try { const q = JSON.parse(get(TIDY_WAIT) || "[]"); return Array.isArray(q) ? q : []; } catch (e) { return []; } };
+  const tidyHold = (body) => set(TIDY_WAIT, JSON.stringify(tidyQueue().concat([body]).slice(-20)));
+
+  // What a decision pays, as the claimer ("c") or the caller ("k"), and how it's told.
+  const tidyPays = (c, role) => {
+    const p = Math.max(0, Math.round(+c.pts) || 0);
+    const d = c.decision;
+    if (role === "c") return d === "approve" ? p : d === "wolf" ? 2 * p : 0;
+    return d === "owned" || d === "cobra" ? p : d === "wolf" ? -p : 0;
+  };
+  const tidyNews = (c, role, pts) => {
+    const room = c.room.toLowerCase();
+    const plus = "+" + fmt(pts) + " points";
+    if (!c.decision) return ["↩️", "Back with Dad: " + room, "Waiting for his decision"];
+    if (role === "c") {
+      if (c.decision === "approve") return ["✅", "Approved: " + room, plus];
+      if (c.decision === "no") return ["✋", "Not approved: " + room, "No points this time"];
+      if (c.decision === "owned") return ["🙋", "Owned: " + room, "No points, and no snake"];
+      if (c.decision === "cobra") return ["🐍", "Cobra: " + room, "No points, and the snake's yours"];
+      return ["🐺", c.caller + " cried wolf", plus];
+    }
+    if (c.decision === "owned") return ["🙋", c.who + " owned it", plus];
+    if (c.decision === "cobra") return ["🐍", "Your Cobra call stood", plus];
+    return ["🐺", "Crying wolf: the wolf's yours", "−" + fmt(-pts) + " points, to " + c.who];
+  };
+
+  // Pays out whatever's been decided since this phone last asked, once each.
+  const tidyPay = () => {
+    if (!who || who === APPROVER || tidy.for !== who) return;
+    const g = loadGame(who);
+    const was = levelOf(g.total);
+    const news = [];
+    tidy.claims.forEach((c) => {
+      [["c", c.who === who], ["k", c.caller === who && c.who !== who]].forEach(([role, mine]) => {
+        if (!mine) return;
+        const key = "hsop|t|" + c.id + "|" + role;
+        const had = g.got[key];
+        const want = tidyPays(c, role);
+        if (had ? had[2] === c.decision && had[0] === want : !c.decision) return;
+        if (had) unaward(g, key);
+        if (c.decision) {
+          g.got[key] = [want, ymd(today), c.decision];
+          g.total = Math.max(0, g.total + want);
+          const day = dayOf(g, today);
+          day.pts = Math.max(0, day.pts + want);
+        }
+        if (had || c.decision) news.push(tidyNews(c, role, want));
+      });
+    });
+    if (!news.length) return;
+    const fresh = checkAwards(g, { cleared: [], undo: false, live: false });
+    saveGame(who, g);
+    renderGame(g);
+    news.forEach((n) => toast(n[0], n[1], n[2]));
+    const l = levelOf(g.total);
+    if (l > was) toast("⭐", "Level up", "Level " + l + ": " + titleOf(l), "up");
+    toastAwards(fresh);
+  };
+
+  const tidyLoad = () => {
+    if (!tidyOn || !who) { renderTidy(); return; }
+    const name = who;
+    tidyGet(name).then((res) => {
+      if (!res || !res.ok || !Array.isArray(res.claims)) return;
+      tidy.badges = Array.isArray(res.badges) ? res.badges : [];
+      tidy.gapHours = +res.gapHours || 3;
+      if (name === who) {
+        tidy.for = name;
+        tidy.claims = res.claims.filter((c) => c && c.id).map((c) => ({
+          id: String(c.id), at: String(c.at || ""), who: String(c.who || ""), room: String(c.room || ""), with: String(c.with || ""),
+          photosBy: String(c.photosBy || ""), pts: Math.round(+c.pts) || 0, decision: String(c.decision || ""), caller: String(c.caller || ""), decided: String(c.decided || "")
+        }));
+        tidyPay();
+      }
+      renderTidy();
+    }, () => {});
+  };
+
+  const STATES = { "": "waiting for Dad", approve: "approved", no: "not approved", owned: "owned", cobra: "Cobra 🐍" };
+  const renderTidy = () => {
+    Array.from(picker.querySelectorAll("button")).forEach((b) => { b.textContent = b.value + badgeMark(b.value); });
+    if (who) {
+      document.getElementById("hud-name").textContent = who + badgeMark(who);
+      document.getElementById("hud-wait").textContent = tidyWaiting();
+    }
+    renderWeek();
+    renderApprove();
+    if (!tidyBox) return;
+    const mine = tidyFor(who).filter((c) => c.who === who && (dayAt(c.at) === today || !c.decision));
+    let h = mine.length
+      ? '<ul class="claims" aria-label="Your claims today">' + mine.map((c) => "<li><b>" + esc(c.room) + "</b> +" + fmt(c.pts) + ", " +
+          esc(c.decision === "wolf" ? "approved, and " + c.caller + " cried wolf" : STATES[c.decision] || "") + "</li>").join("") + "</ul>"
+      : '<p class="note">Nothing claimed today.</p>';
+    h += '<button type="button" class="cta" id="tidy-go">Claim a tidy</button>';
+    h += '<p class="note">Each room once every ' + tidy.gapHours + " hours. Points land when Dad approves.</p>";
+    h += '<p class="note" role="status" id="tidy-msg"></p>';
+    const msg = byId("tidy-msg");
+    const keep = msg ? msg.textContent : "";
+    tidyBox.innerHTML = h;
+    byId("tidy-msg").textContent = keep;
+  };
+
+  /* The claim pop-up. It's drawn afresh on every choice; the photos are kept here, not in the form. */
+  let tc = null;
+  const tidyPts = () => Math.round(cardPts(tidyCard) * hc(who) * (tc && tc.mate ? TIDY_TOGETHER : 1));
+  const lastClaim = (room) => tidyFor(who).filter((c) => c.who === who && c.room === room && Date.now() - Date.parse(c.at) < tidy.gapHours * 36e5)[0];
+  const tidyCaption = () => who + " tidied the " + tc.room.toLowerCase() + (tc.mate ? ", with " + tc.mate : "") + ". +" + fmt(tidyPts());
+  const drawSheet = () => {
+    const focusKey = document.activeElement && tidySheet.contains(document.activeElement) ? document.activeElement.getAttribute("data-k") : null;
+    const chip = (k, label, on, off) => '<button type="button" data-k="' + esc(k) + '" aria-pressed="' + on + '"' + (off ? " disabled" : "") + ">" + esc(label) + "</button>";
+    const sends = !tc.mate || tc.sender === who;
+    let h = '<p class="tq" id="tq-room">Which room?</p><div class="who chips" role="group" aria-labelledby="tq-room">';
+    TIDY_ROOMS.forEach((r) => { const last = lastClaim(r); h += chip("room:" + r, last ? r + " · " + clockAt(last.at) : r, tc.room === r, !!last); });
+    h += '</div><p class="tq" id="tq-mate">Did anyone help?</p><div class="who chips" role="group" aria-labelledby="tq-mate">';
+    h += chip("mate:", "Just me", !tc.mate);
+    NAMES.filter((n) => n !== who).forEach((n) => { h += chip("mate:" + n, n, tc.mate === n); });
+    h += "</div>";
+    if (tc.mate) {
+      h += '<p class="tq" id="tq-send">Who\'s sending the photos?</p><div class="who chips" role="group" aria-labelledby="tq-send">';
+      h += chip("send:" + who, "Me", tc.sender === who) + chip("send:" + tc.mate, tc.mate, tc.sender === tc.mate) + "</div>";
+    }
+    if (sends) {
+      h += '<p class="tq">Before and after</p><div class="shots">';
+      ["before", "after"].forEach((s) => {
+        const f = tc[s];
+        h += '<label class="shot' + (f ? " got" : "") + '">' + (f ? '<img alt="" src="' + esc(f.url) + '">' : "") +
+          '<input class="vh" type="file" accept="image/*" data-k="shot:' + s + '"><span>' + (s === "before" ? "Before" : "After") + (f ? " ✓" : "") + "</span></label>";
+      });
+      h += "</div>";
+    }
+    h += '<div class="tidy-total"><span class="hud-pts"><b>+' + fmt(tidyPts()) + "</b><small>points</small></span><p>" +
+      esc(!tc.room ? "Pick the room." : sends ? "Caption: " + tidyCaption() : "Dad approves it once " + tc.mate + "'s photos are in " + TIDY_CHAT + ".") + "</p></div>";
+    h += '<button type="button" class="cta" data-k="send"' + (tc.busy ? " disabled" : "") + ">" + (sends ? "Share to the chat" : "Claim it") + "</button>";
+    h += '<p class="note" role="status" id="tidy-say">' + esc(tc.say || "") + "</p>";
+    tidyBody.innerHTML = h;
+    const back = focusKey && tidyBody.querySelector('[data-k="' + focusKey.replace(/"/g, '\\"') + '"]');
+    if (back) back.focus({ preventScroll: true });
+  };
+  const dropShots = () => { if (tc) ["before", "after"].forEach((s) => { if (tc[s]) URL.revokeObjectURL(tc[s].url); }); };
+  let tidyFrom = null;
+  const openTidy = () => {
+    if (!who || who === APPROVER) return;
+    tidyFrom = document.activeElement;
+    tc = { room: "", mate: "", sender: who, before: null, after: null, busy: false, say: "" };
+    drawSheet();
+    tidySheet.hidden = false;
+    byId("tidy-x").focus({ preventScroll: true });
+  };
+  const closeTidy = () => {
+    tidySheet.hidden = true;
+    dropShots();
+    tc = null;
+    tidyBody.innerHTML = "";
+    if (tidyFrom && tidyFrom.focus) tidyFrom.focus({ preventScroll: true });
+  };
+
+  // The photos go through the phone's share sheet. "cancel" means they backed out; "none" means this phone can't
+  // share photos, so they post them themselves.
+  const shareShots = () => {
+    const files = [tc.before.file, tc.after.file];
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
+      return navigator.share({ files: files, text: tidyCaption() }).then(() => "shared", (e) => (e && e.name === "AbortError" ? "cancel" : "none"));
+    }
+    return Promise.resolve("none");
+  };
+  const sendTidy = () => {
+    if (!tc || tc.busy) return;
+    const sends = !tc.mate || tc.sender === who;
+    if (!tc.room) { tc.say = "Pick the room first."; drawSheet(); return; }
+    if (sends && (!tc.before || !tc.after)) { tc.say = "Add your before and after first."; drawSheet(); return; }
+    const body = { tidy: "claim", who: who, room: tc.room, with: tc.mate, photosBy: sends ? who : tc.mate, pts: tidyPts() };
+    const claimed = { room: tc.room, pts: body.pts, mate: tc.mate };
+    tc.busy = true;
+    tc.say = "";
+    const shared = sends ? shareShots() : Promise.resolve("theirs");
+    drawSheet();
+    shared.then((how) => {
+      if (!tc) return;
+      if (how === "cancel") { tc.busy = false; tc.say = "Not shared, so nothing's claimed."; drawSheet(); return; }
+      tc.say = "Sending your claim…";
+      drawSheet();
+      const after = how === "none" ? " Now post your before and after in " + TIDY_CHAT + "." : how === "theirs" ? " It counts once " + claimed.mate + "'s photos are in " + TIDY_CHAT + "." : "";
+      tidyPost(body).then((res) => {
+        if (res && res.ok) {
+          closeTidy();
+          if (tidy.for !== who) tidy.claims = [];
+          tidy.claims.push({ id: String(res.id || Date.now()), at: new Date().toISOString(), who: who, room: claimed.room, with: claimed.mate, photosBy: body.photosBy, pts: claimed.pts, decision: "", caller: "", decided: "" });
+          tidy.for = who;
+          renderTidy();
+          byId("tidy-msg").textContent = "Claim sent. +" + fmt(claimed.pts) + " waiting for Dad." + after;
+          toast("🧹", "Claim sent: " + claimed.room.toLowerCase(), "+" + fmt(claimed.pts) + " waiting for Dad");
+        } else if (tc) {
+          tc.busy = false;
+          tc.say = "That didn't go in: " + ((res && res.error) || "no answer from the sheet.") + (how === "shared" ? " Your photos did go to the chat." : "");
+          drawSheet();
+        }
+      }, () => {
+        tidyHold(body);
+        closeTidy();
+        renderTidy();
+        byId("tidy-msg").textContent = "Saved on this phone. It'll reach Dad the next time the page can reach the sheet." + after;
+      });
+    });
+  };
+
+  if (tidyOn && tidyBox) {
+    tidyBox.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#tidy-go")) openTidy(); });
+    tidyBody.addEventListener("click", (e) => {
+      const b = e.target.closest && e.target.closest("button[data-k]");
+      if (!b || !tc || b.disabled) return;
+      const k = b.getAttribute("data-k");
+      const v = k.slice(k.indexOf(":") + 1);
+      if (k === "send") { sendTidy(); return; }
+      if (k.indexOf("room:") === 0) tc.room = v;
+      if (k.indexOf("mate:") === 0) { tc.mate = v; tc.sender = who; }
+      if (k.indexOf("send:") === 0) tc.sender = v;
+      tc.say = "";
+      drawSheet();
+    });
+    tidyBody.addEventListener("change", (e) => {
+      const input = e.target;
+      if (!tc || !input.files || !/^shot:/.test(input.getAttribute("data-k") || "")) return;
+      const s = input.getAttribute("data-k").slice(5);
+      const file = input.files[0];
+      if (!file) return;
+      if (tc[s]) URL.revokeObjectURL(tc[s].url);
+      tc[s] = { file: file, url: URL.createObjectURL(file) };
+      tc.say = "";
+      drawSheet();
+    });
+    byId("tidy-x").addEventListener("click", closeTidy);
+    tidySheet.addEventListener("click", (e) => { if (e.target === tidySheet) closeTidy(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !tidySheet.hidden) closeTidy(); });
+  }
+
+  /* Dad's list: what's waiting, oldest first, and what he's decided today, newest first, with Undo. */
+  const SAID = {
+    approve: (c) => "Approved. " + c.who + " +" + fmt(c.pts) + ".",
+    no: () => "Not this one. No points.",
+    owned: (c) => "Owned. " + c.who + " gets nothing. " + c.caller + " +" + fmt(c.pts) + ".",
+    cobra: (c) => "Cobra. " + c.who + " gets nothing, and 🐍 for a week. " + c.caller + " +" + fmt(c.pts) + ".",
+    wolf: (c) => "Wolf. " + c.who + " +" + fmt(2 * c.pts) + ". " + c.caller + " −" + fmt(c.pts) + ", and 🐺 for a week."
+  };
+  const renderApprove = () => {
+    if (!approveEl) return;
+    const list = tidyOn && who === APPROVER && tidy.for === who ? tidy.claims : [];
+    const waiting = list.filter((c) => !c.decision).sort((a, b) => (a.at < b.at ? -1 : 1));
+    const done = list.filter((c) => SAID[c.decision] && c.decided && dayAt(c.decided) === today).sort((a, b) => (a.decided < b.decided ? 1 : -1));
+    approveEl.hidden = !waiting.length && !done.length;
+    if (approveEl.hidden) return;
+    byId("approve-n").textContent = waiting.length ? waiting.length + " waiting" : "All done";
+    const meta = (c) => [clockAt(c.at) + (dayAt(c.at) === today ? "" : ", " + longDay(c.at)), c.with ? "with " + c.with : "", c.photosBy && c.photosBy !== c.who ? "photos from " + c.photosBy : ""].filter(Boolean).join(" · ");
+    let h = "";
+    waiting.concat(done).forEach((c) => {
+      h += '<div class="ap" data-id="' + esc(c.id) + '"><p class="ap-row"><b>' + esc(c.who + " · " + c.room) + '</b><span class="pts">+' + fmt(c.pts) + "</span></p>";
+      h += '<p class="ap-meta">' + esc(meta(c)) + "</p>";
+      if (!c.decision) {
+        h += '<div class="ap-acts"><button type="button" class="yes" data-d="approve">Approve</button><button type="button" data-d="no">Not this one</button></div>';
+        NAMES.filter((n) => n !== c.who && n !== c.with && n !== APPROVER).forEach((n) => {
+          h += '<div class="ap-acts ap-calls"><span>' + esc(n) + ' called it?</span><button type="button" data-d="owned" data-c="' + esc(n) + '">Owned</button>' +
+            '<button type="button" data-d="cobra" data-c="' + esc(n) + '">Cobra 🐍</button><button type="button" data-d="wolf" data-c="' + esc(n) + '">Wolf 🐺</button></div>';
+        });
+      } else {
+        h += '<div class="ap-done"><span>' + esc(SAID[c.decision](c)) + '</span><button type="button" data-d="">Undo</button></div>';
+      }
+      h += '<p role="status"></p></div>';
+    });
+    byId("approve-list").innerHTML = h;
+  };
+  if (approveEl) {
+    approveEl.addEventListener("click", (e) => {
+      const b = e.target.closest && e.target.closest("button[data-d]");
+      const box = b && b.closest(".ap");
+      if (!box) return;
+      const c = tidy.claims.find((x) => x.id === box.getAttribute("data-id"));
+      if (!c) return;
+      const decision = b.getAttribute("data-d");
+      const caller = b.getAttribute("data-c") || "";
+      Array.from(box.querySelectorAll("button")).forEach((x) => { x.disabled = true; });
+      const say = box.querySelector('[role="status"]');
+      say.textContent = "Sending…";
+      tidyPost({ tidy: "decide", id: c.id, decision: decision, caller: caller }).then((res) => {
+        if (res && res.ok) {
+          c.decision = decision;
+          c.caller = caller;
+          c.decided = decision ? new Date().toISOString() : "";
+          renderTidy();
+          tidyLoad(); // The sheet's word on badges.
+        } else {
+          Array.from(box.querySelectorAll("button")).forEach((x) => { x.disabled = false; });
+          say.textContent = "That didn't go in: " + ((res && res.error) || "no answer from the sheet.");
+        }
+      }, () => {
+        Array.from(box.querySelectorAll("button")).forEach((x) => { x.disabled = false; });
+        say.textContent = "Couldn't reach the sheet. Try again in a bit.";
+      });
+    });
+  }
+
+  if (tidyOn) {
+    picker.addEventListener("click", tidyLoad); // A new name: their own claims.
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") tidyLoad(); });
+    // Claims that couldn't get through last time go first, then the page asks what's been decided.
+    const waiting = tidyQueue();
+    del(TIDY_WAIT);
+    Promise.all(waiting.map((body) => tidyPost(body).catch(() => tidyHold(body)))).then(tidyLoad, tidyLoad);
   }
 
   renderPlan();
