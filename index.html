@@ -287,6 +287,7 @@ section.gate.just > h2::before { animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0
 .sop.done .p { color: var(--go); font-weight: 700; }
 .sop .pts { font: 800 0.85rem/1 var(--display); font-synthesis: none; color: var(--pts); background: var(--pts-soft); border-radius: var(--pill); padding: 4px 8px 3px; }
 .sop.done .pts { background: var(--pts-fill); color: var(--pts-ink); }
+.sop .pts:empty { display: none; }
 .sop .body { padding: 2px 14px 14px; }
 .sop.flash { animation: flash 0.9s ease-out; }
 .tag { background: var(--raise); color: var(--fg); border-radius: var(--pill); padding: 2px 9px; font-size: 0.8rem; font-weight: 700; }
@@ -444,6 +445,39 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: calc(7px * va
 .love-card b { display: block; font: 800 1.9rem/1.1 var(--display); font-synthesis: none; color: var(--award); }
 .love-card strong { display: block; margin: 4px 0 2px; font: 800 3.4rem/1 var(--display); font-synthesis: none; color: var(--pts); font-variant-numeric: tabular-nums; }
 .love-card small { display: block; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
+/* The Thug Life send-off, for glasses, in time with its beat. --go is when the build starts and --b is one beat, both
+   set from FX, and beats count from 0, as in thugBeat. Over the build bar, beats 0 to 4, the world goes black and white
+   and the face zooms; shades land on beat 2 and a gold chain on beat 3, and the label slams in on the drop, beat 4. Then
+   the face pumps on every beat for two bars, and it all fades after the last hit, on beat 12. With less motion asked
+   for, it's all on from the start. */
+.love.thug { --drop: calc(var(--go) + 4 * var(--b)); --end: calc(var(--go) + 12 * var(--b) + 0.3s); }
+.love.thug::before {
+  background: rgba(0, 0, 0, 0.3); -webkit-backdrop-filter: grayscale(1) contrast(1.15); backdrop-filter: grayscale(1) contrast(1.15);
+  animation: noir 1s ease-out both, noir-out 0.9s ease-in var(--end) forwards;
+}
+.love.thug .love-card { animation: thug-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both, thug-out 0.9s ease-in var(--end) forwards; }
+.love.thug .love-card .i { animation: zoom calc(4 * var(--b)) linear var(--go) both; }
+.love.thug .love-card b {
+  display: table; margin: 2px auto 8px; padding: 3px 12px 5px; background: #000; color: #fff; text-transform: uppercase; letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3); animation: slam 0.3s steps(3, start) var(--drop) both;
+}
+.love.thug .love-card small { animation: slam 0.3s steps(3, start) calc(var(--drop) + 0.5 * var(--b)) both; }
+.thug-face {
+  display: block; width: 6rem; height: 8.25rem; margin: 4px auto 6px; overflow: visible;
+  animation: thud 0.24s steps(2, start) calc(var(--go) + 2 * var(--b)), thud 0.24s steps(2, start) calc(var(--go) + 3 * var(--b)), pump var(--b) ease-out var(--drop) 8;
+}
+.thug-face .specs { animation: specs-down calc(2 * var(--b)) steps(15, end) var(--go) both; }
+.thug-face .chain { animation: chain-down var(--b) steps(8, end) calc(var(--go) + 2 * var(--b)) both; }
+@keyframes specs-down { from { transform: translateY(-30px); opacity: 0; } 1% { opacity: 1; } to { transform: none; } }
+@keyframes chain-down { from { transform: translateY(-24px); opacity: 0; } 1% { opacity: 1; } to { transform: none; } }
+@keyframes thud { 50% { transform: translateY(4px); } }
+@keyframes zoom { from { transform: scale(1); } to { transform: scale(1.12); } }
+@keyframes slam { from { opacity: 0; transform: scale(1.7); } to { opacity: 1; transform: none; } }
+@keyframes pump { from { transform: scale(1.07); } to { transform: none; } }
+@keyframes noir { from { opacity: 0; } }
+@keyframes noir-out { to { opacity: 0; } }
+@keyframes thug-in { 0% { opacity: 0; transform: scale(0.3) rotate(-8deg); } 60% { opacity: 1; transform: scale(1.08) rotate(2deg); } 100% { opacity: 1; transform: none; } }
+@keyframes thug-out { to { opacity: 0; transform: scale(0.9) translateY(-20px); } }
 
 /* End of the day: the results screen, from Close the day or a clean sweep. Built to be compared. */
 .close-day, .win button { font-family: var(--display); font-weight: 800; font-synthesis: none; border: 0; border-radius: calc(16px * var(--rad)); cursor: pointer; background: var(--pts-fill); color: var(--pts-ink); box-shadow: 0 4px 0 var(--pts-lip); }
@@ -812,6 +846,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     <summary>Your morning</summary>
     <div class="body">
       <ol class="steps">
+        <li data-who="leo">Glasses on.</li>
         <li>Bed made.</li>
         <li data-who="dad">Showered.</li>
         <li>Pyjamas folded or hung up.</li>
@@ -825,7 +860,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
         <li data-who="aurora leo" data-days="1 2 3 4 5">Phone, wallet, and keys on you.</li>
         <li data-who="cook:next"><span class="tag">Tomorrow's meal</span> <span data-ahead="morning">Anything frozen? Out of the freezer and into the fridge.</span></li>
       </ol>
-      <p class="dw"><b>Done when:</b> bed made, floor clear, window shut, and no dishes in your room.</p>
+      <p class="dw"><b>Done when:</b> <span data-who="leo">glasses on, </span>bed made, floor clear, window shut, and no dishes in your room.</p>
     </div>
   </details>
 
@@ -1571,6 +1606,17 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     </div>
   </details>
 
+  <!-- A bonus card that pays nothing, so it's fair on Aurora: the shades and the run of days are the reward. See BONUS. -->
+  <details class="sop" id="glasses" data-who="leo" data-period="d" data-time="1 min">
+    <summary>Glasses</summary>
+    <div class="body">
+      <ol class="steps">
+        <li>Glasses worn all day.</li>
+      </ol>
+      <p class="dw"><b>Done when:</b> they've been on your face since breakfast.</p>
+    </div>
+  </details>
+
   <!-- A bonus card: see BONUS in the script. It pays extra and sets off the hearts, and the day never waits on it. -->
   <details class="sop" id="cuddle" data-who="aurora leo" data-period="d" data-time="1 min">
     <summary>Dad's cuddle</summary>
@@ -1837,7 +1883,11 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const HANDICAP = { Aurora: 1.2, Leo: 1.6, Dad: 1 };
   // Bonus cards, by card id. One pays its pts here, not its time, and ticking it sets off the big send-off with these words.
   // A bonus is extra: it's never needed for a cleared moment, a clean sweep, or a streak.
-  const BONUS = { cuddle: { pts: 300, icon: "🤗", title: "Dad's cuddle!", line: "Best bit of Dad's day." } };
+  // fx picks the send-off: hearts unless it says "thug", for Thug Life shades and chain. With run, it counts the days in a row.
+  const BONUS = {
+    cuddle: { pts: 300, icon: "🤗", title: "Dad's cuddle!", line: "Best bit of Dad's day." },
+    glasses: { pts: 0, icon: "😎", title: "Thug life", line: "Glasses on all day.", fx: "thug", run: true }
+  };
   // A tidy claim pays its card's time, times your handicap, times this when someone helped. Each of you claims your own.
   const TIDY_TOGETHER = 1.5;
   const LEVEL_AT = (l) => 500 * (l - 1) * l; // Total points to reach level l: 1,000 for level 2, 3,000 for 3, 6,000 for 4.
@@ -2088,7 +2138,8 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const hcText = (p) => "×" + hc(p).toFixed(1);
   // What a card pays the picked person: its points times their handicap.
   const clearPts = (card) => Math.round((cardPts(card) * hc(who)) / 2);
-  const stepPts = (card) => Math.max(5, Math.round((cardPts(card) * hc(who)) / 2 / Math.max(1, stepBoxes(card).length)));
+  const stepPts = (card) => (cardPts(card) ? Math.max(5, Math.round((cardPts(card) * hc(who)) / 2 / Math.max(1, stepBoxes(card).length))) : 0);
+  const ptsText = (card) => (cardPts(card) ? fmt(cardPts(card) * hc(who)) + " pts" : "");
 
   cards.forEach((card) => {
     const s = card.querySelector("summary");
@@ -2101,7 +2152,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     m.className = "m";
     m.innerHTML = '<span class="tags"></span><span class="time"></span><span class="p"></span><span class="pts"></span>';
     m.querySelector(".time").textContent = card.getAttribute("data-time") || "";
-    m.querySelector(".pts").textContent = fmt(cardPts(card)) + " pts";
+    m.querySelector(".pts").textContent = cardPts(card) ? fmt(cardPts(card)) + " pts" : "";
     s.appendChild(t);
     s.appendChild(m);
 
@@ -2438,8 +2489,11 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     const was = !!d.clear;
     d.clear = s.all > 0 && s.done === s.all;
     d.pct = dayPct();
+    // A bonus that counts its run keeps, on the day, whether it was ticked.
+    cards.forEach((c) => { if (c.hidden || !isBonus(c) || !BONUS[c.id].run) return; if (allTicked(c)) d[c.id] = 1; else delete d[c.id]; });
     return d.clear && !was;
   };
+  const runOf = (g, id) => { let t = today; let n = 0; while ((g.days[ymd(t)] || {})[id]) { n++; t -= DAY; } return n; };
   // This week's average share, counting days missed as nothing, from the first day this phone scored.
   const weekPct = (g) => {
     let n = 0;
@@ -2599,24 +2653,122 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
   const replay = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
   // A bonus card's send-off: hearts up the whole screen, its words and points on a card in the middle, and a buzz
   // where the phone can. With less motion asked for, it's the card alone, held still.
+  // Thug Life: a block face, pixel shades drop onto it, then a gold chain, then its label, all on its beat. No rain.
   const loveEl = document.getElementById("love");
-  const HEARTS = ["❤️", "💖", "💛", "🧡", "💜", "💙", "💚", "💖", "❤️", "😘"];
+  const THUG = '<svg class="thug-face" viewBox="0 0 16 22" shape-rendering="crispEdges" aria-hidden="true">' +
+    '<rect width="16" height="16" fill="#2a1d12"/><rect x="1" y="1" width="14" height="14" fill="#f2b632"/>' +
+    '<rect x="1" y="1" width="14" height="2" fill="#ffe08a"/><rect x="13" y="3" width="2" height="12" fill="#c98f1c"/><rect x="1" y="13" width="12" height="2" fill="#c98f1c"/>' +
+    '<g fill="#2a1d12"><rect x="4" y="6" width="2" height="2"/><rect x="10" y="6" width="2" height="2"/><rect x="4" y="10" width="1" height="1"/><rect x="11" y="10" width="1" height="1"/><rect x="5" y="11" width="6" height="1"/></g>' +
+    '<g class="specs"><g fill="#000"><rect x="0" y="5" width="16" height="1"/><rect x="2" y="6" width="5" height="2"/><rect x="3" y="8" width="3" height="1"/><rect x="7" y="6" width="2" height="1"/><rect x="9" y="6" width="5" height="2"/><rect x="10" y="8" width="3" height="1"/></g>' +
+    '<g fill="#fff"><rect x="3" y="6" width="1" height="1"/><rect x="4" y="7" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="11" y="7" width="1" height="1"/></g></g>' +
+    '<g class="chain"><g fill="#f5b400"><rect x="1" y="16" width="1" height="1"/><rect x="3" y="18" width="1" height="1"/><rect x="5" y="19" width="1" height="1"/><rect x="7" y="19" width="1" height="1"/><rect x="9" y="19" width="1" height="1"/><rect x="11" y="18" width="1" height="1"/><rect x="13" y="17" width="1" height="1"/></g><g fill="#9a6b00"><rect x="2" y="17" width="1" height="1"/><rect x="4" y="18" width="1" height="1"/><rect x="6" y="19" width="1" height="1"/><rect x="8" y="19" width="1" height="1"/><rect x="10" y="19" width="1" height="1"/><rect x="12" y="18" width="1" height="1"/><rect x="14" y="16" width="1" height="1"/></g>' +
+    '<rect x="6" y="20" width="4" height="2" fill="#f5b400"/><rect x="7" y="20" width="1" height="1" fill="#fff3b0"/></g></svg>';
+  // Its beat: an original one-bar build into two bars of boom-bap, made on the phone with Web Audio, so there's no file.
+  // Beat 0 is the start of the build, go seconds after t0, when the send-off appears. The drop lands with the label on
+  // beat 4, and a last hit ends it on beat 12; the styles under .love.thug count the same beats. It plays at the
+  // phone's media volume, and an iPhone on silent stays silent.
+  const thugBeat = (ac, out, t0, go, b) => {
+    const T = (beats) => t0 + go + beats * b;
+    const noise = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+    const nd = noise.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    const env = (g, t, peak, len) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + len); };
+    const tone = (type, t, f0, f1, glide, peak, len) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.setValueAtTime(f0, t); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + glide);
+      env(g, t, peak, len); o.connect(g); g.connect(out); o.start(t); o.stop(t + len + 0.05);
+    };
+    const hiss = (t, freq, peak, len) => {
+      const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      n.buffer = noise; n.loop = true; f.type = "highpass"; f.frequency.value = freq;
+      env(g, t, peak, len); n.connect(f); f.connect(g); g.connect(out); n.start(t); n.stop(t + len + 0.05);
+    };
+    const kick = (t, peak) => tone("sine", t, 160, 42, 0.11, peak, 0.42);
+    const snare = (t, peak) => { hiss(t, 1400, peak, 0.2); tone("triangle", t, 220, 160, 0.05, peak * 0.5, 0.1); };
+    const hat = (t, peak, len) => hiss(t, 7500, peak, len);
+    const bass = (t, f, len) => tone("sine", t, f * 1.5, f, 0.06, 0.6, len);
+    const stab = (t, fs, len) => fs.forEach((f) => { tone("triangle", t, f, f, 0, 0.13, len); tone("square", t, f / 2, f / 2, 0, 0.03, len * 0.7); });
+    // The build: a noise sweep and a rising tone swell over the bar, under a snare roll that doubles each beat, with a
+    // kick as the shades land on beat 2 and the chain on beat 3. The swell cuts just short of the drop, for the gap.
+    const swell = (g, peak) => { g.gain.setValueAtTime(0.0001, T(0)); g.gain.exponentialRampToValueAtTime(peak, T(4) - 0.09); g.gain.setValueAtTime(0.0001, T(4) - 0.08); };
+    const sweep = ac.createBufferSource(), sf = ac.createBiquadFilter(), sg = ac.createGain();
+    sweep.buffer = noise; sweep.loop = true; sf.type = "highpass";
+    sf.frequency.setValueAtTime(300, T(0)); sf.frequency.exponentialRampToValueAtTime(6000, T(4));
+    sweep.connect(sf); sf.connect(sg); sg.connect(out); swell(sg, 0.22); sweep.start(T(0)); sweep.stop(T(4));
+    const rise = ac.createOscillator(), rf = ac.createBiquadFilter(), rg = ac.createGain();
+    rise.type = "sawtooth"; rise.frequency.setValueAtTime(110, T(0)); rise.frequency.exponentialRampToValueAtTime(880, T(4));
+    rf.type = "lowpass"; rf.frequency.setValueAtTime(600, T(0)); rf.frequency.exponentialRampToValueAtTime(5000, T(4));
+    rise.connect(rf); rf.connect(rg); rg.connect(out); swell(rg, 0.1); rise.start(T(0)); rise.stop(T(4));
+    [0, 1, 2, 2.5, 3, 3.25, 3.5, 3.75].forEach((x, i) => snare(T(x), 0.2 + i * 0.08));
+    kick(T(2), 0.9); kick(T(3), 0.9);
+    // The drop: a crash, then two bars of boom-bap in A minor, swung hats, an 808 under each kick, and chord stabs.
+    hiss(T(4), 4000, 0.35, 1.6);
+    const KICKS = [0, 7, 10]; // In sixteenths of the bar; the snare is on 4 and 12.
+    const ROOTS = [[55, 55, 65.41], [43.65, 43.65, 49]];
+    const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63]];
+    for (let bar = 0; bar < 2; bar++) {
+      const at = (step) => T(4 + bar * 4 + step / 4);
+      KICKS.forEach((st, i) => { kick(at(st), 0.95); bass(at(st), ROOTS[bar][i], ((KICKS[i + 1] || 16) - st) * b / 4 * 0.95); });
+      [4, 12].forEach((st) => snare(at(st), 0.75));
+      for (let st = 0; st < 16; st += 2) { const off = st % 4 === 2; hat(at(st) + (off ? b * 0.06 : 0), off ? 0.12 : 0.2, bar === 1 && st === 14 ? 0.3 : 0.05); }
+      stab(at(0), CHORDS[bar], 0.35); stab(at(6), CHORDS[bar], 0.2);
+    }
+    kick(T(12), 1); tone("sine", T(12), 110, 55, 0.2, 0.7, 1.1); stab(T(12), CHORDS[0], 0.9); hiss(T(12), 4000, 0.25, 1.2);
+  };
+  // Each play gets its own line into the mix, so ticking again cuts the last one off rather than playing over it.
+  let mix = null;
+  const playBeat = (fx) => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!mix) {
+        const ac = new AC(), vol = ac.createGain(), comp = ac.createDynamicsCompressor();
+        vol.gain.value = 0.5; vol.connect(comp); comp.connect(ac.destination);
+        mix = { ac, vol, line: null };
+      }
+      if (mix.line) mix.line.disconnect();
+      const line = mix.ac.createGain();
+      line.connect(mix.vol);
+      mix.line = line;
+      const shown = performance.now();
+      const start = () => { // Sound leaves the speaker late, so it's scheduled that much early to land with the picture.
+        const ac = mix.ac;
+        fx.beat(ac, line, ac.currentTime - (performance.now() - shown) / 1000 - (ac.outputLatency || ac.baseLatency || 0), fx.go, 60 / fx.bpm);
+      };
+      if (mix.ac.state === "running") start(); else mix.ac.resume().then(start, () => {});
+    } catch (e) { /* no sound */ }
+  };
+  // A send-off with a beat sets its own length and buzzes from its tempo: go is when its build starts, beats how long
+  // it runs from there.
+  const FX = {
+    love: { rain: ["❤️", "💖", "💛", "🧡", "💜", "💙", "💚", "💖", "❤️", "😘"], ms: 4400, buzz: [40, 60, 40, 60, 160] },
+    thug: { rain: [], art: THUG, beat: thugBeat, bpm: 90, go: 0.6, beats: 12 }
+  };
   let loveTimer = 0;
-  const sendOff = (b, pts) => {
+  const sendOff = (b, pts, run) => {
+    const fx = FX[b.fx] || FX.love;
+    const beat = 60 / (fx.bpm || 60);
+    const ms = fx.beat ? (fx.go + fx.beats * beat + 1.3) * 1000 : motion ? fx.ms : 3000;
+    // The buzzes are the shades and the chain landing, then the drop.
+    const buzz = fx.beat ? [1, (fx.go + 2 * beat) * 1000, 120, beat * 1000 - 120, 120, beat * 1000 - 120, 300] : fx.buzz;
     let h = "";
-    if (motion) {
+    if (motion && fx.rain.length) {
       for (let i = 0; i < 54; i++) {
         h += '<i style="--l:' + (Math.random() * 96 - 2).toFixed(1) + "%;--s:" + (1.3 + Math.random() * 2.4).toFixed(2) +
           "rem;--d:" + (1.7 + Math.random() * 1.3).toFixed(2) + "s;--w:" + (Math.random() * 1.3).toFixed(2) +
-          "s;--x:" + Math.round(Math.random() * 120 - 60) + "px;--r:" + Math.round(Math.random() * 80 - 40) + 'deg">' + HEARTS[i % HEARTS.length] + "</i>";
+          "s;--x:" + Math.round(Math.random() * 120 - 60) + "px;--r:" + Math.round(Math.random() * 80 - 40) + 'deg">' + fx.rain[i % fx.rain.length] + "</i>";
       }
     }
-    h += '<div class="love-card"><span class="i">' + esc(b.icon) + "</span><b>" + esc(b.title) + "</b>" + (pts ? "<strong>+" + fmt(pts) + "</strong>" : "") + "<small>" + esc(b.line) + "</small></div>";
+    const line = b.line + (run > 1 ? " " + run + " days in a row." : "");
+    h += '<div class="love-card"><span class="i">' + (fx.art || esc(b.icon)) + "</span><b>" + esc(b.title) + "</b>" + (pts ? "<strong>+" + fmt(pts) + "</strong>" : "") + "<small>" + esc(line) + "</small></div>";
+    loveEl.className = "love" + (b.fx ? " " + b.fx : "");
+    if (fx.beat) { loveEl.style.setProperty("--go", fx.go + "s"); loveEl.style.setProperty("--b", beat.toFixed(4) + "s"); }
     loveEl.innerHTML = h;
     loveEl.hidden = false;
+    if (fx.beat) playBeat(fx);
     clearTimeout(loveTimer);
-    loveTimer = setTimeout(() => { loveEl.hidden = true; loveEl.innerHTML = ""; }, motion ? 4400 : 3000);
-    try { if (motion && navigator.vibrate) navigator.vibrate([40, 60, 40, 60, 160]); } catch (e) { /* no buzz */ }
+    loveTimer = setTimeout(() => { loveEl.hidden = true; loveEl.innerHTML = ""; }, ms);
+    try { if (motion && navigator.vibrate) navigator.vibrate(buzz); } catch (e) { /* no buzz */ }
   };
   const gateStates = (live) => {
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => {
@@ -2769,7 +2921,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     renderGame(g);
     if (isBonus(card)) {
       // A bonus card says it all at once, and every time it's ticked.
-      if (box.checked && allTicked(card)) { if (motion) replay(card, "flash", 950); sendOff(BONUS[card.id], step + bonus); }
+      if (box.checked && allTicked(card)) { if (motion) replay(card, "flash", 950); sendOff(BONUS[card.id], step + bonus, runOf(g, card.id)); }
     } else {
       if (step) pop(box.parentNode, "+" + fmt(step));
       if (bonus) {
@@ -2945,7 +3097,7 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       const due = (t) => /^(Today|Tonight|Still to finish)/.test(t);
       card.querySelector(".tags").innerHTML = tags.map((t) => '<span class="tag' + (due(t) ? " due" : "") + '">' + esc(t) + "</span>").join("");
       card.classList.toggle("due", tags.some(due));
-      card.querySelector(".pts").textContent = fmt(cardPts(card) * hc(who)) + " pts";
+      card.querySelector(".pts").textContent = ptsText(card);
       progress(card);
     });
     Array.from(document.querySelectorAll("section.gate")).forEach((sec) => { sec.hidden = !sec.querySelector(".sop:not([hidden])"); });
