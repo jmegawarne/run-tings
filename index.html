@@ -448,23 +448,27 @@ table.skills input { width: 1.3rem; height: 1.3rem; border-radius: calc(7px * va
 /* The Thug Life send-off, for glasses, in time with its beat. --go is when the build starts and --b is one beat, both
    set from FX, and beats count from 0, as in thugBeat. Over the build bar, beats 0 to 4, the world goes black and white
    and the face zooms; shades land on beat 2 and a gold chain on beat 3, and the label slams in on the drop, beat 4. Then
-   the face pumps on every beat for two bars, and it all fades after the last hit, on beat 12. With less motion asked
-   for, it's all on from the start. */
-.love.thug { --drop: calc(var(--go) + 4 * var(--b)); --end: calc(var(--go) + 12 * var(--b) + 0.3s); }
+   the face pumps on every beat for as long as the beat loops. Tapping the card stops it, which adds .bye. With less
+   motion asked for, it's all on from the start. */
+.love.thug { --drop: calc(var(--go) + 4 * var(--b)); }
 .love.thug::before {
   background: rgba(0, 0, 0, 0.3); -webkit-backdrop-filter: grayscale(1) contrast(1.15); backdrop-filter: grayscale(1) contrast(1.15);
-  animation: noir 1s ease-out both, noir-out 0.9s ease-in var(--end) forwards;
+  animation: noir 1s ease-out both;
 }
-.love.thug .love-card { animation: thug-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both, thug-out 0.9s ease-in var(--end) forwards; }
+.love.thug .love-card { pointer-events: auto; cursor: pointer; animation: thug-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.love.thug.bye::before { animation: noir-out 0.5s ease-in forwards; }
+.love.thug.bye .love-card { animation: thug-out 0.5s ease-in forwards; }
+.love.thug .love-card .hint { margin-top: 8px; font-size: 0.8rem; font-weight: 500; }
 .love.thug .love-card .i { animation: zoom calc(4 * var(--b)) linear var(--go) both; }
 .love.thug .love-card b {
   display: table; margin: 2px auto 8px; padding: 3px 12px 5px; background: #000; color: #fff; text-transform: uppercase; letter-spacing: 0.06em;
   box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3); animation: slam 0.3s steps(3, start) var(--drop) both;
 }
 .love.thug .love-card small { animation: slam 0.3s steps(3, start) calc(var(--drop) + 0.5 * var(--b)) both; }
+.love.thug .love-card small.hint { animation: slam 0.3s steps(3, start) calc(var(--drop) + 8 * var(--b)) both; }
 .thug-face {
   display: block; width: 6rem; height: 8.25rem; margin: 4px auto 6px; overflow: visible;
-  animation: thud 0.24s steps(2, start) calc(var(--go) + 2 * var(--b)), thud 0.24s steps(2, start) calc(var(--go) + 3 * var(--b)), pump var(--b) ease-out var(--drop) 8;
+  animation: thud 0.24s steps(2, start) calc(var(--go) + 2 * var(--b)), thud 0.24s steps(2, start) calc(var(--go) + 3 * var(--b)), pump var(--b) ease-out var(--drop) infinite;
 }
 .thug-face .specs { animation: specs-down calc(2 * var(--b)) steps(15, end) var(--go) both; }
 .thug-face .chain { animation: chain-down var(--b) steps(8, end) calc(var(--go) + 2 * var(--b)) both; }
@@ -2663,10 +2667,12 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
     '<g fill="#fff"><rect x="3" y="6" width="1" height="1"/><rect x="4" y="7" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="11" y="7" width="1" height="1"/></g></g>' +
     '<g class="chain"><g fill="#f5b400"><rect x="1" y="16" width="1" height="1"/><rect x="3" y="18" width="1" height="1"/><rect x="5" y="19" width="1" height="1"/><rect x="7" y="19" width="1" height="1"/><rect x="9" y="19" width="1" height="1"/><rect x="11" y="18" width="1" height="1"/><rect x="13" y="17" width="1" height="1"/></g><g fill="#9a6b00"><rect x="2" y="17" width="1" height="1"/><rect x="4" y="18" width="1" height="1"/><rect x="6" y="19" width="1" height="1"/><rect x="8" y="19" width="1" height="1"/><rect x="10" y="19" width="1" height="1"/><rect x="12" y="18" width="1" height="1"/><rect x="14" y="16" width="1" height="1"/></g>' +
     '<rect x="6" y="20" width="4" height="2" fill="#f5b400"/><rect x="7" y="20" width="1" height="1" fill="#fff3b0"/></g></svg>';
-  // Its beat: an original one-bar build into two bars of boom-bap, made on the phone with Web Audio, so there's no file.
-  // Beat 0 is the start of the build, go seconds after t0, when the send-off appears. The drop lands with the label on
-  // beat 4, and a last hit ends it on beat 12; the styles under .love.thug count the same beats. It plays at the
-  // phone's media volume, and an iPhone on silent stays silent.
+  // Its beat: original, and made on the phone with Web Audio, so there's no file. A one-bar build drops into an 8-bar
+  // boom-bap loop that runs until it's stopped: Am, F, C, G, twice over, with a sliding 808 sub under the kicks, and a
+  // lead and octave pops the second time round. Beat 0 is the start of the build, go seconds after t0, when the send-off
+  // appears, and the drop lands with the label on beat 4; the styles under .love.thug count the same beats. It returns
+  // more(until), which schedules the loop's bars up to that time on the audio clock, so it runs seamlessly. It plays at
+  // the phone's media volume, and an iPhone on silent stays silent.
   const thugBeat = (ac, out, t0, go, b) => {
     const T = (beats) => t0 + go + beats * b;
     const noise = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
@@ -2683,72 +2689,142 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       n.buffer = noise; n.loop = true; f.type = "highpass"; f.frequency.value = freq;
       env(g, t, peak, len); n.connect(f); f.connect(g); g.connect(out); n.start(t); n.stop(t + len + 0.05);
     };
-    const kick = (t, peak) => tone("sine", t, 160, 42, 0.11, peak, 0.42);
+    const kick = (t, peak) => { tone("sine", t, 180, 55, 0.06, peak, 0.22); hiss(t, 3000, peak * 0.3, 0.015); }; // Short, so the 808 owns the low end; the click carries on a phone.
     const snare = (t, peak) => { hiss(t, 1400, peak, 0.2); tone("triangle", t, 220, 160, 0.05, peak * 0.5, 0.1); };
     const hat = (t, peak, len) => hiss(t, 7500, peak, len);
-    const bass = (t, f, len) => tone("sine", t, f * 1.5, f, 0.06, 0.6, len);
-    const stab = (t, fs, len) => fs.forEach((f) => { tone("triangle", t, f, f, 0, 0.13, len); tone("square", t, f / 2, f / 2, 0, 0.03, len * 0.7); });
+    const stab = (t, fs, len) => fs.forEach((f) => { tone("triangle", t, f, f, 0, 0.24, len); tone("square", t, f / 2, f / 2, 0, 0.04, len * 0.7); });
+    const pad = (t, fs, len) => fs.forEach((f) => { // A soft chord held under the bar, so a phone speaker never goes quiet.
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = "triangle"; o.frequency.value = f * 2;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.065, t + 0.08); g.gain.setValueAtTime(0.065, t + len - 0.06); g.gain.linearRampToValueAtTime(0, t + len);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + len + 0.02);
+    });
+    // The 808: a sine sub, driven a little so its harmonics carry on a phone speaker while a sub gets the fundamental.
+    // Notes are [sixteenth, semitones from A1, length in sixteenths, slide]; a slide glides from the note before.
+    const curve = new Float32Array(1024);
+    for (let i = 0; i < 1024; i++) curve[i] = Math.tanh(4 * (i / 511.5 - 1)) * 0.7;
+    const drive = ac.createWaveShaper(), tame = ac.createBiquadFilter();
+    drive.curve = curve; drive.oversample = "2x"; tame.type = "lowpass"; tame.frequency.value = 1800;
+    drive.connect(tame); tame.connect(out);
+    const sub = (t, notes) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      let was = 0;
+      g.gain.setValueAtTime(0.0001, t);
+      notes.forEach(([st, semi, len, slide], i) => {
+        const f = 55 * Math.pow(2, semi / 12), s = t + (st * b) / 4, e = s + (len * b) / 4, next = notes[i + 1];
+        if (slide && was) { o.frequency.setValueAtTime(was, s); o.frequency.exponentialRampToValueAtTime(f, s + 0.08); }
+        else {
+          o.frequency.setValueAtTime(f * 1.6, s); o.frequency.exponentialRampToValueAtTime(f, s + 0.04);
+          g.gain.setValueAtTime(0.0001, s); g.gain.linearRampToValueAtTime(0.4, s + 0.006); g.gain.setTargetAtTime(0.2, s + 0.006, 0.25);
+        }
+        if (!(next && next[3] && next[0] === st + len)) g.gain.setTargetAtTime(0.0001, e - 0.03, 0.012);
+        was = f;
+      });
+      o.connect(g); g.connect(drive); o.start(t); o.stop(t + 4 * b + 0.1);
+    };
     // The build: a noise sweep and a rising tone swell over the bar, under a snare roll that doubles each beat, with a
     // kick as the shades land on beat 2 and the chain on beat 3. The swell cuts just short of the drop, for the gap.
     const swell = (g, peak) => { g.gain.setValueAtTime(0.0001, T(0)); g.gain.exponentialRampToValueAtTime(peak, T(4) - 0.09); g.gain.setValueAtTime(0.0001, T(4) - 0.08); };
     const sweep = ac.createBufferSource(), sf = ac.createBiquadFilter(), sg = ac.createGain();
     sweep.buffer = noise; sweep.loop = true; sf.type = "highpass";
     sf.frequency.setValueAtTime(300, T(0)); sf.frequency.exponentialRampToValueAtTime(6000, T(4));
-    sweep.connect(sf); sf.connect(sg); sg.connect(out); swell(sg, 0.22); sweep.start(T(0)); sweep.stop(T(4));
+    sweep.connect(sf); sf.connect(sg); sg.connect(out); swell(sg, 0.09); sweep.start(T(0)); sweep.stop(T(4));
     const rise = ac.createOscillator(), rf = ac.createBiquadFilter(), rg = ac.createGain();
     rise.type = "sawtooth"; rise.frequency.setValueAtTime(110, T(0)); rise.frequency.exponentialRampToValueAtTime(880, T(4));
     rf.type = "lowpass"; rf.frequency.setValueAtTime(600, T(0)); rf.frequency.exponentialRampToValueAtTime(5000, T(4));
-    rise.connect(rf); rf.connect(rg); rg.connect(out); swell(rg, 0.1); rise.start(T(0)); rise.stop(T(4));
-    [0, 1, 2, 2.5, 3, 3.25, 3.5, 3.75].forEach((x, i) => snare(T(x), 0.2 + i * 0.08));
+    rise.connect(rf); rf.connect(rg); rg.connect(out); swell(rg, 0.06); rise.start(T(0)); rise.stop(T(4));
+    [0, 1, 2, 2.5, 3, 3.25, 3.5, 3.75].forEach((x, i) => snare(T(x), 0.08 + i * 0.04));
     kick(T(2), 0.9); kick(T(3), 0.9);
-    // The drop: a crash, then two bars of boom-bap in A minor, swung hats, an 808 under each kick, and chord stabs.
-    hiss(T(4), 4000, 0.35, 1.6);
-    const KICKS = [0, 7, 10]; // In sixteenths of the bar; the snare is on 4 and 12.
-    const ROOTS = [[55, 55, 65.41], [43.65, 43.65, 49]];
-    const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63]];
-    for (let bar = 0; bar < 2; bar++) {
-      const at = (step) => T(4 + bar * 4 + step / 4);
-      KICKS.forEach((st, i) => { kick(at(st), 0.95); bass(at(st), ROOTS[bar][i], ((KICKS[i + 1] || 16) - st) * b / 4 * 0.95); });
-      [4, 12].forEach((st) => snare(at(st), 0.75));
-      for (let st = 0; st < 16; st += 2) { const off = st % 4 === 2; hat(at(st) + (off ? b * 0.06 : 0), off ? 0.12 : 0.2, bar === 1 && st === 14 ? 0.3 : 0.05); }
-      stab(at(0), CHORDS[bar], 0.35); stab(at(6), CHORDS[bar], 0.2);
-    }
-    kick(T(12), 1); tone("sine", T(12), 110, 55, 0.2, 0.7, 1.1); stab(T(12), CHORDS[0], 0.9); hiss(T(12), 4000, 0.25, 1.2);
+    hiss(T(4), 4000, 0.35, 1.6); // The drop's crash.
+    // The loop, a bar at a time. Kicks are on sixteenths 0, 7, and 10, the snare on 4 and 12.
+    const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63], [196, 261.63, 329.63], [196, 246.94, 293.66]];
+    const SUBS = [
+      [[0, 0, 6], [7, 0, 3], [10, 7, 2, true], [12, 7, 2], [14, 3, 2, true]],
+      [[0, -4, 6], [7, -4, 3], [10, 0, 3, true], [14, 3, 2]],
+      [[0, 3, 6], [7, 3, 3], [10, 7, 3, true], [14, 5, 2, true]],
+      [[0, -2, 6], [7, -2, 3], [10, 2, 2, true], [12, 5, 2, true], [14, -2, 2]]
+    ];
+    const SUBS2 = [ // Second time round: shorter roots with octave pops.
+      [[0, 0, 3], [3, 12, 1], [7, 0, 3], [10, 7, 2, true], [12, 7, 3], [15, 12, 1]],
+      [[0, -4, 3], [3, 8, 1], [7, -4, 3], [10, 0, 3, true], [13, 3, 2, true], [15, 8, 1]],
+      [[0, 3, 3], [3, 15, 1], [7, 3, 3], [10, 7, 3, true], [13, 5, 2, true], [15, 15, 1]],
+      [[0, -2, 3], [3, 10, 1], [7, -2, 3], [10, 2, 2, true], [12, 5, 2, true], [14, 7, 1], [15, 10, 1]]
+    ];
+    const LEAD = [
+      [[0, 659.25], [3, 659.25], [6, 587.33], [8, 523.25], [11, 440]],
+      [[0, 523.25], [3, 523.25], [6, 440], [8, 523.25], [11, 587.33]],
+      [[0, 659.25], [3, 783.99], [6, 659.25], [8, 587.33], [11, 523.25]],
+      [[0, 587.33], [3, 493.88], [6, 392], [8, 440], [10, 493.88], [12, 587.33]]
+    ];
+    const bar = (n) => {
+      const t = T(4 + 4 * n), k = n % 8, c = k % 4, second = k >= 4, last = c === 3;
+      const at = (step) => t + (step * b) / 4;
+      if (n > 0 && c === 0) hiss(t, 4000, 0.25, 1.2);
+      [0, 7, 10].forEach((st) => kick(at(st), 0.95));
+      snare(at(4), 0.9);
+      if (last) [12, 13, 14, 15].forEach((st, i) => snare(at(st), 0.5 + i * 0.13)); else snare(at(12), 0.9);
+      for (let st = 0; st < 16; st++) {
+        const off = st % 4 === 2;
+        if (st % 2 === 0) hat(at(st) + (off ? b * 0.06 : 0), off ? 0.16 : 0.28, last && st === 14 ? 0.3 : 0.05);
+        else if (second) hat(at(st), 0.07, 0.03);
+      }
+      stab(at(0), CHORDS[c], 0.45); stab(at(6), CHORDS[c], 0.25); pad(t, CHORDS[c], 4 * b);
+      sub(t, (second ? SUBS2 : SUBS)[c]);
+      if (second) LEAD[c].forEach(([st, f]) => tone("square", at(st), f, f, 0, 0.06, (1.5 * b) / 4));
+    };
+    let n = 0;
+    return (until) => { while (T(4 + 4 * n) < until) bar(n++); };
   };
-  // Each play gets its own line into the mix, so ticking again cuts the last one off rather than playing over it.
+  // One beat plays at a time, on its own line into the mix, topped up from the audio clock until it's stopped.
   let mix = null;
+  const stopBeat = () => {
+    if (!mix || !mix.line) return;
+    clearInterval(mix.timer);
+    const line = mix.line, t = mix.ac.currentTime;
+    line.gain.setValueAtTime(line.gain.value, t); line.gain.linearRampToValueAtTime(0, t + 0.4);
+    setTimeout(() => line.disconnect(), 500);
+    mix.line = null;
+  };
   const playBeat = (fx) => {
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       if (!mix) {
         const ac = new AC(), vol = ac.createGain(), comp = ac.createDynamicsCompressor();
-        vol.gain.value = 0.5; vol.connect(comp); comp.connect(ac.destination);
-        mix = { ac, vol, line: null };
+        vol.gain.value = 0.5; comp.threshold.value = -14; comp.knee.value = 10; comp.ratio.value = 4; comp.attack.value = 0.005; comp.release.value = 0.15;
+        vol.connect(comp); comp.connect(ac.destination);
+        mix = { ac, vol, line: null, timer: 0 };
       }
-      if (mix.line) mix.line.disconnect();
       const line = mix.ac.createGain();
       line.connect(mix.vol);
       mix.line = line;
       const shown = performance.now();
       const start = () => { // Sound leaves the speaker late, so it's scheduled that much early to land with the picture.
+        if (mix.line !== line) return;
         const ac = mix.ac;
-        fx.beat(ac, line, ac.currentTime - (performance.now() - shown) / 1000 - (ac.outputLatency || ac.baseLatency || 0), fx.go, 60 / fx.bpm);
+        const more = fx.beat(ac, line, ac.currentTime - (performance.now() - shown) / 1000 - (ac.outputLatency || ac.baseLatency || 0), fx.go, 60 / fx.bpm);
+        more(ac.currentTime + 2);
+        mix.timer = setInterval(() => more(ac.currentTime + 2), 500);
       };
       if (mix.ac.state === "running") start(); else mix.ac.resume().then(start, () => {});
     } catch (e) { /* no sound */ }
   };
-  // A send-off with a beat sets its own length and buzzes from its tempo: go is when its build starts, beats how long
-  // it runs from there.
   const FX = {
     love: { rain: ["❤️", "💖", "💛", "🧡", "💜", "💙", "💚", "💖", "❤️", "😘"], ms: 4400, buzz: [40, 60, 40, 60, 160] },
-    thug: { rain: [], art: THUG, beat: thugBeat, bpm: 90, go: 0.6, beats: 12 }
+    thug: { rain: [], art: THUG, beat: thugBeat, bpm: 90, go: 0.6 }
   };
   let loveTimer = 0;
+  // A send-off with a beat stays up until it's tapped, or the phone locks or leaves the page.
+  const endSendOff = () => {
+    stopBeat();
+    clearTimeout(loveTimer);
+    loveEl.classList.add("bye");
+    loveTimer = setTimeout(() => { loveEl.hidden = true; loveEl.innerHTML = ""; }, 600);
+  };
+  document.addEventListener("visibilitychange", () => { if (document.hidden && !loveEl.hidden && loveEl.classList.contains("thug")) endSendOff(); });
   const sendOff = (b, pts, run) => {
     const fx = FX[b.fx] || FX.love;
     const beat = 60 / (fx.bpm || 60);
-    const ms = fx.beat ? (fx.go + fx.beats * beat + 1.3) * 1000 : motion ? fx.ms : 3000;
     // The buzzes are the shades and the chain landing, then the drop.
     const buzz = fx.beat ? [1, (fx.go + 2 * beat) * 1000, 120, beat * 1000 - 120, 120, beat * 1000 - 120, 300] : fx.buzz;
     let h = "";
@@ -2760,14 +2836,21 @@ ul.won li { background: var(--award-soft); border-radius: var(--pill); padding: 
       }
     }
     const line = b.line + (run > 1 ? " " + run + " days in a row." : "");
-    h += '<div class="love-card"><span class="i">' + (fx.art || esc(b.icon)) + "</span><b>" + esc(b.title) + "</b>" + (pts ? "<strong>+" + fmt(pts) + "</strong>" : "") + "<small>" + esc(line) + "</small></div>";
+    h += '<div class="love-card"><span class="i">' + (fx.art || esc(b.icon)) + "</span><b>" + esc(b.title) + "</b>" + (pts ? "<strong>+" + fmt(pts) + "</strong>" : "") + "<small>" + esc(line) + "</small>" +
+      (fx.beat ? '<small class="hint">Tap here to stop the music.</small>' : "") + "</div>";
+    stopBeat();
+    clearTimeout(loveTimer);
     loveEl.className = "love" + (b.fx ? " " + b.fx : "");
     if (fx.beat) { loveEl.style.setProperty("--go", fx.go + "s"); loveEl.style.setProperty("--b", beat.toFixed(4) + "s"); }
     loveEl.innerHTML = h;
     loveEl.hidden = false;
-    if (fx.beat) playBeat(fx);
-    clearTimeout(loveTimer);
-    loveTimer = setTimeout(() => { loveEl.hidden = true; loveEl.innerHTML = ""; }, ms);
+    if (fx.beat) {
+      const card = loveEl.querySelector(".love-card");
+      card.setAttribute("role", "button"); card.tabIndex = 0;
+      card.addEventListener("click", endSendOff);
+      card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); endSendOff(); } });
+      playBeat(fx);
+    } else loveTimer = setTimeout(() => { loveEl.hidden = true; loveEl.innerHTML = ""; }, motion ? fx.ms : 3000);
     try { if (motion && navigator.vibrate) navigator.vibrate(buzz); } catch (e) { /* no buzz */ }
   };
   const gateStates = (live) => {
