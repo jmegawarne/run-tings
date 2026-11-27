@@ -1,14 +1,14 @@
 {
-  "2026-11-16": "Smoked salmon and cream cheese wraps, with cucumber",
-  "2026-11-17": "Taco Tuesday",
-  "2026-11-18": "Harissa chickpea and carrot couscous with pecorino, and a satsuma",
-  "2026-11-19": "Tuna, sweetcorn, and Old Bay quesadillas, with an apple",
-  "2026-11-20": "Flava Friday",
-  "2026-11-21": "From the staples, like cacio e pepe",
-  "2026-11-23": { "dish": "Leftover tamales for lunch", "doc": "1yDAJ9vVw9iBh-ReWqa7OHHswmN5liZjzUN8DKCARJ0I" },
+  "2026-11-23": {"dish": "Leftover tamales for lunch", "doc": "1yDAJ9vVw9iBh-ReWqa7OHHswmN5liZjzUN8DKCARJ0I"},
   "2026-11-24": "Taco Tuesday",
   "2026-11-25": "Out for Aurora's birthday",
-  "2026-11-26": { "dish": "Harissa meatball sub", "doc": "1Yw7A4p2IyVEaTjI4YmtG6M0DaTklkCYayfi_p4PkAxM" },
+  "2026-11-26": {"dish": "Harissa meatball sub", "doc": "1Yw7A4p2IyVEaTjI4YmtG6M0DaTklkCYayfi_p4PkAxM"},
   "2026-11-27": "Flava Friday",
-  "2026-11-28": "From the staples, like cacio e pepe"
+  "2026-11-28": "From the staples, like cacio e pepe",
+  "2026-11-30": {"dish": "Leftover lasagne for lunch", "doc": "1aqRvBvyV2QqZ2WVrW0wv8HgHXAyuxgG-yA-15AlZlZA"},
+  "2026-12-01": "Out in Southampton",
+  "2026-12-02": {"dish": "Leftover nihari for lunch", "doc": "1_1vs_d3secD_rWnNzEuTOsYBEif24PP7UsPkY6_gBDE"},
+  "2026-12-03": {"dish": "Leftover cod and butter bean stew for lunch", "doc": "1DMqriCF0y7nwgmRptQICIPuTQQVEhVIzWHEAiHkJWoQ"},
+  "2026-12-04": {"dish": "Fish katsu sandos for lunch", "doc": "1M-f9WdNUmXmNmQXizEKPRfMsxx6d3-dmfZUqjfBpul4", "deck": "1qdMxmL_e--tyl-qxtVstucbAaijI7l2eJeZeJTRYgOI"},
+  "2026-12-05": "From the staples, like the pesto fusilli or cacio e pepe"
 }

@@ -1,37 +1,34 @@
 {
-  "2026-11-16": [
-    { "dish": "Harissa cod with carrots, chickpeas, and lemon couscous", "deck": "15SRckPN773zznaF4PSOy1dSWcvDOiDT77Tfh3j7LPJE", "doc": "1JvwRPIZZxjsEj5RHtcRyfCRY_0BN1sfxeuWk8c5g8W0", "before": { "night": "Chicken thighs, breaded cod, tuna steaks, sweetcorn, and edamame in the freezer. Sea bass in the freezer too if its date is before Tuesday. Leo's Food Tech bag weighed out, with its cold things in the fridge." }}
-  ],
-  "2026-11-17": [
-    { "dish": "Ginger and spring onion sea bass with sesame noodles", "deck": "1IeoDl9GiRgAhEnIS3Jl_41G0ZPmVxXm7lgNUqpdXy-4", "doc": "1B1HDKZMcfR72kwk6Y2svx-QVyDfuHC5n0thzlh3r90A", "before": { "night": "Wednesday's lunches boxed and in the fridge. Sea bass in the fridge, not the freezer." }}
-  ],
-  "2026-11-18": [
-    { "dish": "Fish katsu sandos", "deck": "1jUGce3I1BuvP-gcX0e5ra7-MueHw9yJ94ZkjBEWGTwA", "doc": "1jA2_o0X9E5GLEqW6UprQ1RtIXsrZiNOyPQ_tQN19W54", "before": { "morning": "Butter out of the fridge by 16:00 and the brioche in the breadmaker by 17:00, for tomorrow's sandos.", "night": "Brioche out of the breadmaker and cooling on the wire rack." }}
-  ],
-  "2026-11-19": [
-    { "dish": "Sri Lankan fish curry with rice and green beans", "deck": "1wdubakb5RJvYUljy7VWlzkDv0uXW6pfd643NVC8Xdpo", "doc": "1JFDph0J4afT2gJaUgcFXSDzxY1h9YxBrW3MBGzznOxk", "before": { "night": "Tuna steaks out of the freezer and into the fridge. 80 g of sweetcorn in a bowl in the fridge, for tomorrow's lunches." }}
-  ],
-  "2026-11-21": [
-    { "dish": "Slow-cooker chicken tinga tacos", "deck": "1tYeTb30TmgaHOkLX1VhDDfDf6rSVzwHoXj9QPyvoTCA", "doc": "1PqVqzz6zkNLtL4IMVHdps2VBn1AG7zONaDJEMXemmKE", "before": { "morning": "Chicken thighs out of the freezer and into the fridge.", "night": "Chicken in the fridge, not the freezer, ready for Leo to start at 10:30 and have the slow cooker on by 11:00. Queso fresco, crema, and tomatillos in the fridge." }}
-  ],
-  "2026-11-22": [
-    { "dish": "Tamales with chicken tinga, and with rajas and queso fresco", "deck": "1S-6alzJCoPerqRN38hZ-F4G8hJc79jTKK4RnL04zR8M", "doc": "1DrCcVr2qtFu2OFRhGPwzrsqNfA6UpZ4VIAOAPiIo8Q8", "before": { "morning": "Little gems, radishes, coriander, a white onion, and double cream bought.", "night": "Half the tinga boxed and in the fridge." }},
-    { "dish": "Tres leches cake", "deck": "1fNvWk23QpSqCRSmLOPw3BQTCqtim87wyke_WaxKMEr4", "doc": "1gIAAy9zFSCpXM2sOP-cqyAn3u2AymAbNrrvpwTICKlc", "before": { "night": "Aurora's tres leches baked, soaked, and in the fridge overnight." }}
-  ],
   "2026-11-23": [
-    { "dish": "Cherry tomato casarecce with burrata", "deck": "1VRBluv9bEM0vfKIShZ7yyK-N2fswe88Ea19jLBu7Pn0", "doc": "1KBylqchVvGWpoGOTzRrLS9djvEaolZc_BZzXobfkgw0", "before": { "night": "Tres leches cake soaking in the fridge, covered. Four tamales in the fridge for Monday's lunch, and the rest in the freezer. Burrata in the fridge, with a use-by of Monday or later. Pancetta in the freezer if its use-by is before Sunday 29th. Basil pots on a windowsill, watered." }}
+    { "dish": "Cherry tomato casarecce with burrata", "deck": "1VRBluv9bEM0vfKIShZ7yyK-N2fswe88Ea19jLBu7Pn0", "doc": "1KBylqchVvGWpoGOTzRrLS9djvEaolZc_BZzXobfkgw0", "before": {"night": "Tres leches cake soaking in the fridge, covered. Four tamales in the fridge for Monday's lunch, and the rest in the freezer. Burrata in the fridge, with a use-by of Monday or later. Pancetta in the freezer if its use-by is before Sunday 29th. Basil pots on a windowsill, watered."} }
   ],
   "2026-11-24": [
-    { "dish": "Fish pie from the freezer, with buttered cabbage", "deck": "16r-oMaGq6pUmpWQ9zujxRmuoZfXsDH8rR8G9VlkAgu4", "doc": "1knvowc-EgYXLW26gzqLuolBt8LLb5kYNvUvsZwt5i2w", "before": { "morning": "Two portions of fish pie out of the freezer and into the fridge.", "night": "Fish pie in the fridge, not the freezer." }}
+    { "dish": "Fish pie from the freezer, with buttered cabbage", "deck": "16r-oMaGq6pUmpWQ9zujxRmuoZfXsDH8rR8G9VlkAgu4", "doc": "1knvowc-EgYXLW26gzqLuolBt8LLb5kYNvUvsZwt5i2w", "before": {"morning": "Two portions of fish pie out of the freezer and into the fridge.", "night": "Fish pie in the fridge, not the freezer."} }
   ],
   "2026-11-26": [
-    { "dish": "Pesto fusilli with potatoes and green beans", "deck": "1zXX9sbnIAxAeA1VwJ4BbeyXTJAEWs-QYVDaMN4EBc98", "doc": "1GynDhoJ8pQoLJ_B9cD-jsEeAUX_CwUNcJe_My-YW1X8", "before": { "morning": "The meatballs for Justin's lunch out of the freezer and into the fridge." }}
+    { "dish": "Pesto fusilli with potatoes and green beans", "deck": "1zXX9sbnIAxAeA1VwJ4BbeyXTJAEWs-QYVDaMN4EBc98", "doc": "1GynDhoJ8pQoLJ_B9cD-jsEeAUX_CwUNcJe_My-YW1X8", "before": {"morning": "The meatballs for Justin's lunch out of the freezer and into the fridge."} }
   ],
   "2026-11-28": [
-    { "dish": "Slow-cooker grah with Cumberland sausages", "deck": "1FSH2LIBcbgRIasZ19itM0NXPKi_80r13j2a_qS6kvPQ", "doc": "1llxAD9LvJXuCf6VAMSyCg-87BTmAYQ2VPNj2RVgNPkM", "before": { "morning": "Cumberland sausages out of the freezer and into the fridge.", "night": "Sausages in the fridge, not the freezer, ready for Leo to start at 10:15 and have the slow cooker on by 11:00." }}
+    { "dish": "Slow-cooker grah with Cumberland sausages", "deck": "1FSH2LIBcbgRIasZ19itM0NXPKi_80r13j2a_qS6kvPQ", "doc": "1llxAD9LvJXuCf6VAMSyCg-87BTmAYQ2VPNj2RVgNPkM", "before": {"morning": "Cumberland sausages out of the freezer and into the fridge.", "night": "Sausages in the fridge, not the freezer, ready for Leo to start at 10:15 and have the slow cooker on by 11:00."} }
   ],
   "2026-11-29": [
-    { "dish": "Lasagne verdi alla bolognese", "deck": "1fwmfwm2wQwLNkuBNGpQS1gwmfQ5xJzFGDMG7h95rTAA", "doc": "1QdcY4bDU0HnD5zlczolLR6tH_Hu4wkAQCq6-gJB5kAs", "before": { "morning": "Beef from the butcher, and double cream, whole milk, and salad leaves from the shop, bought. Pancetta out of the freezer and into the fridge, if it went in.", "night": "Beef, pancetta, milk, and cream in the fridge." }},
+    { "dish": "Lasagne verdi alla bolognese", "deck": "1fwmfwm2wQwLNkuBNGpQS1gwmfQ5xJzFGDMG7h95rTAA", "doc": "1QdcY4bDU0HnD5zlczolLR6tH_Hu4wkAQCq6-gJB5kAs", "before": {"morning": "Beef from the butcher, and double cream, whole milk, and salad leaves from the shop, bought. Pancetta out of the freezer and into the fridge, if it went in.", "night": "Beef, pancetta, milk, and cream in the fridge."} },
     { "dish": "Sticky toffee pudding", "deck": "1bcbJ_jzA8EAfWlRY32TPsT69uMryZ2vv2URk1fpOlEI", "doc": "1RNqreXlTVKhgPjlha5uMwVdvWm8GA5ET8QrFVJfyQLc" }
+  ],
+  "2026-11-30": [
+    { "dish": "Air-fryer prawn tacos with lime slaw and avocado crema", "deck": "1QBt5aPzdcm_PGkTFlnO0GwR2AzBUacqdFSlwAqT_YAc", "doc": "11JiLsOBicM29ItWmvJPeeNeNrdtRmKPLneANWSbbdvo", "before": {"night": "220 g of the prawns in a covered bowl in the fridge to thaw, and the rest of the bag back in the freezer. Cod loins and green beans in the freezer. Chicken thighs and diced pork in the freezer. Beef shin in the fridge, or the freezer if its use-by is before Tuesday. Lardons in the freezer if their use-by is before Sunday 6th. Two portions of lasagne boxed in the fridge for Monday's lunches."} }
+  ],
+  "2026-12-01": [
+    { "dish": "Slow-cooker beef nihari", "deck": "1r3_rNxqLG3NRrMRLeRAQ5g95bF7dTy2_s-DLuqZZZGU", "doc": "1KNybpE5BY52VaJVGAlwd9P5uv_EwEcphZCXxYPhqzu0", "before": {"morning": "Beef shin out of the freezer and into the fridge, if it went in.", "night": "Mangoes out of the freezer and into the fridge, for Leo's lassi. Slow cooker on the worktop, ready for Justin to load before leaving for Southampton."} }
+  ],
+  "2026-12-02": [
+    { "dish": "Cod, chorizo, and butter bean stew", "deck": "10VIb61cwwu3afiwMAS0ZOPJGwSCHaqsvUgQIevVO_aE", "doc": "1g2uLHyh5wCKhbphD5CcqnCyitg3RosBiBVbhv3qdCpY", "before": {"morning": "Both packs of cod loins out of the freezer and into the fridge.", "night": "Wednesday's nihari lunches boxed in the fridge, with 2 naans. The rest of the nihari in 3 boxes in the freezer."} }
+  ],
+  "2026-12-05": [
+    { "dish": "Slow-cooker char siu pork", "deck": "1HLc1100ga19DnZ7deXYhDxZumqSULoCWId7a_bB-iwI", "doc": "1B2NvRz-GPFgKLPi3jRq_Erpv5rjJLX2Pou4ZbJldtrs", "before": {"morning": "Diced pork out of the freezer and into the fridge, and Sunday's chicken thighs too.", "night": "Pork in the fridge, not the freezer, ready for Leo to start at 10:15 and have the slow cooker on by 11:00."} }
+  ],
+  "2026-12-06": [
+    { "dish": "Coq au vin with whisked mash and buttered green beans", "deck": "1iXatqD177uejK5lN6im921lmiqffWMvDG_C3ySyuiI0", "doc": "1O-CBzChwuqfPB2qQzLp8ijzbKxwoZMP6-oNvI_lYMOw", "before": {"morning": "Mushrooms, pak choi, whole milk, and double cream bought near home. Lardons out of the freezer and into the fridge, if they went in.", "night": "Chicken in its Burgundy marinade in the fridge overnight (Justin, 10 minutes: step 1 of the recipe)."} },
+    { "dish": "Pear and almond tart", "deck": "1p4WaYghrJdW8k5fiFFVfzpBB24w5XBo0ZnSzy64PeHY", "doc": "1pcAhgwxlemcP_lfhcCYjrzIxZNUVKhLsVnjvZ5b0kP8" }
   ]
 }
